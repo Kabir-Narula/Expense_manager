@@ -12,6 +12,9 @@
 ## Project Description
 Our group will be developing a budgeting website. This website will feature tools that allow users to track how much money they are making or losing per month. The main tools will include: a dashboard that displays their monthly loss or savings with options for creating or adding expenses, a page for adding expenses, and a page for adding income. 
 
+### Home Login Screen
+This screen acts as an login screen where user can login with its password and email, and therefore can logout later in the other screens
+
 ### Dashboard
 The dashboard will be on the home page for the user. Users will be able to view how much money they are losing or saving per month. They will also have options for creating expenses or income for a designated month.
 
