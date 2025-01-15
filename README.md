@@ -26,13 +26,16 @@ Users will be able to add a title, description, and cost associated with the exp
 
 ## Tech Stack 
 ### Backend
-The backend will run on Node.js and will use an Express.js network to process HTTP requests. All of the users data will be stored in MongoDB Atlas. 
+The backend will run on Node.js and will use an Express.js network to process HTTP requests. 
 
 ### Frontend
-The Frontend will be made using React-Bootstrap. 
+The Frontend will be made using React-Bootstrap, and other Ui libraries such as Shadecn, MaterialUI and Tailwind. 
+
+### Database
+The database will run using either MongoDB or Sql combined with Prisma or drizzle.
 
 ### Developing tools. 
-The website will be developed using Visual Studio Code with a number of npm installations. We will use Postman and THunder Client to test HTTP requests. 
+The website will be developed using Visual Studio Code with a number of npm installations. We will use Postman and Thunder Client to test HTTP requests. 
 
 
 
