@@ -26,7 +26,7 @@ Users will be able to add a title, description, and cost associated with the exp
 The backend will run on Node.js and will use an Express.js network to process HTTP requests. All of the users data will be stored in MongoDB Atlas. 
 
 ### Frontend
-The Frontend will be made using Reat-Bootstrap. 
+The Frontend will be made using React-Bootstrap. 
 
 ### Developing tools. 
 The website will be developed using Visual Studio Code with a number of npm installations. We will use Postman and THunder Client to test HTTP requests. 
