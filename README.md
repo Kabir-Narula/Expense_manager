@@ -5,7 +5,7 @@
 |---|---|---|---|
 |Sean Muniz | Back-End Dev | seanMuniz | smuniz@myseneca.ca |
 |Cris Huynh | Back-End Dev | CrisH2307 | xhuynh@myseneca.ca | 
-|Sukhman Hara | Front-End Dev | shara11 |shara1@myseneca.ca |
+|Sukhman Hara | Front-End Dev | shara111 |shara1@myseneca.ca |
 |Kabir Narula | Front-End Dev | Kabir-Narula | knarula9@myseneca.ca|
 
 
