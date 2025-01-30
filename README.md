@@ -19,7 +19,6 @@ To provide users with a comprehensive and organized experience, our budgeting to
 The dashboard will be the central hub for users to visualize and analyze their financial data. Key views that will be provided include:
 - **Pie Charts:** Visual representation of expenses broken down by category. Users can quickly identify which categories consume the largest portion of their budget.
 - **Bar Charts:** A month-over-month comparison of income and expenses to track trends over time.
-- **Line Graphs:** Insights into cumulative savings or deficits for a given period.
 - **Summary Table:** A detailed breakdown of all income and expenses for the current month, categorized and itemized.
 
 ### Multi-Account Support
