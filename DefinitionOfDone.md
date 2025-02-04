@@ -1,33 +1,44 @@
 # Definition of Done
 ### Purpose:
 
-This document is needed so that we have a defined criteria for what is needed for our working agreement to be considered complete. 
+This document establishes the criteria required for our working agreement to be considered complete. It ensures clarity, alignment, and accountability within the team, serving as a guiding reference for project completion standards.
+
+### A user story is considered done when:
++ Met the acceptance criteria.
++ The code has been peer-reviewed and approved.
++ Code is merged into the main branch with passing tests.
++ The functionality is demonstrated and validated in a testing or staging environment.
++ Required documentation was completed.
++ No open bugs are associated with the story.
 
 #### 1. Communication:
-+ A communication method must be specified.
-+ A time, place, and date should be defined for when, where, and how our meetings will be done.
-+ The working agreement should describe the frequency at which group members will provide updates.
-
++ A primary communication method must be specified.
++ A schedule, including time, place, and format of meetings, must be defined.
++ The agreement must outline the frequency and method of progress updates among group members.
++ 
 #### 2. Task Management
-+ Should describe how tasks will be delegated and and what tools will be used for creating, assigning, and tracking tasks.
-+ Should describe how group members will handle events where tasks cannot be completed on time.
-+ Should describe how code updates will be handled and who will be the one to examine and approve changes. 
++ The process for task delegation must be clearly described.
++ The tools used for task creation, assignment, and tracking must be specified.
++ A protocol must be established for handling delays in task completion.
++ The procedure for updating code, including review and approval responsibilities, must be defined.
 
 #### 3. Decision Making: 
-+ Should describe how major decisions will be handled.
-+ Should describe how smaller assigned tasks should be handled. 
-+ Should describe how differences in opinions will be handled.
++ The process for making major decisions must be outlined.
++ Guidelines for handling smaller, individual tasks must be documented.
++ A conflict-resolution strategy must be included to address differing opinions within the team.
 
 #### 4. Availability and Commitments: 
-+ This section should describe how long members are expected to work on the projetc per week.
-+ This section should describe how to handle events in which members cannot commit to doing work due to personal or other obligations.
++ Expected weekly working hours for each team member must be defined.
++ A plan must be in place for handling situations where members cannot fulfill their commitments due to personal or external obligations.
   
 #### 5. Code Standards: 
-+ The working agreement should describe the standards that should be held in order to produce code that is readable and maintainable.
-+ It should also describe how group members will ensure that these standards are met. 
++ The agreement must outline coding standards to ensure readability, maintainability, and consistency.
++ A method for enforcing these standards among team members must be described.
 
 #### 6. Respect and Collaboration 
-+ The agreement should describe how to uphold respect and collaboration amongst group members to ensure that everyone can work in a safe environment. 
++ The document must establish guidelines to promote respect and teamwork among members.
++ Expectations for maintaining a professional and inclusive work environment must be set.
 
 #### 7. Conflict Resolution
-+ This section should describe how group members will handle disagreements to avoid any further escalation of conflict. 
++ A structured approach for handling disagreements and conflicts must be documented to prevent escalation and ensure productive resolutions.
+
