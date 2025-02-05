@@ -1,13 +1,39 @@
 # Definition of Done
-### Purpose:
+## Purpose:
 
-This document establishes the criteria required for our working agreement to be considered complete. It ensures clarity, alignment, and accountability within the team, serving as a guiding reference for project completion standards.
+This document establishes the standard that all work must meet in order to be considered complete.
 
-### A user story is considered done when:
-+ Met the acceptance criteria.
-+ The code has been peer-reviewed and approved.
-+ Code is merged into the main branch with passing tests.
-+ The functionality is demonstrated and validated in a testing or staging environment.
-+ Required documentation was completed.
-+ No open bugs are associated with the story.
+### Code Implementation
+- Features are implemnted in accordance to the acceptance criteria.
+- Code is written in accordance to best practices and is properly formatted using
+  tools like Prettier.
+- Any new features are implemented on a separate branch, reviewed, and approved via a pull request.
+
+### Testing 
+- Unit tests must be written and all features must pass these unit tests.
+- Manual testing has been performed and functionality has been validated.
+- No bugs or issues remain when merged onto the main branch.
+
+### Documentation 
+- Code has sufficient documentation with comments that explain functionality and
+  reasoning behind why code is written the way it is.
+- .md files should be provided to give explinations for certain folders with any
+  documentation that is required.
+
+### Security
+- User passwords should be hashed.
+- No other security vulnerabilities are introduced.
+
+### Deployment
+- When ready, all features must be merged onto the main branch.
+- Project is containerized using Docker.
+
+### Business Requirements
+- All features meet the business requirements and needs of all user stories.
+- UI/UX design is reviewed and aligns with business requirements.
+- Feedback from stakeholders (Marcel Jar) are incorporated. 
+
+
+  
+
 
