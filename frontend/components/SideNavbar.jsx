@@ -64,8 +64,7 @@ const SideNavbar = () => {
                     flex-col 
                     justify-between 
                     transition-transform duration-300
-                    md:m-5 
-                    ${isSmallScreen ? "translate-x-0 rounded-none" : "-translate-x-full md:translate-x-0 sm:rounded-l-lg md:rounded-l-lg"}`}
+                    ${isSmallScreen ? "translate-x-0 rounded-none" : "-translate-x-full md:translate-x-0"}`}
                     ref={sideNavBar}>
       <div>
       {/* Logo */}
