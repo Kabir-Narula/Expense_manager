@@ -1,138 +1,96 @@
-import "../src/App";
-import "../src/App.css"
+import "../src/App.css";
 import { CgMenuGridO } from "react-icons/cg";
-import { MdAttachMoney } from "react-icons/md";
+import { MdAttachMoney, MdBarChart } from "react-icons/md";
 import { FaHandHoldingUsd } from "react-icons/fa";
-import { RiLogoutBoxLine } from "react-icons/ri";
+import { RiLogoutBoxLine, RiDashboardLine } from "react-icons/ri";
 import { Link, useLocation } from "react-router-dom";
-import { RiTailwindCssFill } from "react-icons/ri";
-import { FiMenu } from "react-icons/fi"; // Hamburger icon
+import { FiMenu } from "react-icons/fi";
 import { useState, useRef, useEffect } from "react";
 
-
-
 const SideNavbar = () => {
+  const location = useLocation();
+  const [isSmallScreen, setIsSmallScreen] = useState(true);
+  const sideNavBar = useRef(null);
 
-    // useLocation hook will be used to apply conditional rendering 
-    // on a link when the user is on that page. 
-    const location = useLocation()
-
-    const [isSmallScreen, setIsSmallScreen] = useState(true)
-
-    const sideNavBar = useRef(null);
-
-    // this will close the sidebar when clicking outside of it
-    useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (sideNavBar.current && !sideNavBar.current.contains(event.target)) {
-          setIsSmallScreen(false); // Close the sidebar if click is outside
-        }
-      };
-      
-      // Add event listener for clicks
-      document.addEventListener("mousedown", handleClickOutside);
-  
-      // Clean up the event listener when the component is unmounted
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }, []);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sideNavBar.current && !sideNavBar.current.contains(event.target)) {
+        setIsSmallScreen(false);
+      }
+    };
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <>
-    {/* 'fixed' ensures that the button stays in the same position when scrolling
-          'md:hidden ensures that the button is hidden when the screen is larger than medium 
-          
-          ${isSmallScreen ? "hidden" : "md:hidden"
+      <button 
+        className={`fixed top-5 left-5 z-50 p-2.5 rounded-lg bg-indigo-700 hover:bg-indigo-600 shadow-lg transition-all md:hidden ${
+          isSmallScreen ? "hidden" : "md:hidden"
+        }`}
+        onClick={() => setIsSmallScreen(!isSmallScreen)}
+      >
+        <FiMenu className="w-6 h-6 text-white" />
+      </button>
 
-          for that code above, understand that if isSmallScreen is true, the hamburger menu button will be completely hidden. 
-          however, if it is false, then the the hamburger menu will only be hidden if the screen is md or more. In other words, 
-          it will only appear for screens smaller than md (small screen). 
+      <div
+        ref={sideNavBar}
+        className={`bg-indigo-900 h-screen p-6 fixed w-72 flex flex-col justify-between transition-all duration-300 ${
+          isSmallScreen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}
+      >
+        <div>
+          {/* Logo Section */}
+          <div className="flex items-center mb-12 ml-2">
+            <RiDashboardLine className="w-8 h-8 text-indigo-400" />
+            <span className="ml-3 text-xl font-semibold text-white">FinDashboard</span>
+          </div>
 
-          */}
-    <button className={`fixed m-5 text-white bg-indigo-600 p-2 rounded-md md:hidden z-50 ${isSmallScreen ? "hidden" : "md:hidden"}`} onClick={()=>{setIsSmallScreen(!isSmallScreen)}}>
-      <FiMenu className="w-8 h-8" />
-    </button>
+          {/* Navigation Links */}
+          <nav className="space-y-1.5">
+            {[
+              { to: '/', icon: <CgMenuGridO />, text: 'Dashboard' },
+              { to: '/income', icon: <MdAttachMoney />, text: 'Income' },
+              { to: '/expenses', icon: <FaHandHoldingUsd />, text: 'Expenses' },
+              { to: '/charts', icon: <MdBarChart />, text: 'Analytics' },
+              { to: '/logout', icon: <RiLogoutBoxLine />, text: 'Log Out' },
+            ].map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`flex items-center px-4 py-3.5 rounded-xl text-indigo-200 hover:bg-indigo-800 hover:text-white transition-all group ${
+                  location.pathname === link.to ? "bg-indigo-800 text-white border-l-4 border-indigo-400" : ""
+                }`}
+              >
+                <span className={`text-xl mr-4 group-hover:text-indigo-300 ${
+                  location.pathname === link.to ? "text-indigo-300" : "text-indigo-400"
+                }`}>
+                  {link.icon}
+                </span>
+                <span className="text-sm font-medium tracking-wide">{link.text}</span>
+              </Link>
+            ))}
+          </nav>
+        </div>
 
-
-    <div className={`bg-indigo-600 
-                    h-screen p-5 
-                    fixed
-                    w-72 
-                    pt-5 
-                    flex 
-                    flex-col 
-                    justify-between 
-                    transition-transform duration-300
-                    ${isSmallScreen ? "translate-x-0 rounded-none" : "-translate-x-full md:translate-x-0"}`}
-                    ref={sideNavBar}>
-      <div>
-      {/* Logo */}
-      <RiTailwindCssFill className="w-12 h-12 mb-10 fill-white"/>
-      
-        {/* Overview link */}
-        <Link
-          to='/'
-          className={`flex items-center 
-                    my-4 
-                    rounded-xl
-                     p-1 
-                    text-indigo-200
-                     ${location.pathname === "/" ? "bg-indigo-700 text-white" : ""}`}
-        >
-          <CgMenuGridO className='mr-5 size-10' />
-          <h3>Dashboard</h3>
-        </Link>
-
-        {/* Income */}
-        <Link
-          to='/income'
-          className={`flex items-center 
-            my-4 
-            rounded-xl
-             p-1 
-             text-indigo-200
-             ${location.pathname === "/income" ? "bg-indigo-700 text-white" : ""}`}
-        >
-          <MdAttachMoney className='mr-5  size-10' />
-          <h3>Income</h3>
-        </Link>
-        {/* Expenses */}
-        <Link
-          to='/expenses'
-          className={`flex items-center 
-            my-4 
-            rounded-xl
-             p-1 
-             text-indigo-200
-             ${location.pathname === "/expenses" ? "bg-indigo-700 text-white" : ""}`}
-        >
-          <FaHandHoldingUsd className='mr-5 size-10' />
-          <h3>Expenses</h3>
-        </Link>
-        {/* logout */}
-        <Link
-          to='/logout'
-          className={`flex items-center 
-            my-4 
-            rounded-xl
-             p-1 
-             text-indigo-200
-             ${location.pathname === "/logout" ? "bg-indigo-700 text-white" : ""}`}
-        >
-          <RiLogoutBoxLine className='mr-5 size-10' />
-          <h3>Log Out</h3>
-        </Link>
+        {/* User Profile */}
+        <div className="border-t border-indigo-700 pt-4">
+          <div className="flex items-center px-2">
+            <img
+              className="w-10 h-10 rounded-full border-2 border-indigo-400"
+              src="https://t3.ftcdn.net/jpg/02/99/04/20/360_F_299042079_vGBD7wIlSeNl7vOevWHiL93G4koMM967.jpg"
+              alt="User profile"
+            />
+            <div className="ml-3">
+              <p className="text-sm font-medium text-white">Sean Muniz</p>
+              <p className="text-xs text-indigo-400">Administrator</p>
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="flex items-center">
-        <img
-            className='w-12 h-12 rounded-full object-cover mr-5'
-            src='https://t3.ftcdn.net/jpg/02/99/04/20/360_F_299042079_vGBD7wIlSeNl7vOevWHiL93G4koMM967.jpg'
-          />
-          <h1 className='text-white'>Sean Muniz</h1>
-      </div>
-    </div>
     </>
   );
 };
+
 export default SideNavbar;
