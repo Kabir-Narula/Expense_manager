@@ -50,8 +50,9 @@ const SideNavbar = () => {
       <div
         ref={sideNavBar}
         className={`bg-indigo-900 h-screen p-6 fixed w-72 flex flex-col justify-between transition-all duration-300 ${
-          isSmallScreen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        }`}
+          isSmallScreen ? "translate-x-0" : "-translate-x-full md:translate-x-0"} z-40`
+        
+        }
       >
         <div>
           {/* Logo Section */}
