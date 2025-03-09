@@ -12,16 +12,29 @@ const SideNavbar = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(true);
   const sideNavBar = useRef(null);
 
+  const [user, setUser] = useState({});
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (sideNavBar.current && !sideNavBar.current.contains(event.target)) {
         setIsSmallScreen(false);
       }
     };
-    
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(()=> {
+    fetch("http://localhost:8080/api/auth/67cd1588c8c7508d8eeb1596")
+    .then((response) => response.json())
+    .then((data) => {
+      setUser(data.user);
+      console.log(data);
+    })
+    .catch((error) => console.log("error fetching data: ", error));    
+  },[])
+
 
   return (
     <>
@@ -79,16 +92,17 @@ const SideNavbar = () => {
           <div className="flex items-center px-2">
             <img
               className="w-10 h-10 rounded-full border-2 border-indigo-400"
-              src="https://t3.ftcdn.net/jpg/02/99/04/20/360_F_299042079_vGBD7wIlSeNl7vOevWHiL93G4koMM967.jpg"
+              src={user.profileImageURL}
               alt="User profile"
             />
             <div className="ml-3">
-              <p className="text-sm font-medium text-white">Sean Muniz</p>
+              <p className="text-sm font-medium text-white">{user.fullName}</p>
               <p className="text-xs text-indigo-400">Administrator</p>
             </div>
           </div>
         </div>
       </div>
+
     </>
   );
 };
