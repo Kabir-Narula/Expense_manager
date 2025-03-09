@@ -1,10 +1,10 @@
-import React from "react";
+// import React from "react";
 import { FiArrowUpRight, FiPlus } from "react-icons/fi";
 import { MdAttachMoney, MdOutlineReceiptLong, MdSavings } from "react-icons/md";
 
 function Income() {
   return (
-    <div className="ml-72 p-8 min-h-screen bg-gray-50">
+    <div className="md:ml-72 md:pt-8 pt-20 p-8 min-h-screen bg-gray-50">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>

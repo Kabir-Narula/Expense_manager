@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import { FiArrowUpRight, FiArrowDownRight, FiDollarSign } from "react-icons/fi";
 import { MdSavings, MdAttachMoney, MdOutlineSavings } from "react-icons/md";
 
@@ -19,7 +19,7 @@ function Dashboard() {
   ];
 
   return (
-    <div className="ml-72 p-8 min-h-screen bg-gray-50">
+    <div className="md:ml-72 md:pt-8 pt-20 p-8 min-h-screen bg-gray-50">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
