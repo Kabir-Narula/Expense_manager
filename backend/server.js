@@ -1,9 +1,15 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
+import dotenv from 'dotenv'
+import express from 'express'
+import cors from 'cors'
+import path from 'path'
+import connectDB from './config/db.js'
+
+import authRoutes from './routes/authRoutes.js'
+
 
 const app = express();
+dotenv.config({path: path.resolve('./.env')});
+
 
 // Middleware CORS
 app.use(
@@ -16,5 +22,11 @@ app.use(
 
 app.use(express.json());
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.use('/api/auth',authRoutes);
+
+
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () =>{
+  connectDB(); 
+  console.log(`Server running on port ${PORT}`)
+});
