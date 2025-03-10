@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import { 
   BarChart, 
   LineChart, 
@@ -47,7 +47,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'];
 
 function FinancialCharts() {
   return (
-    <div className="ml-72 p-8 min-h-screen bg-gray-50">
+    <div className="md:ml-72 md:pt-8 pt-20 p-8 min-h-screen bg-gray-50">
       <h1 className="text-3xl font-bold text-gray-800 mb-8">Financial Analytics</h1>
       
       {/* Income vs Expenses Trend Chart */}
