@@ -1,32 +1,34 @@
 import User from "../models/User.js";
-import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 
+// Generate JWT Token
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+};
 
-// Get user info
+// Register User
+export const registerUser = async (req, res) => {
+  const { fullName, email, password, profileImageUrl } = req.body;
 
-export const getUserInfo = async (req, res) => {
-    try{
-        const { id } = req.params;
+  // Validation: Check for missing fields
+  if (!fullName || !email || !password) return res.status(400).json({ message: "All fields are required" });
 
-        console.log("extracted id", id)
+  try {
+    // Check if mail already exists
+    const existingUser = await User.findOne({ email });
 
-        if (!mongoose.Types.ObjectId.isValid(id)){
-            console.log(id);
-            return res.status(400).json({success: false, message: "invalid user id"})
-        }
+    if (existingUser) return res.status(400).json({ message: "Email already in use" });
 
-        const user = await User.findById(id).exec();
+    // Create user
+    const user = await User.create({
+      fullName,
+      email,
+      password,
+      profileImageUrl,
+    });
 
-        if (!user) {
-            return res.status(404).json({ success: false, message: "User not found" });
-        }
-
-        return res.status(200).json({user});
-
-
-    } catch(error) {
-        res.status(500).json({success: false, message: "server error"});
-    }
-}
-
-export default getUserInfo
+    res.status(201).json({ id: user._id, user, token: generateToken(user._id) });
+  } catch (err) {
+    res.status(500).json({ message: "Error registering user", error: err.message });
+  }
+};

@@ -1,8 +1,8 @@
-import express from 'express'
-import { getUserInfo } from '../controllers/authController.js'; // Named imports
+import express from "express";
+import { registerUser } from "../controllers/authController.js";
 
 const router = express.Router();
 
-router.get("/:id", getUserInfo);
+router.post("/register", registerUser);
 
-export default router
+export default router;
