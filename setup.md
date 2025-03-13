@@ -26,7 +26,7 @@ Please setup by type this command:
 `npm install`
 
 Enviroment file has to be followed by these step:
-1. Connect mongodb by clicking connect button, the URI will appear then copy into the .env:
+1. Connect mongodb by clicking connect button, the URI will appear then copy this value into the .env:
 
 + `MONGO_URI=mongodb+srv://me:23L0zmsuNLjTPFs1@expenses-tracker.pm9qh.mongodb.net/expense_tracker_db?retryWrites=true&w=majority&appName=expenses-tracker`
 2. Every local computer needs to get a JWT to connect to the mongo, use this command to create a password:
