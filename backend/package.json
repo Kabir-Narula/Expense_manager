@@ -7,5 +7,9 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.12.1"
   },
+  "scripts": {
+    "start": "node server.js",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+  },
   "type": "module"
 }
