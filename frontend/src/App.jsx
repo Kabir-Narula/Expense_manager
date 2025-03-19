@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from "react-router-dom";
 import "./App.css";
 
 import SideNavbar from "../components/SideNavbar";
@@ -6,21 +6,37 @@ import Dashboard from "../pages/Dashboard";
 import Expenses from "../pages/Expenses";
 import Income from "../pages/Income";
 import Logout from "../pages/Logout";
-import Charts from "../pages/Charts"; // Import Charts Page
+import Charts from "../pages/Charts";
+import Login from "../pages/Auth/Login";
+import Signup from "../pages/Auth/Signup";
 
-function App() {
+const App = () => {
+  const location = useLocation();
+  const showNavbar = location.pathname !== "/login" && location.pathname !== "/signup";
+
   return (
-    <Router>
-      <SideNavbar />
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/expenses" element={<Expenses />} />
-        <Route path="/income" element={<Income />} />
-        <Route path="/logout" element={<Logout />} />
-        <Route path="/charts" element={<Charts />} /> {/* Added Charts Route */}
-      </Routes>
-    </Router>
+    <div className="app-container">
+      {showNavbar && <SideNavbar />}
+      <div className={`main-content ${showNavbar ? 'with-sidebar' : ''}`}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/expenses" element={<Expenses />} />
+          <Route path="/income" element={<Income />} />
+          <Route path="/logout" element={<Logout />} />
+          <Route path="/charts" element={<Charts />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+        </Routes>
+      </div>
+    </div>
   );
-}
+};
 
-export default App;
+const AppWrapper = () => (
+  <Router>
+    <App />
+  </Router>
+);
+
+export default AppWrapper;
