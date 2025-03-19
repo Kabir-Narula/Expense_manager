@@ -1,67 +1,65 @@
 import React, { useState } from "react";
-import AuthLayout from "../../components/layouts/AuthLayout";
 import { Link, useNavigate } from "react-router-dom";
+import AuthLayout from "../../components/layouts/AuthLayout";
 import Input from "../../components/Inputs/Input";
-import { validateEmail } from "../../src/Utils/helper";
+import api from "../../src/Utils/api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
   const navigate = useNavigate();
 
-  //Handle Login Form Submit
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    if (!validateEmail(email)) {
-      setError("Please enter a valid email address.");
-      return;
+    try {
+      const { data } = await api.post("/login", { email, password });
+      localStorage.setItem("token", data.token);
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed");
     }
-
-    if (!password) {
-      setError("Please enter the password");
-      return;
-    }
-
-    setError("");
-
-    //Login API Call
   };
 
   return (
     <AuthLayout>
-      <div className='lg:w-[70%] h-3/4 md:h-full flex flex-col justify-center'>
-        <h3 className='text-xl font-semibold text-black'>Welcome Back</h3>
-        <p className='text-xs text-slate-700 mt-[5px] mb-6'>
-          Please enter your details to log in
-        </p>
-        <form onSubmit={handleLogin}>
-          <Input
-            value={email}
-            onChange={({ target }) => setEmail(target.value)}
-            label='Email Address'
-            placeholder='john@example.com'
-            type='text'
-          />
-          <Input
-            value={password}
-            onChange={({ target }) => setPassword(target.value)}
-            label='Password'
-            placeholder='min 8 characters'
-            type='password'
-          />
-          {error && <p className='text-red-500 text-xs pb-2.5'>{error}</p>}
+      <div className="w-full max-w-md mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+          <p className="text-sm text-gray-600">Track your expenses efficiently</p>
+        </div>
 
-          <button type='submit' className='btn-primary'>
-            LOGIN
+        <form onSubmit={handleLogin} className="space-y-6">
+          <Input
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            label="Email Address"
+            placeholder="john@example.com"
+          />
+
+          <Input
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            label="Password"
+            placeholder="••••••••"
+            type="password"
+          />
+
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          <button
+            type="submit"
+            className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90"
+          >
+            Sign In
           </button>
 
-          <p className='text-[13px] text-slate-800 mt-3'>
-            Don’t have an account?{" "}
-            <Link className='font-medium text-primary underline' to='/signup'>
-              SignUp
+          <p className="text-center text-sm text-gray-600">
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-primary font-semibold hover:underline">
+              Sign up
             </Link>
           </p>
         </form>
