@@ -7,17 +7,19 @@ import authRoutes from "./routes/authRoutes.js";
 // Configure environment variables
 dotenv.config();
 
+app.use(cors());
+
 const app = express();
 
 // CORS Configuration
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173", // Match frontend port
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true
-  })
-);
+// app.use(
+//   cors({
+//     origin: process.env.CLIENT_URL || "http://localhost:5173", // Match frontend port
+//     methods: ["GET", "POST", "PUT", "DELETE"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//     credentials: true
+//   })
+// );
 
 // Middleware
 app.use(express.json());
