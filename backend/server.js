@@ -9,15 +9,17 @@ dotenv.config();
 
 const app = express();
 
+app.use(cors())
+
 // CORS Configuration
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173", // Match frontend port
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true
-  })
-);
+// app.use(
+//   cors({
+//     origin: process.env.CLIENT_URL || "http://localhost:5173", // Match frontend port
+//     methods: ["GET", "POST", "PUT", "DELETE"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//     credentials: true
+//   })
+// );
 
 // Middleware
 app.use(express.json());
