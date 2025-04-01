@@ -11,6 +11,8 @@ app.use(cors());
 
 const app = express();
 
+app.use(cors())
+
 // CORS Configuration
 // app.use(
 //   cors({
