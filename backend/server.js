@@ -7,11 +7,9 @@ import authRoutes from "./routes/authRoutes.js";
 // Configure environment variables
 dotenv.config();
 
-app.use(cors());
 
 const app = express();
-
-app.use(cors())
+app.use(cors());
 
 // CORS Configuration
 // app.use(
