@@ -3,10 +3,10 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
+import incomeRoutes from "./routes/incomeRoutes.js";
 
 // Configure environment variables
 dotenv.config();
-
 
 const app = express();
 app.use(cors());
@@ -26,6 +26,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/income", incomeRoutes);
 
 // Server setup
 const PORT = process.env.PORT || 8000;
