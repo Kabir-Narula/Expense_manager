@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
+import expenseRoutes from "./routes/expenseRoutes.js"
 
 // Configure environment variables
 dotenv.config();
@@ -26,6 +27,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/expense", expenseRoutes);
 
 // Server setup
 const PORT = process.env.PORT || 8000;
