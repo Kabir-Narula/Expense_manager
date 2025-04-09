@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import Income from "../models/Income.js";
 import { json } from "express";
 
-// Add Income
+// Add Income # CRIS SPRINT 4
 export const addIncome = async (req, res) => {
   const userId = req.user.id;
 
@@ -28,7 +28,7 @@ export const addIncome = async (req, res) => {
   }
 };
 
-// Get Income
+// Get Income # CRIS SPRINT
 export const getAllIncome = async (req, res) => {
   const userId = req.user.id;
 
@@ -40,7 +40,7 @@ export const getAllIncome = async (req, res) => {
   }
 };
 
-// Delete Income
+// Delete Income # CRIS SPRINT 4
 export const deleteIncome = async (req, res) => {
   try {
     await Income.findByIdAndDelete(req.params.id);
@@ -49,7 +49,7 @@ export const deleteIncome = async (req, res) => {
     res.status(500).json({ message: error });
   }
 };
-// Update Income
+// Update Income # SUKHMAN Sprint 4
 export const updateIncome = async (req, res) => {
   const userId = req.user.id;
   const incomeId = req.params.id;
