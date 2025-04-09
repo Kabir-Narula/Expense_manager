@@ -1,4 +1,5 @@
-import Expense from "../models/Expense.js";
+
+import Expense from "../models/Expense.js"
 
 // Add Expense
 export const addExpense = async (req, res) => {
@@ -27,49 +28,25 @@ export const addExpense = async (req, res) => {
   }
 };
 
-// // Get All Expenses (For Logged-in User)
-// export const getAllExpenses = async (req, res) => {
-//   const userId = req.user.id;
+export const getAllExpense = async (req, res) => {
+    const userId = req.user.id
+    try {
+        console.log(userId)
+        const expense = await Expense.find({userId}).sort({date: -1});
+        res.status(200).json(expense);
 
-//   try {
-//     const expenses = await Expense.find({ userId }).sort({ date: -1 });
-//     res.json(expenses);
-//   } catch (error) {
-//     res.status(500).json({ message: "Server Error" });
-//   }
-// };
+    } catch (err) {
+        res.status(500).json({message: "Server Error"});
+    }
+}
 
-// // Delete Expense
-// export const deleteExpense = async (req, res) => {
-//   try {
-//     await Expense.findByIdAndDelete(req.params.id);
-//     res.json({ message: "Expense deleted successfully" });
-//   } catch (error) {
-//     res.status(500).json({ message: "Server Error" });
-//   }
-// };
+export const updateExpense = async (req, res) => {
+    const id = req.user.id
+    try{
+        const result = await Expense.updateOne({userId: id}, {$set: req.body}, {upsert: true});
+        res.status(200).json(result);
+    } catch (err){
+        res.status(500).json({message: "Server Error"})
+    }
+}
 
-// // Download Expense Details in Excel
-// export const downloadExpenseExcel = async (req, res) => {
-//   const userId = req.user.id;
-//   try {
-//     const expenses = await Expense.find({ userId }).sort({ date: -1 });
-
-//     const data = expenses.map((item) => ({
-//       Category: item.category,
-//       Amount: item.amount,
-//       Date: item.date,
-//     }));
-
-//     const wb = xlsx.utils.book_new();
-//     const ws = xlsx.utils.json_to_sheet(data);
-//     xlsx.utils.book_append_sheet(wb, ws, "Expense");
-
-//     const filename = 'expense_details.xlsx';
-//     xlsx.writeFile(wb, filename);
-
-//     res.download(filename);
-//   } catch (error) {
-//     res.status(500).json({ message: "Server Error" });
-//   }
-// };

@@ -1,17 +1,17 @@
-// expenseRoutes.js (ESM version)
+export default router;
+import express from "express"
+import {
+    getAllExpense,
+    updateExpense,
+    addExpense
+} from "../controllers/expenseController.js";
 
-import express from 'express';
-import { addExpense /* , getExpenses, updateExpense, deleteExpense, downloadExpenseExcel */ } from '../controllers/expenseController.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { protect } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
-// Routes
 router.post('/add', protect, addExpense);
-
-// Future Routes:
-// router.get('/', protect, getExpenses);
-// router.put('/:id', protect, updateExpense);
-// router.delete('/:id', protect, deleteExpense);
-// router.get('/download', protect, downloadExpenseExcel);
+router.get("/get", protect, getAllExpense);
+router.put("/put", protect, updateExpense);
 
 export default router;
+

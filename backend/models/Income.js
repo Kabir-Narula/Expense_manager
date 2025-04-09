@@ -1,0 +1,13 @@
+import mongoose from "mongoose";
+
+const IncomeSchema = new mongoose.Schema(
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", require: true },
+    icon: { type: String },
+    source: { type: String, require: true },
+    amount: { type: Number, require: true },
+    date: { type: Date, default: Date.now },
+  },
+  { timestamps: true }
+);
+export default mongoose.model("Income", IncomeSchema);
