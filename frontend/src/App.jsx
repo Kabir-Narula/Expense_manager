@@ -9,6 +9,7 @@ import Logout from "../pages/Logout";
 import Charts from "../pages/Charts";
 import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/Signup";
+import EditIncome from "../components/EditIncome";
 
 const App = () => {
   const location = useLocation();
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="/charts" element={<Charts />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/edit-income" element={<EditIncome /> } />
         </Routes>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import api from "../src/Utils/api";
 import { MdAttachMoney, MdSavings } from "react-icons/md";
 import { FiDollarSign } from "react-icons/fi";
