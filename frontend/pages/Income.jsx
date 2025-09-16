@@ -2,7 +2,7 @@
 import { FiArrowUpRight, FiPlus } from "react-icons/fi";
 import { MdAttachMoney, MdOutlineReceiptLong, MdSavings } from "react-icons/md";
 import { useState } from "react";
-import EditIncome from "../components/EditIncome"
+import EditIncome from "../components/AddSource"
 
 function Income() {
 
@@ -23,6 +23,7 @@ function Income() {
             onClick={() => {
               setOpen(true) 
               console.log(open)
+              console.log("Income")
             }}
           >
             
