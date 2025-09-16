@@ -146,4 +146,19 @@ describe("Protected Routes", () => {
     // Assert the mocked sidebar is visible on protected pages, indicating we did not land on /login
     expect(await screen.findByLabelText("mock-logout")).toBeInTheDocument();
   });
+
+  // Tiny tests for alias '/analytics'
+  it("redirects to /login when visiting /analytics without a token", async () => {
+    goTo("/analytics");
+    render(<AppWrapper />);
+    expect(await screen.findByText(/Welcome Back/i)).toBeInTheDocument();
+  });
+
+  it("renders Charts when visiting /analytics with a token", async () => {
+    window.localStorage.setItem("token", "abc");
+    goTo("/analytics");
+    render(<AppWrapper />);
+    // Charts page has heading 'Financial Analytics'
+    expect(await screen.findByText(/Financial Analytics/i)).toBeInTheDocument();
+  });
 });
