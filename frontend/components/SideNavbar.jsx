@@ -21,7 +21,7 @@ const SideNavbar = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const { data } = await api.get("/getUser");
+        const { data } = await api.get("/auth/getUser");
         console.log("In here")
         setUser(data);
       } catch (error) {

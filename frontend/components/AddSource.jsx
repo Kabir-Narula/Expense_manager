@@ -1,28 +1,35 @@
 import { useState } from "react"
-import api from "../src/Utils/api"
+import api from "../src/Utils/api";
+
 export default function EditIncome ({open, closeModal }) {
-
-    const [source, setSource] = useState("");
-    const [amount, setAmount] = useState(0)
-
-    const handleChange = (e) => {
-        setAmount(e.target.value);
-    }
-
-    const handleSave = async () => {
-        if (amount <= 0) {
-            console.log("please enter a valid amount")
+    const [sourceUI, setSourceUI] = useState("");
+    const [amountUI, setAmountUI] = useState(null);
+    const [dateUI, setDateUI] = useState("");
+    const [showError, setShowError] = useState(false); 
+    const [errorMessage, setErrorMessage] = useState("");
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const floatVal = parseFloat(amountUI)
+            let cents;
+            cents = Math.round(floatVal * 100) 
+            const expenseData = {
+                icon:"",
+                source: sourceUI,
+                amount: cents,
+                date: dateUI,
+            };
+            let res = await api.post("/income/add", expenseData);
+            if (res.status === 200) {
+                closeModal();
+            }
+        } catch (error) {
+            console.log(JSON.stringify(error, null, 2));
+            setShowError(true);
+            setErrorMessage(error.response.data.message);
         }
-        const floatVal = parseFloat(amount)
-        if (!isNaN(floatVal)) {
-            const cents = Math.round(floatVal * 100);
-            setAmount(0)
-            const res = await api.post("/add")
-        }
     }
-
     if (!open) return null
-
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75">
             <div className="flex flex-col bg-white justify-center gap-5 p-5 rounded-xl shadow-xl w-full max-w-xl border-solid max-h-80 h-80">
@@ -31,11 +38,16 @@ export default function EditIncome ({open, closeModal }) {
                     <h2 className="text-sm text-gray-500">Please provide a name and numerical value for your income source</h2>
                 </div>
                 <div className="flex justify-center">
-                    <form className="w-120">
-                        <div className="flex flex-row justify-around">
+                    <form className="w-120" onSubmit={handleSubmit}>
+                        <div className="flex flex-row justify-between">
                             <div className="flex flex-col">
                                 <label>Income Source</label>
-                                <input placeholder="pay cheque" className="border-1 h-10 rounded-lg p-2"/>
+                                <input 
+                                    placeholder="pay cheque" 
+                                    className="border-1 h-10 rounded-lg p-2"
+                                    value={sourceUI}
+                                    onChange={(e) => setSourceUI(e.target.value)}
+                                />
                             </div>
                             <div className="flex flex-col">
                                 <label>Amount $</label>
@@ -43,13 +55,24 @@ export default function EditIncome ({open, closeModal }) {
                                     placeholder="1000" 
                                     className="border-1 h-10 rounded-lg p-2"
                                     type="number"
-                                    step="0.01"
-                                    value={amount}
-                                    onChange={handleChange}
+                                    value={amountUI}
+                                    onChange={(e) => setAmountUI(e.target.value)}
                                 />
                             </div>
                         </div>
+                        <div className="flex flex-col w-full">
+                            <label>Date</label>
+                            <input 
+                                type="date" 
+                                className="border-1 h-10 rounded-lg p-2"
+                                value={dateUI}
+                                onChange={(e) => setDateUI(e.target.value)}
+                            />
+                        </div>
                         <hr className="mt-5"/>
+                        {showError && (
+                            <p className="text-red-600">{errorMessage}</p>
+                        )}
                         <div className=" flex justify-end gap-5 mt-4">
                             <button 
                                 onClick={() => closeModal()} 
@@ -59,7 +82,7 @@ export default function EditIncome ({open, closeModal }) {
                             </button>
                             <button 
                                 className="border-1 w-20 h-10 rounded-lg bg-indigo-600 text-white cursor-pointer hover:bg-indigo-700"
-                                onClick={handleSave}
+                                type="submit"
                             >
                                 Save
                             </button>
