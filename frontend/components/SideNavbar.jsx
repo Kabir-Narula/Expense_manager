@@ -7,8 +7,8 @@ import { MdAttachMoney, MdBarChart } from "react-icons/md";
 import { FaHandHoldingUsd } from "react-icons/fa";
 import { RiLogoutBoxLine, RiDashboardLine } from "react-icons/ri";
 // import defaultAvatar from "../assets/default-avatar.png";
-const defaultAvatar = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2VlZWVlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjMwIiBmaWxsPSIjNjY2NjY2Ij5VU0VSPC90ZXh0Pjwvc3ZnPg==";
-
+const defaultAvatar =
+  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2VlZWVlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjMwIiBmaWxsPSIjNjY2NjY2Ij5VU0VSPC90ZXh0Pjwvc3ZnPg==";
 
 const SideNavbar = () => {
   const location = useLocation();
@@ -52,7 +52,7 @@ const SideNavbar = () => {
 
   return (
     <>
-      <button 
+      <button
         className={`fixed top-5 left-5 z-50 p-2.5 rounded-lg bg-indigo-700 hover:bg-indigo-600 shadow-lg transition-all md:hidden ${
           isSmallScreen ? "hidden" : "md:hidden"
         }`}
@@ -64,8 +64,8 @@ const SideNavbar = () => {
       <div
         ref={sideNavBar}
         className={`bg-indigo-900 h-screen p-6 fixed w-72 flex flex-col justify-between transition-all duration-300 ${
-          isSmallScreen ? "translate-x-0" : "-translate-x-full md:translate-x-0"} z-40`
-        }
+          isSmallScreen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        } z-40`}
       >
         <div>
           <div className="flex items-center mb-12 ml-2">
@@ -75,10 +75,10 @@ const SideNavbar = () => {
 
           <nav className="space-y-1.5">
             {[
-              { to: '/dashboard', icon: <CgMenuGridO />, text: 'Dashboard' },
-              { to: '/income', icon: <MdAttachMoney />, text: 'Income' },
-              { to: '/expenses', icon: <FaHandHoldingUsd />, text: 'Expenses' },
-              { to: '/analytics', icon: <MdBarChart />, text: 'Analytics' },
+              { to: "/dashboard", icon: <CgMenuGridO />, text: "Dashboard" },
+              { to: "/income", icon: <MdAttachMoney />, text: "Income" },
+              { to: "/expenses", icon: <FaHandHoldingUsd />, text: "Expenses" },
+              { to: "/charts", icon: <MdBarChart />, text: "Charts" },
             ].map((link) => (
               <Link
                 key={link.to}
@@ -87,9 +87,11 @@ const SideNavbar = () => {
                   location.pathname === link.to ? "bg-indigo-800 text-white border-l-4 border-indigo-400" : ""
                 }`}
               >
-                <span className={`text-xl mr-4 group-hover:text-indigo-300 ${
-                  location.pathname === link.to ? "text-indigo-300" : "text-indigo-400"
-                }`}>
+                <span
+                  className={`text-xl mr-4 group-hover:text-indigo-300 ${
+                    location.pathname === link.to ? "text-indigo-300" : "text-indigo-400"
+                  }`}
+                >
                   {link.icon}
                 </span>
                 <span className="text-sm font-medium tracking-wide">{link.text}</span>
@@ -119,12 +121,8 @@ const SideNavbar = () => {
                 }}
               />
               <div className="ml-3">
-                <p className="text-sm font-medium text-white">
-                  {user.fullName || "Guest User"}
-                </p>
-                <p className="text-xs text-indigo-400">
-                  {user.email || "user@example.com"}
-                </p>
+                <p className="text-sm font-medium text-white">{user.fullName || "Guest User"}</p>
+                <p className="text-xs text-indigo-400">{user.email || "user@example.com"}</p>
               </div>
             </div>
           )}
