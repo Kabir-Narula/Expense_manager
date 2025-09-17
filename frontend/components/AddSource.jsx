@@ -1,7 +1,7 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import api from "../src/Utils/api";
 
-export default function EditIncome ({open, closeModal }) {
+export default function EditIncome ({open, closeModal, type, incomeData }) {
     const [sourceUI, setSourceUI] = useState("");
     const [amountUI, setAmountUI] = useState(null);
     const [dateUI, setDateUI] = useState("");
@@ -13,29 +13,45 @@ export default function EditIncome ({open, closeModal }) {
             const floatVal = parseFloat(amountUI)
             let cents;
             cents = Math.round(floatVal * 100) 
-            const expenseData = {
+            const formData = {
                 icon:"",
                 source: sourceUI,
                 amount: cents,
                 date: dateUI,
             };
-            let res = await api.post("/income/add", expenseData);
+            let res;
+            if (type === "addIncome") {
+                res = await api.post("/income/add", formData);s
+            } else if (type ==="editIncome") {
+                res = await api.put(`/income/${incomeData}`, formData);
+            }
             if (res.status === 200) {
                 closeModal();
             }
         } catch (error) {
-            console.log(JSON.stringify(error, null, 2));
             setShowError(true);
-            setErrorMessage(error.response.data.message);
+            console.log(incomeData)
+            setErrorMessage(error?.response?.data?.message);
         }
     }
+
     if (!open) return null
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75">
             <div className="flex flex-col bg-white justify-center gap-5 p-5 rounded-xl shadow-xl w-full max-w-xl border-solid max-h-80 h-80">
-                <div className="">
-                    <h1 className="text-2xl font-semibold">Add Income</h1>
-                    <h2 className="text-sm text-gray-500">Please provide a name and numerical value for your income source</h2>
+                <div>
+                    {type === "addIncome" && (
+                        <>
+                            <h1 className="text-2xl font-semibold">Add Income</h1>
+                            <h2 className="text-sm text-gray-500">Please provide a name and numerical value for your income source</h2>
+                        </>
+                    )}
+                    {type === "editIncome" && (
+                        <>                        
+                            <h1 className="text-2xl font-semibold">Edit Income</h1>
+                            <h2 className="text-sm text-gray-500">You may edit the income source, amount, or date as you wish.</h2>
+                        </>
+                    )}
                 </div>
                 <div className="flex justify-center">
                     <form className="w-120" onSubmit={handleSubmit}>

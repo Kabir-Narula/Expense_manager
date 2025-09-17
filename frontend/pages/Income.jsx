@@ -4,12 +4,16 @@ import { MdAttachMoney, MdSavings } from "react-icons/md";
 import { useState, useEffect } from "react";
 import EditIncome from "../components/AddSource";
 import api from "../src/Utils/api";
+import { MdModeEdit } from "react-icons/md";
+import { FaTrashAlt } from "react-icons/fa";
 
 function Income() {
   const [open, setOpen] = useState(false);
   const [incomeData, setIncomeData] = useState([]);
   const [totalIncome, setTotalIncome] = useState(null);
   const [avgIncome, setAvgIncome] = useState(null);
+  const [type, setType] = useState("");
+  const [selectedIncome, setSelectedIncome] = useState(null)
 
   useEffect(() => {
     const fetchIncomeData = async () => {
@@ -45,12 +49,12 @@ function Income() {
           </div>
           <button 
             className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center"
-            onClick={() => { setOpen(true) }}
+            onClick={() => { setOpen(true); setType("addIncome") }}
           >
             <FiPlus className="mr-2" /> Add Income
           </button>
         </div>
-        <EditIncome open={open} closeModal={() => setOpen(false)} />
+        <EditIncome open={open} closeModal={() => setOpen(false)} type={type} incomeData={selectedIncome}/>
         {/* Income Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -102,6 +106,21 @@ function Income() {
                       })}
                     </td>
                     <td className="py-4 font-medium">${(item.amount / 100).toFixed(2)}</td>
+                    <td>
+                      <div className="flex justify-center gap-5">   
+                        <button onClick={() => {
+                          setOpen(true); 
+                          setType("editIncome");
+                          setSelectedIncome(item._id)
+                          console.log(item._id)
+                        }}>
+                          <MdModeEdit className="text-2xl text-green-500"/>
+                        </button>
+                        <button>
+                          <FaTrashAlt className="text-2xl text-red-500"/>
+                        </button>                  
+                      </div>
+                    </td>
                   </tr>
                 ))) }
               </tbody>
@@ -114,3 +133,4 @@ function Income() {
 }
 
 export default Income;
+
