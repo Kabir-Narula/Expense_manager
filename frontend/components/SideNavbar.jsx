@@ -78,7 +78,7 @@ const SideNavbar = () => {
               { to: "/dashboard", icon: <CgMenuGridO />, text: "Dashboard" },
               { to: "/income", icon: <MdAttachMoney />, text: "Income" },
               { to: "/expenses", icon: <FaHandHoldingUsd />, text: "Expenses" },
-              { to: "/charts", icon: <MdBarChart />, text: "Charts" },
+              { to: "/charts", icon: <MdBarChart />, text: "Analytics" },
             ].map((link) => (
               <Link
                 key={link.to}

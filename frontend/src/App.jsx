@@ -54,6 +54,14 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute>
+                <Charts />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
         </Routes>
