@@ -9,7 +9,6 @@ import Logout from "../pages/Logout";
 import Charts from "../pages/Charts";
 import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/Signup";
-import AddSource from "../components/AddSource";
 import ProtectedRoute from "../components/ProtectedRoutes";
 
 const App = () => {
@@ -64,8 +63,7 @@ const App = () => {
             }
           />
           <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/edit-income" element={<AddSource /> } />
+          <Route path="/signup" element={<Signup />} />>
         </Routes>
       </div>
     </div>
