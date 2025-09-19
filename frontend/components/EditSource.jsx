@@ -2,9 +2,21 @@ import { useState, useEffect } from "react"
 import api from "../src/Utils/api";
 
 export default function EditSource ({open, closeModal, type, incomeData }) {
-    const [sourceUI, setSourceUI] = useState("");
-    const [amountUI, setAmountUI] = useState(null);
-    const [dateUI, setDateUI] = useState("");
+
+    // format the date: 
+    let formattedDate = ""
+    if (type === "editIncome"){
+
+        const date = new Date(`${incomeData.date}`.replace(/-/g, '\/').replace(/T.+/, ''));
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        formattedDate = `${year}-${month}-${day}`;
+    }
+
+    const [sourceUI, setSourceUI] = useState(type === "editIncome" ? incomeData.source : "");
+    const [amountUI, setAmountUI] = useState(type === "editIncome" ? (incomeData.amount / 100).toFixed(2) : "");
+    const [dateUI, setDateUI] = useState(formattedDate);
     const [showError, setShowError] = useState(false); 
     const [errorMessage, setErrorMessage] = useState("");
     const handleSubmit = async (e) => {
@@ -23,9 +35,9 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
             if (type === "addIncome") {
                 res = await api.post("/income/add", formData);
             } else if (type ==="editIncome") {
-                res = await api.put(`/income/${incomeData}`, formData);
+                res = await api.put(`/income/${incomeData._id}`, formData);
             } else if (type === "deleteIncome") {
-                res = await api.delete(`/income/${incomeData}`);
+                res = await api.delete(`/income/${incomeData._id}`);
             }
             if (res.status === 200) {
                 closeModal();

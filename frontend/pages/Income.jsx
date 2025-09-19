@@ -58,7 +58,10 @@ function Income() {
             <FiPlus className="mr-2" /> Add Income
           </button>
         </div>
-        <EditSource open={open} closeModal={() => setOpen(false)} type={type} incomeData={selectedIncome}/>
+        {open &&
+
+          <EditSource open={open} closeModal={() => setOpen(false)} type={type} incomeData={selectedIncome}/>
+        }
         {/* Income Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -115,16 +118,14 @@ function Income() {
                         <button onClick={() => {
                           setOpen(true); 
                           setType("editIncome");
-                          setSelectedIncome(item._id)
-                          console.log(item._id)
+                          setSelectedIncome(item)
                         }}>
                           <MdModeEdit className="text-2xl text-green-500"/>
                         </button>
                         <button onClick={() => {
                             setOpen(true); 
                             setType("deleteIncome");
-                            setSelectedIncome(item._id)
-                            console.log(item._id)
+                            setSelectedIncome(item)
                         }}
                         >
                           <FaTrashAlt className="text-2xl text-red-500"/>
