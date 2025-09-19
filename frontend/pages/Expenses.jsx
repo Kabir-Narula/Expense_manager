@@ -1,91 +1,144 @@
-import React from "react";
-import { FiArrowDownRight, FiPlus } from "react-icons/fi";
-import { MdFastfood, MdShoppingBag, MdHealthAndSafety } from "react-icons/md";
-import { MdOutlineReceiptLong } from "react-icons/md";
+// import React from "react";
+import { FiPlus } from "react-icons/fi";
+import { MdAttachMoney, MdTrendingDown } from "react-icons/md";
+import { useState, useEffect } from "react";
+import EditExpense from "../components/AddExpense";
+import api from "../src/Utils/api";
+import { MdModeEdit } from "react-icons/md";
+import { FaTrashAlt } from "react-icons/fa";
 
 function Expenses() {
-  const categories = [
-    { name: "Food", icon: <MdFastfood />, amount: 1200 },
-    { name: "Shopping", icon: <MdShoppingBag />, amount: 850 },
-    { name: "Health", icon: <MdHealthAndSafety />, amount: 450 },
-  ];
+  const [open, setOpen] = useState(false);
+  const [expenseData, setExpenseData] = useState([]);
+  const [totalExpense, setTotalExpense] = useState(null);
+  const [avgExpense, setAvgExpense] = useState();
+  const [type, setType] = useState("");
+  const [selectedExpense, setSelectedExpense] = useState(null)
+
+  useEffect(() => {
+    const fetchExpenseData = async () => {
+      try {
+        let res = await api.get("/expense/get")
+        let val = 0
+        if (res.status === 200) {
+          setExpenseData(res.data);
+          res.data.map(data => {
+            console.log(data.amount)
+            val += data.amount;
+          });
+          const cents = (val/100).toFixed(2);
+          const avg = (cents / res.data.length).toFixed(2);
+          setTotalExpense(cents);
+          setAvgExpense(avg)
+        }
+      } catch (error) {
+        console.log(error.message);
+      }
+    } 
+    fetchExpenseData();
+  }, [open])
+
+  useEffect(() => {
+    console.log(avgExpense);
+  }, [avgExpense])
 
   return (
-    <div className="md:ml-72 md:pt-8 pt-20 p-8 min-h-screen bg-gray-50"> 
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Expense Tracking</h1>
-          <p className="text-gray-500">September 2023 Spending</p>
+    <>
+      <div className="md:ml-72 md:pt-8 pt-20 p-8 min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Expense Tracking</h1>
+            <p className="text-gray-500">September 2023 Spending</p>
+          </div>
+          <button 
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center"
+            onClick={() => { setOpen(true); setType("addExpense") }}
+          >
+            <FiPlus className="mr-2" /> Add Expense
+          </button>
         </div>
-        <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center">
-          <FiPlus className="mr-2" /> Add Expense
-        </button>
-      </div>
-
-      {/* Expense Breakdown */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {categories.map((category, index) => (
-          <div key={index} className="bg-white p-6 rounded-xl shadow-sm">
+        <EditExpense open={open} closeModal={() => setOpen(false)} type={type} expenseData={selectedExpense}/>
+        {/* Expense Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-xl shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">{category.name}</p>
-                <p className="text-2xl font-bold text-gray-800 mt-2">${category.amount.toLocaleString()}</p>
+                <p className="text-gray-500 text-sm">Total Expenses</p>
+                <p className="text-2xl font-bold text-gray-800 mt-2">${totalExpense}</p>
               </div>
-              <div className={`p-3 rounded-lg ${["bg-red-100", "bg-purple-100", "bg-blue-100"][index]}`}>
-                {React.cloneElement(category.icon, { className: "w-6 h-6 " + ["text-red-600", "text-purple-600", "text-blue-600"][index] })}
+              <div className="bg-red-100 p-3 rounded-lg">
+                <MdAttachMoney className="w-6 h-6 text-red-600" />
               </div>
-            </div>
-            <div className="flex items-center mt-4 text-sm">
-              <FiArrowDownRight className={`w-4 h-4 ${index === 1 ? "text-purple-600" : "text-red-600"} mr-1`} />
-              <span className={`font-medium ${index === 1 ? "text-purple-600" : "text-red-600"}`}>
-                {index === 2 ? "+2.1%" : "-4.5%"}
-              </span>
-              <span className="text-gray-500 ml-2">vs last month</span>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Recent Expenses */}
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-800 mb-6">Recent Spending</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="text-left text-gray-500 border-b">
-                <th className="pb-4">Category</th>
-                <th className="pb-4">Date</th>
-                <th className="pb-4">Amount</th>
-                <th className="pb-4">Status</th>
-                <th className="pb-4">Receipt</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[1, 2, 3, 4, 5].map((item) => (
-                <tr key={item} className="border-b last:border-b-0 hover:bg-gray-50">
-                  <td className="py-4">{["Groceries", "Entertainment", "Bills", "Transport", "Misc"][item-1]}</td>
-                  <td className="py-4">Sept {item + 10}, 2023</td>
-                  <td className="py-4 font-medium text-red-600">-${(300 - item * 20).toLocaleString()}</td>
-                  <td className="py-4">
-                    <span className={`px-3 py-1 rounded-full text-sm ${
-                      item % 2 === 0 ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"
-                    }`}>
-                      {item % 2 === 0 ? "Pending" : "Paid"}
-                    </span>
-                  </td>
-                  <td className="py-4">
-                    <button className="text-indigo-600 hover:text-indigo-700 flex items-center">
-                      <MdOutlineReceiptLong className="mr-2" /> View
-                    </button>
-                  </td>
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Average Expense</p>
+                <p className="text-2xl font-bold text-gray-800 mt-2">${isNaN(avgExpense) ? "0.00" : avgExpense}</p>
+              </div>
+              <div className="bg-orange-100 p-3 rounded-lg">
+                <MdTrendingDown className="w-6 h-6 text-orange-600" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Expenses */}
+        <div className="bg-white p-6 rounded-xl shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-800 mb-6">Recent Spending</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="text-left text-gray-500 border-b">
+                  <th className="pb-4">Category</th>
+                  <th className="pb-4">Date</th>
+                  <th className="pb-4">Amount</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {expenseData && (expenseData.map((item) => (
+                  <tr key={item._id} className="border-b last:border-b-0 hover:bg-gray-50">
+                    <td className="py-4">{item.category}</td>
+                    <td className="py-4">
+                      {new Date(item.date).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric"
+                      })}
+                    </td>
+                    <td className="py-4 font-medium text-red-600">-${(item.amount / 100).toFixed(2)}</td>
+                    <td>
+                      <div className="flex justify-center gap-5">   
+                        <button onClick={() => {
+                          setOpen(true); 
+                          setType("editExpense");
+                          setSelectedExpense(item._id)
+                          console.log(item._id)
+                        }}>
+                          <MdModeEdit className="text-2xl text-green-500"/>
+                        </button>
+                        <button onClick={() => {
+                            setOpen(true); 
+                            setType("deleteExpense");
+                            setSelectedExpense(item._id)
+                            console.log(item._id)
+                        }}
+                        >
+                          <FaTrashAlt className="text-2xl text-red-500"/>
+                        </button>                  
+                      </div>
+                    </td>
+                  </tr>
+                ))) }
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
