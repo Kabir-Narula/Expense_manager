@@ -23,7 +23,6 @@ function Expenses() {
         if (res.status === 200) {
           setExpenseData(res.data);
           res.data.map(data => {
-            console.log(data.amount)
             val += data.amount;
           });
           const cents = (val/100).toFixed(2);
