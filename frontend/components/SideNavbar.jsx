@@ -22,7 +22,6 @@ const SideNavbar = () => {
     const fetchUserData = async () => {
       try {
         const { data } = await api.get("/auth/getUser");
-        console.log("In here")
         setUser(data);
       } catch (error) {
         console.error("Error fetching user:", error);
