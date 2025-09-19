@@ -11,7 +11,7 @@ function Income() {
   const [open, setOpen] = useState(false);
   const [incomeData, setIncomeData] = useState([]);
   const [totalIncome, setTotalIncome] = useState(null);
-  const [avgIncome, setAvgIncome] = useState(null);
+  const [avgIncome, setAvgIncome] = useState();
   const [type, setType] = useState("");
   const [selectedIncome, setSelectedIncome] = useState(null)
 
@@ -37,6 +37,10 @@ function Income() {
     } 
     fetchIncomeData();
   }, [open])
+
+  useEffect(() => {
+    console.log(avgIncome);
+  }, [avgIncome])
 
   return (
     <>
@@ -73,7 +77,7 @@ function Income() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">Average Income</p>
-                <p className="text-2xl font-bold text-gray-800 mt-2">${avgIncome}</p>
+                <p className="text-2xl font-bold text-gray-800 mt-2">${isNaN(avgIncome) ? "0.00" : avgIncome}</p>
               </div>
               <div className="bg-blue-100 p-3 rounded-lg">
                 <MdSavings className="w-6 h-6 text-blue-600" />
@@ -116,7 +120,13 @@ function Income() {
                         }}>
                           <MdModeEdit className="text-2xl text-green-500"/>
                         </button>
-                        <button>
+                        <button onClick={() => {
+                            setOpen(true); 
+                            setType("deleteIncome");
+                            setSelectedIncome(item._id)
+                            console.log(item._id)
+                        }}
+                        >
                           <FaTrashAlt className="text-2xl text-red-500"/>
                         </button>                  
                       </div>
