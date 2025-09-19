@@ -9,8 +9,13 @@ export const addIncome = async (req, res) => {
   try {
     const { icon, source, amount, date } = req.body;
 
-    if (!source || !amount) {
-      return res.status(400).json({ message: " All field are required" });
+
+    if (!source || isNaN(amount) || !date) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    if (amount <= 0 ) {
+      return res.status(400).json({ message: "Please provide value more than 0." });
     }
 
     const newIncome = new Income({
@@ -57,8 +62,12 @@ export const updateIncome = async (req, res) => {
   try {
     const { icon, source, amount, date } = req.body;
 
-    if (!source || !amount) {
-      return res.status(400).json({ message: "All fields are required" });
+    if (!source || isNaN(amount) || !date) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    if (amount <= 0 ) {
+      return res.status(400).json({ message: "Please provide value more than 0." });
     }
 
     const updatedIncome = await Income.findByIdAndUpdate(

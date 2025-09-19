@@ -29,10 +29,11 @@ export default function EditIncome ({open, closeModal, type, incomeData }) {
             }
             if (res.status === 200) {
                 closeModal();
+                setShowError(false);
+                setErrorMessage("")
             }
         } catch (error) {
             setShowError(true);
-            console.log(incomeData)
             setErrorMessage(error?.response?.data?.message);
         }
     }
@@ -101,7 +102,15 @@ export default function EditIncome ({open, closeModal, type, incomeData }) {
                                                 className="border-1 h-10 rounded-lg p-2"
                                                 type="number"
                                                 value={amountUI}
-                                                onChange={(e) => setAmountUI(e.target.value)}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    // Allow only numbers with up to 2 decimals
+                                                    if (/^\d*\.?\d{0,2}$/.test(value)) {
+                                                        setAmountUI(value);
+                                                    }
+                                                }}
+                                                step="0.01"
+                                                min="0"
                                             />
                                         </div>
                                     </div>
@@ -120,7 +129,11 @@ export default function EditIncome ({open, closeModal, type, incomeData }) {
                                     )}
                                     <div className=" flex justify-end gap-5 mt-4">
                                         <button 
-                                            onClick={() => closeModal()} 
+                                            onClick={() => {
+                                                closeModal()
+                                                setErrorMessage("")
+                                                setShowError(false);
+                                            }} 
                                             className="border-1 w-20 h-10 rounded-lg cursor-pointer"
                                         >
                                             Cancel
