@@ -9,6 +9,7 @@ import Logout from "../pages/Logout";
 import Charts from "../pages/Charts";
 import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/Signup";
+import AddSource from "../components/AddSource";
 import ProtectedRoute from "../components/ProtectedRoutes";
 
 const App = () => {
@@ -46,10 +47,6 @@ const App = () => {
             }
           />
           <Route path="/logout" element={<Logout />} />
-<<<<<<< HEAD
-          <Route path="/charts" element={<Charts />} />
-          <Route path="/analytics" element={<Charts />} />
-=======
           <Route
             path="/charts"
             element={
@@ -66,9 +63,9 @@ const App = () => {
               </ProtectedRoute>
             }
           />
->>>>>>> 4a3ef2b46dbdb31603b524326c1b420be4b7d13e
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/edit-income" element={<AddSource />} />
         </Routes>
       </div>
     </div>
