@@ -10,6 +10,8 @@ import Charts from "../pages/Charts";
 import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/Signup";
 import AddSource from "../components/AddSource";
+import ProtectedRoute from "../components/ProtectedRoutes";
+
 
 const App = () => {
   const location = useLocation();
@@ -18,15 +20,50 @@ const App = () => {
   return (
     <div className="app-container">
       {showNavbar && <SideNavbar />}
-      <div className={`main-content ${showNavbar ? 'with-sidebar' : ''}`}>
+      <div className={`main-content ${showNavbar ? "with-sidebar" : ""}`}>
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/expenses" element={<Expenses />} />
-          <Route path="/income" element={<Income />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/expenses"
+            element={
+              <ProtectedRoute>
+                <Expenses />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/income"
+            element={
+              <ProtectedRoute>
+                <Income />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/logout" element={<Logout />} />
-          <Route path="/charts" element={<Charts />} />
-          <Route path="/analytics" element={<Charts />} />
+          <Route
+            path="/charts"
+            element={
+              <ProtectedRoute>
+                <Charts />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute>
+                <Charts />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/edit-income" element={<AddSource /> } />
