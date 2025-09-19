@@ -2,7 +2,7 @@
 import { FiPlus } from "react-icons/fi";
 import { MdAttachMoney, MdSavings } from "react-icons/md";
 import { useState, useEffect } from "react";
-import EditIncome from "../components/AddSource";
+import EditSource from "../components/EditSource";
 import api from "../src/Utils/api";
 import { MdModeEdit } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
@@ -58,7 +58,7 @@ function Income() {
             <FiPlus className="mr-2" /> Add Income
           </button>
         </div>
-        <EditIncome open={open} closeModal={() => setOpen(false)} type={type} incomeData={selectedIncome}/>
+        <EditSource open={open} closeModal={() => setOpen(false)} type={type} incomeData={selectedIncome}/>
         {/* Income Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 rounded-xl shadow-sm">

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import api from "../src/Utils/api";
 
-export default function EditIncome ({open, closeModal, type, incomeData }) {
+export default function EditSource ({open, closeModal, type, incomeData }) {
     const [sourceUI, setSourceUI] = useState("");
     const [amountUI, setAmountUI] = useState(null);
     const [dateUI, setDateUI] = useState("");
