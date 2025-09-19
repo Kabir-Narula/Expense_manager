@@ -9,7 +9,7 @@ import Logout from "../pages/Logout";
 import Charts from "../pages/Charts";
 import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/Signup";
-import AddSource from "../components/AddSource";
+import EditSource from "../components/EditSource";
 import ProtectedRoute from "../components/ProtectedRoutes";
 
 const App = () => {
