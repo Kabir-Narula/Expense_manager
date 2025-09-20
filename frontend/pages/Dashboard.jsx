@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import api from "../src/Utils/api";
 import { MdAttachMoney, MdSavings } from "react-icons/md";
 import { FiDollarSign } from "react-icons/fi";
@@ -15,7 +15,7 @@ function Dashboard() {
     const fetchData = async () => {
       try {
         // Fetch user data from existing endpoint
-        const userResponse = await api.get("/getUser");
+        const userResponse = await api.get("/auth/getUser");
         setUser(userResponse.data);
 
         // Mock data - replace with actual API calls when backend is ready
