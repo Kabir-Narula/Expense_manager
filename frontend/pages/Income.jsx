@@ -23,7 +23,6 @@ function Income() {
         if (res.status === 200) {
           setIncomeData(res.data);
           res.data.map(data => {
-            console.log(data.amount)
             val += data.amount;
           });
           const cents = (val/100).toFixed(2);
@@ -37,10 +36,6 @@ function Income() {
     } 
     fetchIncomeData();
   }, [open])
-
-  useEffect(() => {
-    console.log(avgIncome);
-  }, [avgIncome])
 
   return (
     <>
@@ -58,7 +53,10 @@ function Income() {
             <FiPlus className="mr-2" /> Add Income
           </button>
         </div>
-        <EditSource open={open} closeModal={() => setOpen(false)} type={type} incomeData={selectedIncome}/>
+        {open &&
+
+          <EditSource open={open} closeModal={() => setOpen(false)} type={type} incomeData={selectedIncome}/>
+        }
         {/* Income Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -103,11 +101,12 @@ function Income() {
                   <tr key={item._id} className="border-b last:border-b-0 hover:bg-gray-50">
                     <td className="py-4">{item.source}</td>
                     <td className="py-4">
-                      {new Date(item.date).toLocaleDateString("en-US", {
+                      {/* Format date as a human-readable string */}
+                      {item.date ? new Date(item.date.slice(0, 10) + 'T00:00:00').toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
                         day: "numeric"
-                      })}
+                      }) : ""}
                     </td>
                     <td className="py-4 font-medium">${(item.amount / 100).toFixed(2)}</td>
                     <td>
@@ -115,16 +114,14 @@ function Income() {
                         <button onClick={() => {
                           setOpen(true); 
                           setType("editIncome");
-                          setSelectedIncome(item._id)
-                          console.log(item._id)
+                          setSelectedIncome(item)
                         }}>
                           <MdModeEdit className="text-2xl text-green-500"/>
                         </button>
                         <button onClick={() => {
                             setOpen(true); 
                             setType("deleteIncome");
-                            setSelectedIncome(item._id)
-                            console.log(item._id)
+                            setSelectedIncome(item)
                         }}
                         >
                           <FaTrashAlt className="text-2xl text-red-500"/>

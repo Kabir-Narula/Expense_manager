@@ -37,10 +37,6 @@ function Expenses() {
     fetchExpenseData();
   }, [open])
 
-  useEffect(() => {
-    console.log(avgExpense);
-  }, [avgExpense])
-
   return (
     <>
       <div className="md:ml-72 md:pt-8 pt-20 p-8 min-h-screen bg-gray-50">
@@ -57,7 +53,9 @@ function Expenses() {
             <FiPlus className="mr-2" /> Add Expense
           </button>
         </div>
-        <EditExpense open={open} closeModal={() => setOpen(false)} type={type} expenseData={selectedExpense}/>
+        {open &&
+          <EditExpense open={open} closeModal={() => setOpen(false)} type={type} expenseData={selectedExpense}/>
+        }
         {/* Expense Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -102,11 +100,12 @@ function Expenses() {
                   <tr key={item._id} className="border-b last:border-b-0 hover:bg-gray-50">
                     <td className="py-4">{item.category}</td>
                     <td className="py-4">
-                      {new Date(item.date).toLocaleDateString("en-US", {
+                      {/* Format date as a human-readable string */}
+                      {item.date ? new Date(item.date.slice(0, 10) + 'T00:00:00').toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
                         day: "numeric"
-                      })}
+                      }) : ""}
                     </td>
                     <td className="py-4 font-medium text-red-600">-${(item.amount / 100).toFixed(2)}</td>
                     <td>
@@ -114,16 +113,14 @@ function Expenses() {
                         <button onClick={() => {
                           setOpen(true); 
                           setType("editExpense");
-                          setSelectedExpense(item._id)
-                          console.log(item._id)
+                          setSelectedExpense(item)
                         }}>
                           <MdModeEdit className="text-2xl text-green-500"/>
                         </button>
                         <button onClick={() => {
                             setOpen(true); 
                             setType("deleteExpense");
-                            setSelectedExpense(item._id)
-                            console.log(item._id)
+                            setSelectedExpense(item)
                         }}
                         >
                           <FaTrashAlt className="text-2xl text-red-500"/>
