@@ -23,7 +23,6 @@ function Income() {
         if (res.status === 200) {
           setIncomeData(res.data);
           res.data.map(data => {
-            console.log(data.amount)
             val += data.amount;
           });
           const cents = (val/100).toFixed(2);
@@ -37,10 +36,6 @@ function Income() {
     } 
     fetchIncomeData();
   }, [open])
-
-  useEffect(() => {
-    console.log(avgIncome);
-  }, [avgIncome])
 
   return (
     <>
@@ -106,11 +101,12 @@ function Income() {
                   <tr key={item._id} className="border-b last:border-b-0 hover:bg-gray-50">
                     <td className="py-4">{item.source}</td>
                     <td className="py-4">
-                      {new Date(item.date).toLocaleDateString("en-US", {
+                      {/* Format date as a human-readable string */}
+                      {item.date ? new Date(item.date.slice(0, 10) + 'T00:00:00').toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
                         day: "numeric"
-                      })}
+                      }) : ""}
                     </td>
                     <td className="py-4 font-medium">${(item.amount / 100).toFixed(2)}</td>
                     <td>

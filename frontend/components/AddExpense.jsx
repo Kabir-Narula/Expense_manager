@@ -2,9 +2,20 @@ import { useState, useEffect } from "react"
 import api from "../src/Utils/api";
 
 export default function EditExpense ({open, closeModal, type, expenseData }) {
-    const [categoryUI, setCategoryUI] = useState("");
-    const [amountUI, setAmountUI] = useState(null);
-    const [dateUI, setDateUI] = useState("");
+    // format the date: 
+    let formattedDate = ""
+    if (type === "editExpense"){
+
+        const date = new Date(`${expenseData.date}`.replace(/-/g, '\/').replace(/T.+/, ''));
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        formattedDate = `${year}-${month}-${day}`;
+    }
+
+    const [categoryUI, setCategoryUI] = useState(type === "editExpense" ? expenseData.category : "");
+    const [amountUI, setAmountUI] = useState( type === "editExpense" ? (expenseData.amount / 100).toFixed(2) : "");
+    const [dateUI, setDateUI] = useState(formattedDate);
     const [showError, setShowError] = useState(false); 
     const [errorMessage, setErrorMessage] = useState("");
     
@@ -24,9 +35,9 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
             if (type === "addExpense") {
                 res = await api.post("/expense/add", formData);
             } else if (type ==="editExpense") {
-                res = await api.put(`/expense/${expenseData}`, formData);
+                res = await api.put(`/expense/${expenseData._id}`, formData);
             } else if (type === "deleteExpense") {
-                res = await api.delete(`/expense/${expenseData}`);
+                res = await api.delete(`/expense/${expenseData._id}`);
             }
             if (res.status === 200) {
                 closeModal();
