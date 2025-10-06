@@ -6,6 +6,8 @@ import EditSource from "../components/EditSource";
 import api from "../src/Utils/api";
 import { MdModeEdit } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
+import { IoIosArrowDown } from "react-icons/io";
+
 
 function Income() {
   const [open, setOpen] = useState(false);
@@ -14,6 +16,8 @@ function Income() {
   const [avgIncome, setAvgIncome] = useState();
   const [type, setType] = useState("");
   const [selectedIncome, setSelectedIncome] = useState(null)
+  const [groupedDataUI, setGroupedDataUI] = useState({})
+  const [expand, setExpand] = useState(false);
 
   useEffect(() => {
     const fetchIncomeData = async () => {
@@ -25,6 +29,23 @@ function Income() {
           res.data.map(data => {
             val += data.amount;
           });
+          const groupedData = res.data.reduce((acc, item) => {
+            const date = new Date(item.date);
+            const year = date.getFullYear();
+            const month = date.toLocaleDateString("default", {month: "long"});
+
+            if (!acc[year]) 
+              acc[year] = {};
+
+            if (!acc[year][month]) 
+              acc[year][month] = { income: [] }
+            
+            acc[year][month].income.push(item);
+            
+            return acc;
+          
+          }, {})
+          setGroupedDataUI(groupedData);
           const cents = (val/100).toFixed(2);
           const avg = (cents / res.data.length).toFixed(2);
           setTotalIncome(cents);
@@ -83,6 +104,22 @@ function Income() {
             </div>
           </div>
         </div>
+
+        {/* breakdown by year  */}
+        { Object.entries(groupedDataUI).map(([year, months]) => (
+          <div 
+            key={year}
+            className="bg-white border-1 rounded-xl shadow-sm p-2 m-4"
+            >
+            <div 
+              className="flex justify-between items-center"
+              onClick={() => setExpand(!expand)}
+            >
+              <p>{year}</p>
+              <IoIosArrowDown/>
+            </div>
+          </div>
+        ))}
 
         {/* Recent Income */}
         <div className="bg-white p-6 rounded-xl shadow-sm">
