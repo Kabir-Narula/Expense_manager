@@ -19,6 +19,9 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
     const [dateUI, setDateUI] = useState(formattedDate);
     const [showError, setShowError] = useState(false); 
     const [errorMessage, setErrorMessage] = useState("");
+
+    const [recurringUI, setRecurringUI] = useState(type === "editIncome" ? incomeData.recurring : false);
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -30,6 +33,8 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
                 source: sourceUI,
                 amount: cents,
                 date: dateUI,
+                recurring: recurringUI,
+                startDate: dateUI,
             };
             let res;
             if (type === "addIncome") {
@@ -150,6 +155,14 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
                                         >
                                             Cancel
                                         </button>
+                                        <label className="flex items-center gap-2">
+                                            <input 
+                                                type="checkbox" 
+                                                checked={recurringUI} 
+                                                onChange={(e) => setRecurringUI(e.target.checked)}
+                                            />
+                                                Recurring Every Month
+                                        </label>
                                         <button 
                                             className="border-1 w-20 h-10 rounded-lg bg-indigo-600 text-white cursor-pointer hover:bg-indigo-700"
                                             type="submit"
