@@ -11,6 +11,7 @@ import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/Signup";
 import EditSource from "../components/EditSource";
 import ProtectedRoute from "../components/ProtectedRoutes";
+import IncomeByYear from "../pages/IncomeByYear";
 
 const App = () => {
   const location = useLocation();
@@ -60,6 +61,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <Charts />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/income/:year"
+            element={
+              <ProtectedRoute>
+                <IncomeByYear />
               </ProtectedRoute>
             }
           />

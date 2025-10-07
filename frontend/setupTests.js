@@ -39,9 +39,9 @@ if (typeof window !== 'undefined') {
 
   // Ensure globalThis has the same references for tests that access global localStorage
   if (typeof globalThis !== 'undefined') {
-    // eslint-disable-next-line no-undef
+     
     globalThis.localStorage = window.localStorage;
-    // eslint-disable-next-line no-undef
+     
     globalThis.sessionStorage = window.sessionStorage;
   }
 
@@ -54,7 +54,7 @@ if (typeof window !== 'undefined') {
     }
     window.ResizeObserver = ResizeObserver;
     if (typeof globalThis !== 'undefined') {
-      // eslint-disable-next-line no-undef
+       
       globalThis.ResizeObserver = ResizeObserver;
     }
   }
