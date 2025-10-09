@@ -7,7 +7,7 @@ import incomeRoutes from "./routes/incomeRoutes.js";
 import expenseRoutes from "./routes/expenseRoutes.js"
 import profileRoutes from "./routes/profileRoutes.js";
 import path from "path";
-
+import financeRoutes from "./routes/financeRoutes.js";
 
 // Configure environment variables
 dotenv.config();
@@ -36,6 +36,9 @@ app.use("/api/v1/expense", expenseRoutes);
 app.use("/uploads", express.static(path.join(process.cwd(), "backend", "uploads")));
 // Profile routes
 app.use("/api/v1/profile", profileRoutes);
+
+// Finance Route
+app.use("/api/v1/finances", financeRoutes);
 
 
 // Server setup
