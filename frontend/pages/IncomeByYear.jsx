@@ -6,9 +6,6 @@ import { IoIosArrowForward } from "react-icons/io";
 import { FaTrashAlt } from "react-icons/fa";
 import { MdModeEdit } from "react-icons/md";
 
-
-
-
 export default function IncomeByYear() {
     const { year } = useParams();
     const location = useLocation();
@@ -19,6 +16,7 @@ export default function IncomeByYear() {
     const [expandedMonth, setExpandedMonth] = useState(null);
     const [selectedIncome, setSelectedIncome] = useState({})
 
+    const [refreshKey, setRefreshKey] = useState(0); // trigger re-fetch
 
     useEffect(() => {
         if (income) {
@@ -30,6 +28,21 @@ export default function IncomeByYear() {
         console.log("second useEffect: " + JSON.stringify(incomeUI, null, 2))
     }, [incomeUI])
 
+    // Fetch year data on mount and when refreshKey changes
+    useEffect(() => {
+        const fetchYearData = async () => {
+            try {
+                const response = await fetch(`/api/v1/finances/income/${year}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setIncomeUI(data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch year data:', error);
+            }
+        };
+        fetchYearData();
+    }, [year, refreshKey]);
 
     return (
         <>
@@ -38,10 +51,16 @@ export default function IncomeByYear() {
                     <h1 className="text-2xl font-bold text-gray-800">Income for {year}</h1>
                     <AddSourceButton func={() => { setOpen(true); setType("addIncome") }} text="Add Income"/>
                 </div>
-                
-                {/* TODO: Ensure there is functionality for adding income for specific year/month */}
                 {open &&
-                    <EditSource open={open} closeModal={() => setOpen(false)} type={type} incomeData={selectedIncome}/>
+                    <EditSource
+                        open={open}
+                        closeModal={() => {
+                            setOpen(false);
+                            setRefreshKey(prev => prev + 1); // trigger re-fetch after modal close
+                        }}
+                        type={type}
+                        incomeData={selectedIncome}
+                    />
                 }
                 {
                     incomeUI && Object.entries(incomeUI).map(([month, incomeData]) => (
@@ -93,7 +112,7 @@ export default function IncomeByYear() {
                                                                         <MdModeEdit className="text-2xl text-green-500"/>
                                                                     </button>
                                                                     <button onClick={() => {
-                                                                        setOpen(true); 
+                                                                        setOpen(true);
                                                                         setType("deleteIncome");
                                                                         setSelectedIncome(item);
                                                                     }}

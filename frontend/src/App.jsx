@@ -72,11 +72,14 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-          <Route path="/expense/:year" element={
-            <ProtectedRoute>
-              <ExpenseByYear />
-            </ProtectedRoute>
-          } />
+          <Route
+            path="/expenses/:year"
+            element={
+              <ProtectedRoute>
+                <ExpenseByYear />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
         </Routes>
