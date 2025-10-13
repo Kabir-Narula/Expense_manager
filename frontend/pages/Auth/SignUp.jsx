@@ -36,7 +36,7 @@ const Signup = () => {
     if (!validateForm()) return;
 
     try {
-      const { data } = await api.post("/register", {
+      const { data } = await api.post("/auth/register", {
         fullName: formData.name,
         email: formData.email,
         password: formData.password
