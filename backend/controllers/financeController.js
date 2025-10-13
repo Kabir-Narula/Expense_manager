@@ -159,8 +159,24 @@ export const getExpenseByYear = async (req, res) => {
 // ----- Month-scoped Income CRUD -----
 export const createIncome = async (req, res) => {
   try {
-    // TODO: create Income, push into Month.incomes
-    return res.status(501).json({ message: "Not implemented: createIncome" });
+    const userId = req.user?.id || req.user?._id || req.body.userId;
+    const { year, month } = req.params; // month 0-11 expected
+    if (!userId) return res.status(400).json({ message: "Missing userId" });
+    const mi = parseInt(month);
+    const yi = parseInt(year);
+    if (Number.isNaN(yi) || Number.isNaN(mi) || mi < 0 || mi > 11) return res.status(400).json({ message: "Invalid year/month" });
+
+    const finance = await Finance.findOne({ userId });
+    if (!finance) return res.status(404).json({ message: "Finance not found" });
+    const yearDoc = await Year.findOne({ _id: { $in: finance.years }, year: yi }).populate('months');
+    if (!yearDoc) return res.status(404).json({ message: "Year not found" });
+    const monthDoc = yearDoc.months.find((m) => m.index === mi);
+    if (!monthDoc) return res.status(404).json({ message: "Month not found" });
+
+    const { icon, source, amount, date, recurring, startDate } = req.body;
+    const created = await Income.create({ userId, icon, source, amount, date, recurring, startDate });
+    await Month.updateOne({ _id: monthDoc._id }, { $addToSet: { incomes: created._id } });
+    return res.status(201).json(created);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -168,8 +184,11 @@ export const createIncome = async (req, res) => {
 
 export const updateIncome = async (req, res) => {
   try {
-    // TODO: update Income by id
-    return res.status(501).json({ message: "Not implemented: updateIncome" });
+    const { incomeId } = req.params;
+    const update = req.body;
+    const updated = await Income.findByIdAndUpdate(incomeId, update, { new: true });
+    if (!updated) return res.status(404).json({ message: "Income not found" });
+    return res.json(updated);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -177,8 +196,22 @@ export const updateIncome = async (req, res) => {
 
 export const deleteIncome = async (req, res) => {
   try {
-    // TODO: delete Income, pull from Month.incomes
-    return res.status(501).json({ message: "Not implemented: deleteIncome" });
+    const { year, month, incomeId } = req.params;
+    const yi = parseInt(year);
+    const mi = parseInt(month);
+    const income = await Income.findById(incomeId);
+    if (!income) return res.status(404).json({ message: "Income not found" });
+
+    const finance = await Finance.findOne({ userId: income.userId });
+    if (!finance) return res.status(404).json({ message: "Finance not found" });
+    const yearDoc = await Year.findOne({ _id: { $in: finance.years }, year: yi }).populate('months');
+    if (!yearDoc) return res.status(404).json({ message: "Year not found" });
+    const monthDoc = yearDoc.months.find((m) => m.index === mi);
+    if (!monthDoc) return res.status(404).json({ message: "Month not found" });
+
+    await Month.updateOne({ _id: monthDoc._id }, { $pull: { incomes: income._id } });
+    await Income.deleteOne({ _id: income._id });
+    return res.json({ message: 'Income deleted' });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -187,8 +220,24 @@ export const deleteIncome = async (req, res) => {
 // ----- Month-scoped Expense CRUD -----
 export const createExpense = async (req, res) => {
   try {
-    // TODO: create Expense, push into Month.expenses
-    return res.status(501).json({ message: "Not implemented: createExpense" });
+    const userId = req.user?.id || req.user?._id || req.body.userId;
+    const { year, month } = req.params;
+    if (!userId) return res.status(400).json({ message: "Missing userId" });
+    const mi = parseInt(month);
+    const yi = parseInt(year);
+    if (Number.isNaN(yi) || Number.isNaN(mi) || mi < 0 || mi > 11) return res.status(400).json({ message: "Invalid year/month" });
+
+    const finance = await Finance.findOne({ userId });
+    if (!finance) return res.status(404).json({ message: "Finance not found" });
+    const yearDoc = await Year.findOne({ _id: { $in: finance.years }, year: yi }).populate('months');
+    if (!yearDoc) return res.status(404).json({ message: "Year not found" });
+    const monthDoc = yearDoc.months.find((m) => m.index === mi);
+    if (!monthDoc) return res.status(404).json({ message: "Month not found" });
+
+    const { icon, category, amount, date, recurring, startDate } = req.body;
+    const created = await Expense.create({ userId, icon, category, amount, date, recurring, startDate });
+    await Month.updateOne({ _id: monthDoc._id }, { $addToSet: { expenses: created._id } });
+    return res.status(201).json(created);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -196,8 +245,11 @@ export const createExpense = async (req, res) => {
 
 export const updateExpense = async (req, res) => {
   try {
-    // TODO: update Expense by id
-    return res.status(501).json({ message: "Not implemented: updateExpense" });
+    const { expenseId } = req.params;
+    const update = req.body;
+    const updated = await Expense.findByIdAndUpdate(expenseId, update, { new: true });
+    if (!updated) return res.status(404).json({ message: "Expense not found" });
+    return res.json(updated);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -205,8 +257,22 @@ export const updateExpense = async (req, res) => {
 
 export const deleteExpense = async (req, res) => {
   try {
-    // TODO: delete Expense, pull from Month.expenses
-    return res.status(501).json({ message: "Not implemented: deleteExpense" });
+    const { year, month, expenseId } = req.params;
+    const yi = parseInt(year);
+    const mi = parseInt(month);
+    const expense = await Expense.findById(expenseId);
+    if (!expense) return res.status(404).json({ message: "Expense not found" });
+
+    const finance = await Finance.findOne({ userId: expense.userId });
+    if (!finance) return res.status(404).json({ message: "Finance not found" });
+    const yearDoc = await Year.findOne({ _id: { $in: finance.years }, year: yi }).populate('months');
+    if (!yearDoc) return res.status(404).json({ message: "Year not found" });
+    const monthDoc = yearDoc.months.find((m) => m.index === mi);
+    if (!monthDoc) return res.status(404).json({ message: "Month not found" });
+
+    await Month.updateOne({ _id: monthDoc._id }, { $pull: { expenses: expense._id } });
+    await Expense.deleteOne({ _id: expense._id });
+    return res.json({ message: 'Expense deleted' });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
