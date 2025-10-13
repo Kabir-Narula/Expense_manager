@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import api from "../src/Utils/api";
 
 export default function EditSource ({open, closeModal, type, incomeData }) {
