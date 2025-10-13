@@ -18,7 +18,8 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
     const [dateUI, setDateUI] = useState(formattedDate);
     const [showError, setShowError] = useState(false); 
     const [errorMessage, setErrorMessage] = useState("");
-    
+    const [recurringUI, setRecurringUI] = useState(type === "editExpense" ? expenseData.recurring : false);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -26,10 +27,12 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
             let cents;
             cents = Math.round(floatVal * 100) 
             const formData = {
-                icon:"",
+                icon: "",
                 category: categoryUI,
                 amount: cents,
                 date: dateUI,
+                recurring: recurringUI,
+                startDate: dateUI,
             };
             let res;
             if (type === "addExpense") {
@@ -140,6 +143,14 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
                                         <p className="text-red-600">{errorMessage}</p>
                                     )}
                                     <div className=" flex justify-end gap-5 mt-4">
+                                        <label className="flex items-center gap-2">
+                                            <input 
+                                                type="checkbox" 
+                                                checked={recurringUI} 
+                                                onChange={(e) => setRecurringUI(e.target.checked)}
+                                            />
+                                            Recurring Every Month
+                                        </label>
                                         <button 
                                             onClick={() => {
                                                 closeModal()

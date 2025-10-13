@@ -6,6 +6,9 @@ const ExpenseSchema = new mongoose.Schema({
     category: {type: String, required: true},
     amount: {type: Number, required: true},
     date: {type: Date, default: Date.now},
+    // Recurring support
+    recurring: { type: Boolean, default: false },
+    startDate: { type: Date },
 }, {timestamps: true});
 
 const Expense = mongoose.model("Expense", ExpenseSchema);
