@@ -15,7 +15,7 @@ function Dashboard() {
     const fetchData = async () => {
       try {
         // Fetch user data from existing endpoint
-        const userResponse = await api.get("/auth/getUser");
+        const userResponse = await api.get("/getUser");
         setUser(userResponse.data);
 
         // Mock data - replace with actual API calls when backend is ready
