@@ -5,6 +5,7 @@ import api from "../src/Utils/api";
 import { IoIosArrowForward } from "react-icons/io";
 import { Link } from "react-router-dom";
 import AddSourceButton from "../components/AddSourceButton";
+import { parseDateToLocal } from "../src/Utils/dateFormatter";
 
 
 
@@ -19,7 +20,7 @@ function Income() {
         let res = await api.get("/income/get")
         if (res.status === 200) {
           const groupedData = res.data.reduce((acc, item) => {
-            const date = new Date(item.date);
+            const date = parseDateToLocal(item.date);
             const year = date.getFullYear();
             const month = date.toLocaleDateString("default", {month: "long"});
 

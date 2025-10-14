@@ -21,6 +21,7 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
     const [recurringUI, setRecurringUI] = useState(type === "editExpense" ? expenseData.recurring : false);
 
     const handleSubmit = async (e) => {
+        console.log("HELLOOOOOO")
         e.preventDefault();
         try {
             const floatVal = parseFloat(amountUI)

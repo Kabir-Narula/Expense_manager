@@ -1,10 +1,12 @@
 import { useParams, useLocation } from "react-router-dom"
 import AddSourceButton from "../components/AddSourceButton";
 import { useState, useEffect } from "react";
-import EditSource from "../components/EditSource";
+import AddExpense from "../components/AddExpense";
 import { IoIosArrowForward } from "react-icons/io";
 import { FaTrashAlt } from "react-icons/fa";
 import { MdModeEdit } from "react-icons/md";
+import api from "../src/Utils/api";
+import { parseDateToLocal } from "../src/Utils/dateFormatter";
 
 export default function ExpenseByYear() {
     const { year } = useParams();
@@ -23,19 +25,25 @@ export default function ExpenseByYear() {
         }
     }, [expense]);
 
-    useEffect(() => {
-        console.log("second useEffect: " + JSON.stringify(expenseUI, null, 2))
-    }, [expenseUI])
-
-
     // Fetch year data on mount and when refreshKey changes
     useEffect(() => {
         const fetchYearData = async () => {
             try {
-                const response = await fetch(`/api/v1/finances/expense/${year}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setExpenseUI(data);
+                let res = await api.get("/expense/get")
+                if (res.status === 200) {
+                    const expenseDocuments = res.data;
+                    const filtered = expenseDocuments.filter(item => {
+                        const itemDate = parseDateToLocal(item.date);
+                        return itemDate.getFullYear() === Number(year);
+                    });
+                    const groupedData = filtered.reduce((acc, item) => {
+                        const date = parseDateToLocal(item.date);
+                        const month = date.toLocaleDateString("default", { month: "long" });
+                        if (!acc[month]) acc[month] = { income: [] };
+                        acc[month].income.push(item);
+                        return acc;
+                    }, {});
+                    setExpenseUI(groupedData);
                 }
             } catch (error) {
                 console.error('Failed to fetch year data:', error);
@@ -52,7 +60,7 @@ export default function ExpenseByYear() {
                     <AddSourceButton func={() => { setOpen(true); setType("addExpense") }} text="Add Expense"/>
                 </div>
                 {open &&
-                    <EditSource
+                    <AddExpense
                         open={open}
                         closeModal={() => {
                             setOpen(false);

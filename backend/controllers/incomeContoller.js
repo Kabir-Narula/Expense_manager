@@ -7,7 +7,7 @@ export const addIncome = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const { icon, source, amount, date } = req.body;
+    const { icon, source, amount, date, recurring, startDate } = req.body;
 
 
     if (!source || isNaN(amount) || !date) {
@@ -17,16 +17,52 @@ export const addIncome = async (req, res) => {
     if (amount <= 0 ) {
       return res.status(400).json({ message: "Please provide value more than 0." });
     }
+    const dateStr = (startDate && String(startDate)) || String(date);
+    const ymd = dateStr.slice(0,10).split("-").map(n => Number(n));
+    const [yy, mm, dd] = ymd; 
+    
+    if (ymd.length < 3 || isNaN(yy) || isNaN(mm) || isNaN(dd)) {
+      return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD." });
+    }
+    
+    const canonicalStart = new Date(yy, mm - 1, dd);
 
     const newIncome = new Income({
       userId,
       icon,
       source,
       amount,
-      date: new Date(date),
+      date: canonicalStart,
+      recurring,
+      startDate: canonicalStart
     });
 
-    await newIncome.save();
+    if (recurring) {
+
+      const recurringIncomes = [];   
+      const startMonthIndex = canonicalStart.getMonth();
+      const startYear = canonicalStart.getFullYear();
+      const startDay = canonicalStart.getDate();
+
+
+      for (let m = startMonthIndex ; m < 12 ; m++ ) {
+        let monthDate = new Date(startYear, m, startDay);
+        if (monthDate.getDate() !== startDay) {
+          monthDate.setDate(0);
+        }
+        recurringIncomes.push({
+          userId, 
+          icon,
+          source, 
+          amount, 
+          date: monthDate,
+          recurring: true,
+        })
+      }
+      await Income.insertMany(recurringIncomes);
+    } else {
+      await newIncome.save();
+    }
     res.status(200).json(newIncome);
   } catch (err) {
     res.status(500).json({ message: err });
@@ -36,7 +72,6 @@ export const addIncome = async (req, res) => {
 // Get Income # CRIS SPRINT
 export const getAllIncome = async (req, res) => {
   const userId = req.user.id;
-
   try {
     const incomes = await Income.find({ userId }).sort({ date: -1 });
     res.status(200).json(incomes);

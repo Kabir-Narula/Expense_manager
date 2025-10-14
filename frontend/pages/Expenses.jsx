@@ -41,11 +41,6 @@ function Expenses() {
     fetchExpenseData();
   }, [open])
 
-  useEffect(() => {
-    console.log("groupedDataUI: " + JSON.stringify(groupedDataUI, null, 2))
-  }, [])
-
-
   return (
     <>
     <div className="md:ml-72 md:pt-8 pt-20 p-8 min-h-screen bg-gray-50">
@@ -68,7 +63,7 @@ function Expenses() {
             >
             <Link 
               className="flex justify-between items-center"
-              to={`/expense/${year}`}
+              to={`/expenses/${year}`}
               state={{expense: months}}
             >
               <p>{year}</p>

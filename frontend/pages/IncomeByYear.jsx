@@ -5,6 +5,8 @@ import EditSource from "../components/EditSource";
 import { IoIosArrowForward } from "react-icons/io";
 import { FaTrashAlt } from "react-icons/fa";
 import { MdModeEdit } from "react-icons/md";
+import api from "../src/Utils/api";
+import { parseDateToLocal } from "../src/Utils/dateFormatter";
 
 export default function IncomeByYear() {
     const { year } = useParams();
@@ -24,18 +26,28 @@ export default function IncomeByYear() {
         }
     }, [income]); 
 
-    useEffect(() => {
-        console.log("second useEffect: " + JSON.stringify(incomeUI, null, 2))
-    }, [incomeUI])
+
 
     // Fetch year data on mount and when refreshKey changes
     useEffect(() => {
         const fetchYearData = async () => {
             try {
-                const response = await fetch(`/api/v1/finances/income/${year}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setIncomeUI(data);
+                let res = await api.get("/income/get")
+                if (res.status === 200) {
+                    
+                    const incomeDocuments = res.data;
+                    const filtered = incomeDocuments.filter(item => {
+                        const itemDate = parseDateToLocal(item.date);
+                        return itemDate.getFullYear() === Number(year);
+                    });
+                    const groupedData = filtered.reduce((acc, item) => {
+                        const date = parseDateToLocal(item.date);
+                        const month = date.toLocaleDateString("default", { month: "long" });
+                        if (!acc[month]) acc[month] = { income: [] };
+                        acc[month].income.push(item);
+                        return acc;
+                    }, {});
+                    setIncomeUI(groupedData);
                 }
             } catch (error) {
                 console.error('Failed to fetch year data:', error);
