@@ -6,7 +6,7 @@ export const addExpense = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const { icon, category, amount, date } = req.body;
+    const { icon, category, amount, date, recurring, startDate } = req.body;
 
     if (!category || isNaN(amount) || !date) {
       return res.status(400).json({ message: "All fields are required." });
@@ -16,15 +16,50 @@ export const addExpense = async (req, res) => {
       return res.status(400).json({ message: "Please provide value more than 0." });
     }
 
+    const dateStr = (startDate && String(startDate)) || String(date);
+    const ymd = dateStr.slice(0,10).split("-").map(n => Number(n));
+    const [yy, mm, dd] = ymd; 
+    
+    if (ymd.length < 3 || isNaN(yy) || isNaN(mm) || isNaN(dd)) {
+      return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD." });
+    }
+
+    const canonicalStart = new Date(yy, mm - 1, dd);
+
     const newExpense = new Expense({
       userId,
       icon,
       category,
       amount,
-      date: new Date(date),
+      date: canonicalStart,
+      recurring,
+      startDate: canonicalStart
     });
 
-    await newExpense.save();
+    if (recurring) {
+      const recurringExpenses = [];
+      const startMonthIndex = canonicalStart.getMonth();
+      const startYear = canonicalStart.getFullYear();
+      const startDay = canonicalStart.getDate();
+      for (let m = startMonthIndex ; m < 12 ; m++) {
+        let monthDate = new Date(startYear, m, startDay);
+        if (monthDate.getDate() !== startDay) {
+          monthDate.setDate(0);
+        }
+        recurringExpenses.push({
+          userId,
+          icon,
+          category,
+          amount,
+          date: monthDate,
+          recurring: true,
+        });
+      }
+      
+      await Expense.insertMany(recurringExpenses);
+    } else {
+      await newExpense.save();
+    }
     res.status(200).json(newExpense);
   } catch (err) {
     res.status(500).json({ message: err });

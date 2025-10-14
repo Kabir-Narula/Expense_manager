@@ -2,11 +2,14 @@ import mongoose from "mongoose";
 
 const IncomeSchema = new mongoose.Schema(
   {
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", require: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     icon: { type: String },
-    source: { type: String, require: true },
-    amount: { type: Number, require: true },
+    source: { type: String, required: true },
+    amount: { type: Number, required: true },
     date: { type: Date, default: Date.now },
+    // Recurring support
+    recurring: { type: Boolean, default: false },
+    startDate: { type: Date },
   },
   { timestamps: true }
 );
