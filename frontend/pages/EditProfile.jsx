@@ -26,7 +26,7 @@ const EditProfile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const { data } = await api.get("/getUser");
+        const { data } = await api.get("/auth/getUser");
         setUser(data);
         setFullName(data.fullName || "");
         // Construct full URL for profile image
