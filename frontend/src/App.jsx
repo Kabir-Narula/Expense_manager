@@ -13,6 +13,7 @@ import EditProfile from "../pages/EditProfile";
 import ProtectedRoute from "../components/ProtectedRoutes";
 import IncomeByYear from "../pages/IncomeByYear";
 import ExpenseByYear from "../pages/ExpenseByYear";
+import ManageAccount from "../pages/ManageAccount";
 
 const App = () => {
   const location = useLocation();
@@ -86,6 +87,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <EditProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manage-account"
+            element={
+              <ProtectedRoute>
+                <ManageAccount />
               </ProtectedRoute>
             }
           />

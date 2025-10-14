@@ -10,10 +10,12 @@ import Expense from "../models/Expense.js";
 // ----- Years -----
 export const getYears = async (req, res) => {
   try {
-    const userId = req.user?.id || req.user?._id || req.query.userId || req.body.userId;
+    const accountId = req.account?._id;
+    const userId = req.user?._id;
     if (!userId) return res.status(400).json({ message: "Missing userId" });
 
-    const finance = await Finance.findOne({ userId }).populate({
+    const query = accountId ? { accountId } : { userId };
+    const finance = await Finance.findOne(query).populate({
       path: "years",
       select: "year",
       options: { sort: { year: 1 } },
@@ -29,14 +31,16 @@ export const getYears = async (req, res) => {
 
 export const addYear = async (req, res) => {
   try {
-    const userId = req.user?.id || req.user?._id || req.body.userId;
+    const accountId = req.account?._id;
+    const userId = req.user?._id;
     const { year } = req.body;
     if (!userId) return res.status(400).json({ message: "Missing userId" });
     if (!year || Number.isNaN(parseInt(year))) return res.status(400).json({ message: "Invalid year" });
 
-    let finance = await Finance.findOne({ userId });
+    const query = accountId ? { accountId } : { userId };
+    let finance = await Finance.findOne(query);
     if (!finance) {
-      finance = await Finance.create({ userId, years: [] });
+      finance = await Finance.create({ ...(accountId ? { accountId } : { userId }), years: [] });
     }
 
     // Check if year already exists for this user
@@ -62,12 +66,13 @@ export const addYear = async (req, res) => {
 
 export const deleteYear = async (req, res) => {
   try {
-    const userId = req.user?.id || req.user?._id || req.body.userId || req.query.userId;
+    const accountId = req.account?._id;
+    const userId = req.user?._id;
     const { year } = req.params;
     if (!userId) return res.status(400).json({ message: "Missing userId" });
     if (!year || Number.isNaN(parseInt(year))) return res.status(400).json({ message: "Invalid year" });
-
-    const finance = await Finance.findOne({ userId });
+    const query = accountId ? { accountId } : { userId };
+    const finance = await Finance.findOne(query);
     if (!finance) return res.status(404).json({ message: "Finance not found" });
 
     const yearDoc = await Year.findOne({ _id: { $in: finance.years }, year: parseInt(year) });
@@ -92,12 +97,13 @@ export const deleteYear = async (req, res) => {
 // ----- Year data (income/expense by year) -----
 export const getIncomeByYear = async (req, res) => {
   try {
-    const userId = req.user?.id || req.user?._id || req.query.userId || req.body.userId;
+    const accountId = req.account?._id;
+    const userId = req.user?._id;
     const { year } = req.params;
     if (!userId) return res.status(400).json({ message: "Missing userId" });
     if (!year || Number.isNaN(parseInt(year))) return res.status(400).json({ message: "Invalid year" });
-
-    const finance = await Finance.findOne({ userId });
+    const query = accountId ? { accountId } : { userId };
+    const finance = await Finance.findOne(query);
     if (!finance) return res.json({});
 
     const yearDoc = await Year.findOne({ _id: { $in: finance.years }, year: parseInt(year) })
@@ -125,12 +131,13 @@ export const getIncomeByYear = async (req, res) => {
 
 export const getExpenseByYear = async (req, res) => {
   try {
-    const userId = req.user?.id || req.user?._id || req.query.userId || req.body.userId;
+    const accountId = req.account?._id;
+    const userId = req.user?._id;
     const { year } = req.params;
     if (!userId) return res.status(400).json({ message: "Missing userId" });
     if (!year || Number.isNaN(parseInt(year))) return res.status(400).json({ message: "Invalid year" });
-
-    const finance = await Finance.findOne({ userId });
+    const query = accountId ? { accountId } : { userId };
+    const finance = await Finance.findOne(query);
     if (!finance) return res.json({});
 
     const yearDoc = await Year.findOne({ _id: { $in: finance.years }, year: parseInt(year) })
@@ -159,22 +166,23 @@ export const getExpenseByYear = async (req, res) => {
 // ----- Month-scoped Income CRUD -----
 export const createIncome = async (req, res) => {
   try {
-    const userId = req.user?.id || req.user?._id || req.body.userId;
+    const accountId = req.account?._id;
+    const userId = req.user?._id;
     const { year, month } = req.params; // month 0-11 expected
     if (!userId) return res.status(400).json({ message: "Missing userId" });
     const mi = parseInt(month);
     const yi = parseInt(year);
     if (Number.isNaN(yi) || Number.isNaN(mi) || mi < 0 || mi > 11) return res.status(400).json({ message: "Invalid year/month" });
 
-    const finance = await Finance.findOne({ userId });
+  const finance = await Finance.findOne(accountId ? { accountId } : { userId });
     if (!finance) return res.status(404).json({ message: "Finance not found" });
     const yearDoc = await Year.findOne({ _id: { $in: finance.years }, year: yi }).populate('months');
     if (!yearDoc) return res.status(404).json({ message: "Year not found" });
     const monthDoc = yearDoc.months.find((m) => m.index === mi);
     if (!monthDoc) return res.status(404).json({ message: "Month not found" });
 
-    const { icon, source, amount, date, recurring, startDate } = req.body;
-    const created = await Income.create({ userId, icon, source, amount, date, recurring, startDate });
+  const { icon, source, amount, date, recurring, startDate } = req.body;
+  const created = await Income.create({ userId, icon, source, amount, date, recurring, startDate, accountId, createdBy: req.user._id });
     await Month.updateOne({ _id: monthDoc._id }, { $addToSet: { incomes: created._id } });
     return res.status(201).json(created);
   } catch (err) {
@@ -220,22 +228,23 @@ export const deleteIncome = async (req, res) => {
 // ----- Month-scoped Expense CRUD -----
 export const createExpense = async (req, res) => {
   try {
-    const userId = req.user?.id || req.user?._id || req.body.userId;
+    const accountId = req.account?._id;
+    const userId = req.user?._id;
     const { year, month } = req.params;
     if (!userId) return res.status(400).json({ message: "Missing userId" });
     const mi = parseInt(month);
     const yi = parseInt(year);
     if (Number.isNaN(yi) || Number.isNaN(mi) || mi < 0 || mi > 11) return res.status(400).json({ message: "Invalid year/month" });
 
-    const finance = await Finance.findOne({ userId });
+  const finance = await Finance.findOne(accountId ? { accountId } : { userId });
     if (!finance) return res.status(404).json({ message: "Finance not found" });
     const yearDoc = await Year.findOne({ _id: { $in: finance.years }, year: yi }).populate('months');
     if (!yearDoc) return res.status(404).json({ message: "Year not found" });
     const monthDoc = yearDoc.months.find((m) => m.index === mi);
     if (!monthDoc) return res.status(404).json({ message: "Month not found" });
 
-    const { icon, category, amount, date, recurring, startDate } = req.body;
-    const created = await Expense.create({ userId, icon, category, amount, date, recurring, startDate });
+  const { icon, category, amount, date, recurring, startDate } = req.body;
+  const created = await Expense.create({ userId, icon, category, amount, date, recurring, startDate, accountId, createdBy: req.user._id });
     await Month.updateOne({ _id: monthDoc._id }, { $addToSet: { expenses: created._id } });
     return res.status(201).json(created);
   } catch (err) {

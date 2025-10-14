@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import Income from "../models/Income.js";
 import { json } from "express";
+import Account from "../models/Account.js";
 
 // Add Income # CRIS SPRINT 4
 export const addIncome = async (req, res) => {
@@ -34,7 +35,9 @@ export const addIncome = async (req, res) => {
       amount,
       date: canonicalStart,
       recurring,
-      startDate: canonicalStart
+      startDate: canonicalStart,
+      accountId: req.account?._id,
+      createdBy: req.user._id,
     });
 
     if (recurring) {
@@ -57,6 +60,8 @@ export const addIncome = async (req, res) => {
           amount, 
           date: monthDate,
           recurring: true,
+          accountId: req.account?._id,
+          createdBy: req.user._id,
         })
       }
       await Income.insertMany(recurringIncomes);
@@ -73,7 +78,21 @@ export const addIncome = async (req, res) => {
 export const getAllIncome = async (req, res) => {
   const userId = req.user.id;
   try {
-    const incomes = await Income.find({ userId }).sort({ date: -1 });
+    const accountId = req.account?._id;
+    const { createdBy } = req.query;
+    const query = [];
+    if (accountId) {
+      query.push({ accountId });
+    }
+    // Legacy: include personal legacy records for personal context
+    if (!accountId || (req.account && req.account.type === "personal")) {
+      query.push({ accountId: { $exists: false }, userId: req.user._id });
+    }
+    const filter = query.length ? { $or: query } : {};
+    if (createdBy) {
+      filter.createdBy = createdBy;
+    }
+    const incomes = await Income.find(filter).sort({ date: -1 }).populate("createdBy", "fullName email");
     res.status(200).json(incomes);
   } catch (error) {
     res.status(500).json({ message: error });
@@ -83,10 +102,23 @@ export const getAllIncome = async (req, res) => {
 // Delete Income # CRIS SPRINT 4
 export const deleteIncome = async (req, res) => {
   try {
-    await Income.findByIdAndDelete(req.params.id);
+    const doc = await Income.findById(req.params.id);
+    if (!doc) return res.status(404).json({ message: "Income not found" });
+
+    // Check account ownership: record must belong to current account (or legacy personal)
+    const inAccount = req.account && doc.accountId && doc.accountId.toString() === req.account._id.toString();
+    const legacyPersonal = (!doc.accountId && req.account && req.account.type === "personal" && doc.userId.toString() === req.user._id.toString());
+    if (!inAccount && !legacyPersonal) return res.status(403).json({ message: "Forbidden" });
+
+    // Permission: owner can delete any; member can delete own only
+    const isOwner = req.account && req.account.owner.toString() === req.user._id.toString();
+    const isCreator = (doc.createdBy && doc.createdBy.toString() === req.user._id.toString()) || (legacyPersonal);
+    if (!isOwner && !isCreator) return res.status(403).json({ message: "Not allowed" });
+
+    await doc.deleteOne();
     res.status(200).json({ message: "Income Deleted Successfully" });
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: error.message || error });
   }
 };
 // Update Income # SUKHMAN Sprint 4
@@ -105,22 +137,25 @@ export const updateIncome = async (req, res) => {
       return res.status(400).json({ message: "Please provide value more than 0." });
     }
 
-    const updatedIncome = await Income.findByIdAndUpdate(
-      incomeId,
-      {
-        icon,
-        source,
-        amount,
-        date: new Date(date),
-      },
-      { new: true }
-    );
+    const existing = await Income.findById(incomeId);
+    if (!existing) return res.status(404).json({ message: "Income not found" });
 
-    if (!updatedIncome) {
-      return res.status(404).json({ message: "Income not found" });
-    }
+    // Check account membership and scope
+    const inAccount = req.account && existing.accountId && existing.accountId.toString() === req.account._id.toString();
+    const legacyPersonal = (!existing.accountId && req.account && req.account.type === "personal" && existing.userId.toString() === req.user._id.toString());
+    if (!inAccount && !legacyPersonal) return res.status(403).json({ message: "Forbidden" });
 
-    res.status(200).json(updatedIncome);
+    // Permission: owner can edit any; member can edit own
+    const isOwner = req.account && req.account.owner.toString() === req.user._id.toString();
+    const isCreator = (existing.createdBy && existing.createdBy.toString() === req.user._id.toString()) || legacyPersonal;
+    if (!isOwner && !isCreator) return res.status(403).json({ message: "Not allowed" });
+
+    existing.icon = icon;
+    existing.source = source;
+    existing.amount = amount;
+    existing.date = new Date(date);
+    await existing.save();
+    res.status(200).json(existing);
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
