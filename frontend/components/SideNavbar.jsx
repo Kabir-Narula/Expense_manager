@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import api from "../src/Utils/api";
 import { FiMenu } from "react-icons/fi";
 import { CgMenuGridO } from "react-icons/cg";
-import { MdAttachMoney, MdBarChart } from "react-icons/md";
+import { MdAttachMoney, MdBarChart, MdPerson } from "react-icons/md";
 import { FaHandHoldingUsd } from "react-icons/fa";
 import { RiLogoutBoxLine, RiDashboardLine } from "react-icons/ri";
 // import defaultAvatar from "../assets/default-avatar.png";
@@ -50,6 +50,17 @@ const SideNavbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Listen for profile updates from other components, and does real-time updates
+  useEffect(() => {
+    const handleProfileUpdate = (event) => {
+      console.log("SideNavbar received profile update:", event.detail);
+      setUser(event.detail);
+    };
+    
+    window.addEventListener('profileUpdated', handleProfileUpdate);
+    return () => window.removeEventListener('profileUpdated', handleProfileUpdate);
+  }, []);
+
   return (
     <>
       <button
@@ -79,6 +90,7 @@ const SideNavbar = () => {
               { to: "/income", icon: <MdAttachMoney />, text: "Income" },
               { to: "/expenses", icon: <FaHandHoldingUsd />, text: "Expenses" },
               { to: "/charts", icon: <MdBarChart />, text: "Analytics" },
+              { to: "/edit-profile", icon: <MdPerson />, text: "Edit Profile" },
             ].map((link) => (
               <Link
                 key={link.to}
@@ -114,7 +126,7 @@ const SideNavbar = () => {
             <div className="flex items-center px-2">
               <img
                 className="w-10 h-10 rounded-full border-2 border-indigo-400"
-                src={user.profileImageURL || defaultAvatar}
+                src={user.profileImageURL ? `http://localhost:8000${user.profileImageURL}` : defaultAvatar}
                 alt="User profile"
                 onError={(e) => {
                   e.target.src = defaultAvatar;

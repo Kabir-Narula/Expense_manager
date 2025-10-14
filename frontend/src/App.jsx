@@ -9,6 +9,7 @@ import Logout from "../pages/Logout";
 import Charts from "../pages/Charts";
 import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/Signup";
+import EditProfile from "../pages/EditProfile";
 import ProtectedRoute from "../components/ProtectedRoutes";
 import IncomeByYear from "../pages/IncomeByYear";
 import ExpenseByYear from "../pages/ExpenseByYear";
@@ -77,6 +78,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <ExpenseByYear />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/edit-profile"
+            element={
+              <ProtectedRoute>
+                <EditProfile />
               </ProtectedRoute>
             }
           />
