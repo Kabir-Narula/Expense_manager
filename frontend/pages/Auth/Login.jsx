@@ -15,6 +15,8 @@ const Login = () => {
     try {
       const { data } = await api.post("/auth/login", { email, password });
       localStorage.setItem("token", data.token);
+      // Reset any previous account selection from another user/session
+      localStorage.removeItem("currentAccountId");
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");

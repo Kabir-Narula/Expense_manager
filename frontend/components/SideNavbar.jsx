@@ -6,6 +6,7 @@ import { CgMenuGridO } from "react-icons/cg";
 import { MdAttachMoney, MdBarChart, MdPerson } from "react-icons/md";
 import { FaHandHoldingUsd } from "react-icons/fa";
 import { RiLogoutBoxLine, RiDashboardLine } from "react-icons/ri";
+import AccountSwitcher from "./AccountSwitcher";
 // import defaultAvatar from "../assets/default-avatar.png";
 const defaultAvatar =
   "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2VlZWVlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjMwIiBmaWxsPSIjNjY2NjY2Ij5VU0VSPC90ZXh0Pjwvc3ZnPg==";
@@ -37,6 +38,7 @@ const SideNavbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("currentAccountId");
     navigate("/login");
   };
 
@@ -84,6 +86,8 @@ const SideNavbar = () => {
             <span className="ml-3 text-xl font-semibold text-white">FinDashboard</span>
           </div>
 
+          <AccountSwitcher />
+
           <nav className="space-y-1.5">
             {[
               { to: "/dashboard", icon: <CgMenuGridO />, text: "Dashboard" },
@@ -91,6 +95,7 @@ const SideNavbar = () => {
               { to: "/expenses", icon: <FaHandHoldingUsd />, text: "Expenses" },
               { to: "/charts", icon: <MdBarChart />, text: "Analytics" },
               { to: "/edit-profile", icon: <MdPerson />, text: "Edit Profile" },
+              { to: "/manage-account", icon: <MdPerson />, text: "Manage Account" },
             ].map((link) => (
               <Link
                 key={link.to}
