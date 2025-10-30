@@ -10,6 +10,7 @@ import path from "path";
 import financeRoutes from "./routes/financeRoutes.js";
 import accountRoutes from "./routes/accountRoutes.js";
 import invitationRoutes from "./routes/invitationRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 // Configure environment variables
 dotenv.config();
@@ -44,6 +45,10 @@ app.use("/api/v1/finances", financeRoutes);
 // Accounts & Invitations
 app.use("/api/v1/accounts", accountRoutes);
 app.use("/api/v1", invitationRoutes);
+
+
+// Notification
+app.use("/api/v1/notifications", notificationRoutes);
 
 
 // Server setup
