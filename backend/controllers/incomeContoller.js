@@ -77,9 +77,11 @@ export const addIncome = async (req, res) => {
 // Get Income # CRIS SPRINT
 export const getAllIncome = async (req, res) => {
   const userId = req.user.id;
+  const { range, start, end } = req.query;
+  let startDate, endDate;
   try {
     const accountId = req.account?._id;
-    const { createdBy } = req.query;
+    const { createdBy } = req.query
     const query = [];
     if (accountId) {
       query.push({ accountId });
@@ -92,7 +94,31 @@ export const getAllIncome = async (req, res) => {
     if (createdBy) {
       filter.createdBy = createdBy;
     }
-    const incomes = await Income.find(filter).sort({ date: -1 }).populate("createdBy", "fullName email");
+    console.log(range)
+    startDate = new Date();
+    endDate = new Date();
+    switch (range) {
+      case "4w": 
+        startDate.setDate(startDate.getDate() - 28);
+        break;
+      case "3m":
+        startDate.setMonth(startDate.getMonth() - 3);
+        break;
+      case "6m":
+        startDate.setMonth(startDate.getMonth() - 6);
+        break;
+      case "12m": 
+        startDate.setFullYear(startDate.getFullYear() -1);
+        break;
+      default: 
+        return res.status(400).json({error: "Invalid range date"});
+    }
+
+    if (start && end) {
+      startDate = new Date(start);
+      endDate = new Date(end)
+    }
+    const incomes = await Income.find({...filter, date: {$gte: startDate, $lte: endDate}}).sort({ date: -1 }).populate("createdBy", "fullName email");
     res.status(200).json(incomes);
   } catch (error) {
     res.status(500).json({ message: error });
