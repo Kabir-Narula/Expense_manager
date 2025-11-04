@@ -11,7 +11,7 @@ import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/Signup";
 import EditProfile from "../pages/EditProfile";
 import ProtectedRoute from "../components/ProtectedRoutes";
-import IncomeByYear from "../pages/IncomeByYear";
+// import IncomeByYear from "../pages/IncomeByYear";
 import ExpenseByYear from "../pages/ExpenseByYear";
 import ManageAccount from "../pages/ManageAccount";
 
@@ -66,14 +66,14 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-          <Route
+          {/* <Route
             path="/income/:year"
             element={
               <ProtectedRoute>
                 <IncomeByYear />
               </ProtectedRoute>
             }
-          />
+          /> */}
           <Route
             path="/expenses/:year"
             element={
