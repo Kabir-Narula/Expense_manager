@@ -3,78 +3,38 @@ import Income from "../models/Income.js";
 import { json } from "express";
 import Account from "../models/Account.js";
 
-// Add Income # CRIS SPRINT 4
 export const addIncome = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const { icon, source, amount, date, recurring, startDate } = req.body;
-
-
+    const { icon, source, amount, date, recurring, endDate} = req.body;
     if (!source || isNaN(amount) || !date) {
       return res.status(400).json({ message: "All fields are required." });
     }
-
     if (amount <= 0 ) {
       return res.status(400).json({ message: "Please provide value more than 0." });
     }
-    const dateStr = (startDate && String(startDate)) || String(date);
-    const ymd = dateStr.slice(0,10).split("-").map(n => Number(n));
-    const [yy, mm, dd] = ymd; 
-    
-    if (ymd.length < 3 || isNaN(yy) || isNaN(mm) || isNaN(dd)) {
-      return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD." });
-    }
-    
-    const canonicalStart = new Date(yy, mm - 1, dd);
-
+    const finalStartDate = new Date(date)
+    const finalEndDate = endDate? new Date(endDate) : ""
     const newIncome = new Income({
       userId,
       icon,
       source,
       amount,
-      date: canonicalStart,
+      date: finalStartDate,
       recurring,
-      startDate: canonicalStart,
+      endDate: finalEndDate,
       accountId: req.account?._id,
       createdBy: req.user._id,
     });
-
-    if (recurring) {
-
-      const recurringIncomes = [];   
-      const startMonthIndex = canonicalStart.getMonth();
-      const startYear = canonicalStart.getFullYear();
-      const startDay = canonicalStart.getDate();
-
-
-      for (let m = startMonthIndex ; m < 12 ; m++ ) {
-        let monthDate = new Date(startYear, m, startDay);
-        if (monthDate.getDate() !== startDay) {
-          monthDate.setDate(0);
-        }
-        recurringIncomes.push({
-          userId, 
-          icon,
-          source, 
-          amount, 
-          date: monthDate,
-          recurring: true,
-          accountId: req.account?._id,
-          createdBy: req.user._id,
-        })
-      }
-      await Income.insertMany(recurringIncomes);
-    } else {
-      await newIncome.save();
-    }
+    console.log(JSON.stringify(newIncome, null,2))
+    await newIncome.save()
     res.status(200).json(newIncome);
   } catch (err) {
     res.status(500).json({ message: err });
   }
 };
 
-// Get Income # CRIS SPRINT
 export const getAllIncome = async (req, res) => {
   const userId = req.user.id;
   const { range, start, end } = req.query;
@@ -133,7 +93,6 @@ export const getAllIncome = async (req, res) => {
   }
 };
 
-// Delete Income # CRIS SPRINT 4
 export const deleteIncome = async (req, res) => {
   try {
     const doc = await Income.findById(req.params.id);
@@ -155,7 +114,7 @@ export const deleteIncome = async (req, res) => {
     res.status(500).json({ message: error.message || error });
   }
 };
-// Update Income # SUKHMAN Sprint 4
+
 export const updateIncome = async (req, res) => {
   const userId = req.user.id;
   const incomeId = req.params.id;
