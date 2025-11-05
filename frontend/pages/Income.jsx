@@ -22,8 +22,36 @@ export default function Income () {
   const [memberFilter, setMemberFilter] = useState("all");
   const [range, setRange] = useState("4w");
   const [customSearch, setCustomSearch] = useState(false);
-
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() -1)
+  const todayStr = today.toISOString().split("T")[0];
+  const yesterdayStr = yesterday.toISOString().split("T")[0];
+  const [customStartDateUI, setCustomStartDateUI] = useState(yesterdayStr);
+  const [customEndDateUI, setCustomEndDateUI] = useState(todayStr);
   const [refreshKey, setRefreshKey] = useState(0); // trigger re-fetch
+  const [noDataMessage, setNoDataMessage] = useState("");
+
+  const handleRangeSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setNoDataMessage("");
+      const res = await api.get(`income/get?start=${customStartDateUI}&end=${customEndDateUI}`);
+      if (res.status === 200) {
+        const incomeDocuments = res.data;
+        if (incomeDocuments.length === 0) {
+          setNoDataMessage("Nothing to show!")
+        }
+        console.log(incomeDocuments)
+        const withFilter = memberFilter === "all"
+          ? incomeDocuments
+          : incomeDocuments.filter((i) => i.createdBy?._id === memberFilter);
+        setIncomeUI(withFilter);
+      }
+    } catch (error) {
+      setNoDataMessage(error.response?.data?.message || "An unexpected error occurred")
+    }
+  }
 
   const viewOptions = [
     {
@@ -61,12 +89,12 @@ export default function Income () {
       };
       fetchMembers();
     }, [currentAccountId]);
-
     // Fetch year data on mount and when refreshKey or memberFilter changes
     useEffect(() => {
         const fetchYearData = async () => {
           try {
-            let res = await api.get(`income/get?range=${range}`)
+            let res = await api.get(`income/get?range=${range}`);
+            setNoDataMessage("");
             if (res.status === 200) {        
               const incomeDocuments = res.data;
               const withFilter = memberFilter === "all"
@@ -106,10 +134,10 @@ export default function Income () {
           )}
           <div className="flex justify-between">
             <button 
-              className="flex items-center cursor-pointer"
+              className="flex items-center cursor-pointer underline"
               onClick={() => setCustomSearch(!customSearch)}>
               <FaMagnifyingGlass />
-              <p className="underline cursor-pointer">Custom Search</p>
+              <p className="cursor-pointer">Custom Search</p>
             </button>
             <div className="flex items-center">
               <p>View:&nbsp; &nbsp;</p>
@@ -119,7 +147,7 @@ export default function Income () {
                     <button 
                       key={item}
                       onClick={item.setter}>
-                      <p className="underline">{item.label}</p>
+                      <p className="cursor-pointer">{item.label}</p>
                     </button>
                     <RxDividerVertical />
                   </>
@@ -133,19 +161,41 @@ export default function Income () {
               <br/>
               <hr className="border-gray-400 border-1"/>
               <br/>
-              <form className="flex flex-col  max-w-xl">
-                <label>Start Date</label>
+              <form 
+                className="flex flex-col max-w-xs"
+                onSubmit={handleRangeSubmit}>
+                <label>From</label>
                 <input
                   type="date"
                   className="border-1 h-10 rounded-lg p-2"
+                  max={yesterdayStr}
+                  onChange={(e) => setCustomStartDateUI(e.target.value)}
+                  value={customStartDateUI}
                 />
-                <label>End Date</label>
+                <label>To</label>
                 <input
                   type="date"
                   className="border-1 h-10 rounded-lg p-2"
+                  max={todayStr}
+                  onChange={(e) => setCustomEndDateUI(e.target.value)}
+                  value={customEndDateUI}
                 />
+                <br/>
+                <div className="flex justify-center w-full">
+                  <button 
+                    type="submit"
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg 
+                      hover:bg-indigo-700 transition-colors flex items-center 
+                      cursor-pointer justify-center max-w-xs w-full">
+                    Set Range
+                  </button>
+                </div>
               </form>
+              <br/>
             </>
+          }
+          {
+            noDataMessage && <p className="text-red-600">{noDataMessage}</p>
           }
           {open &&
             <EditSource
