@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Bell, X, Check } from 'lucide-react';
-import axios from 'axios';
+import { Bell, X } from 'lucide-react';
 import api from '../src/Utils/api';
 
 const Notifications = () => {
@@ -60,18 +59,6 @@ const Notifications = () => {
       console.error('Error marking notification as read:', err);
     }
   };
-
-  const deleteNotification = async (notificationId, e) => {
-    e.stopPropagation();
-    try {
-      await axios.delete(`/api/v1/notifications/${notificationId}`);
-      setNotifications(notifications.filter(notif => notif._id !== notificationId));
-    } catch (err) {
-      console.error('Error deleting notification:', err);
-    }
-  };
-
-  const unreadCount = notifications.filter(notif => !notif.readAt).length;
 
   return (
     <div className="relative">
