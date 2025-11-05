@@ -42,10 +42,10 @@ const Notifications = () => {
   };
 
   useEffect(() => {
-    if (isOpen && user?._id) {
+    if (user?._id) {
       fetchNotifications();
     }
-  }, [isOpen, user?._id]);
+  }, [user?._id]);
 
 
   const markAsRead = async (notificationId, e) => {
@@ -81,7 +81,7 @@ const Notifications = () => {
         aria-label="Notifications"
       >
         <Bell className="h-6 w-6 text-gray-600" />
-        {notifications.some(n => !n.readAt) && (
+        {notifications.some(n => n.readAt) && (
           <span className="absolute top-0.5 right-0.5 h-3 w-3 bg-red-500 rounded-full border-2 border-white" />
         )}
       </button>
