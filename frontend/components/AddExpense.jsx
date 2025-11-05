@@ -1,7 +1,18 @@
 import { useState, useEffect } from "react"
 import api from "../src/Utils/api";
+import toast from 'react-hot-toast';
 
 export default function EditExpense ({open, closeModal, type, expenseData }) {
+    // Handle ESC key to close modal
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === 'Escape') closeModal();
+        };
+        if (open) {
+            window.addEventListener('keydown', handleEsc);
+        }
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [open, closeModal]);
     // format the date: 
     let formattedDate = ""
     if (type === "editExpense"){
@@ -15,7 +26,7 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
 
     const [categoryUI, setCategoryUI] = useState(type === "editExpense" ? expenseData.category : "");
     const [amountUI, setAmountUI] = useState( type === "editExpense" ? (expenseData.amount / 100).toFixed(2) : "");
-    const [dateUI, setDateUI] = useState(formattedDate);
+    const [dateUI, setDateUI] = useState(type === "editExpense" ? formattedDate : new Date().toISOString().split('T')[0]);
     const [showError, setShowError] = useState(false); 
     const [errorMessage, setErrorMessage] = useState("");
     const [recurringUI, setRecurringUI] = useState(type === "editExpense" ? expenseData.recurring : false);
@@ -37,10 +48,13 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
             let res;
             if (type === "addExpense") {
                 res = await api.post("/expense/add", formData);
+                toast.success("Expense added successfully!");
             } else if (type ==="editExpense") {
                 res = await api.put(`/expense/${expenseData._id}`, formData);
+                toast.success("Expense updated successfully!");
             } else if (type === "deleteExpense") {
                 res = await api.delete(`/expense/${expenseData._id}`);
+                toast.success("Expense deleted successfully!");
             }
             if (res.status === 200) {
                 closeModal();
@@ -68,12 +82,12 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
                                     <div className=" flex justify-center gap-5 mt-4">
                                         <button 
                                             onClick={() => closeModal()} 
-                                            className="border-1 w-20 h-10 rounded-lg cursor-pointer"
+                                            className="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
                                         >
                                             No
                                         </button>
                                         <button 
-                                            className="border-1 w-20 h-10 rounded-lg bg-indigo-600 text-white cursor-pointer hover:bg-indigo-700"
+                                            className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors cursor-pointer"
                                             type="submit"
                                         >
                                             Yes
@@ -105,7 +119,7 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
                                             <label>Expense Category</label>
                                             <input 
                                                 placeholder="groceries" 
-                                                className="border-1 h-10 rounded-lg p-2"
+                                                className="border-1 h-10 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
                                                 value={categoryUI}
                                                 onChange={(e) => setCategoryUI(e.target.value)}
                                             />
@@ -114,7 +128,7 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
                                             <label>Amount $</label>
                                             <input 
                                                 placeholder="50.00" 
-                                                className="border-1 h-10 rounded-lg p-2"
+                                                className="border-1 h-10 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
                                                 type="number"
                                                 value={amountUI}
                                                 onChange={(e) => {
@@ -133,7 +147,7 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
                                         <label>Date</label>
                                         <input 
                                             type="date" 
-                                            className="border-1 h-10 rounded-lg p-2"
+                                            className="border-1 h-10 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
                                             value={dateUI}
                                             onChange={(e) => setDateUI(e.target.value)}
                                         />
@@ -157,12 +171,12 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
                                                 setErrorMessage("")
                                                 setShowError(false);
                                             }} 
-                                            className="border-1 w-20 h-10 rounded-lg cursor-pointer"
+                                            className="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
                                         >
                                             Cancel
                                         </button>
                                         <button 
-                                            className="border-1 w-20 h-10 rounded-lg bg-indigo-600 text-white cursor-pointer hover:bg-indigo-700"
+                                            className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors cursor-pointer"
                                             type="submit"
                                         >
                                             Save

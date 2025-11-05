@@ -1,7 +1,18 @@
 import { useState, useEffect } from "react"
 import api from "../src/Utils/api";
+import toast from 'react-hot-toast';
 
 export default function EditSource ({open, closeModal, type, incomeData }) {
+    // Handle ESC key to close modal
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === 'Escape') closeModal();
+        };
+        if (open) {
+            window.addEventListener('keydown', handleEsc);
+        }
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [open, closeModal]);
 
     // format the date: 
     let formattedDate = ""
@@ -16,7 +27,7 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
 
     const [sourceUI, setSourceUI] = useState(type === "editIncome" ? incomeData.source : "");
     const [amountUI, setAmountUI] = useState(type === "editIncome" ? (incomeData.amount / 100).toFixed(2) : "");
-    const [dateUI, setDateUI] = useState(formattedDate);
+    const [dateUI, setDateUI] = useState(type === "editIncome" ? formattedDate : new Date().toISOString().split('T')[0]);
     const [showError, setShowError] = useState(false); 
     const [errorMessage, setErrorMessage] = useState("");
 
@@ -39,10 +50,13 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
             let res;
             if (type === "addIncome") {
                 res = await api.post("/income/add", formData);
+                toast.success("Income added successfully!");
             } else if (type ==="editIncome") {
                 res = await api.put(`/income/${incomeData._id}`, formData);
+                toast.success("Income updated successfully!");
             } else if (type === "deleteIncome") {
                 res = await api.delete(`/income/${incomeData._id}`);
+                toast.success("Income deleted successfully!");
             }
             if (res.status === 200) {
                 closeModal();
@@ -70,12 +84,12 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
                                     <div className=" flex justify-center gap-5 mt-4">
                                         <button 
                                             onClick={() => closeModal()} 
-                                            className="border-1 w-20 h-10 rounded-lg cursor-pointer"
+                                            className="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
                                         >
                                             No
                                         </button>
                                         <button 
-                                            className="border-1 w-20 h-10 rounded-lg bg-indigo-600 text-white cursor-pointer hover:bg-indigo-700"
+                                            className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors cursor-pointer"
                                             type="submit"
                                         >
                                             Yes
@@ -107,7 +121,7 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
                                             <label>Income Source</label>
                                             <input 
                                                 placeholder="pay cheque" 
-                                                className="border-1 h-10 rounded-lg p-2"
+                                                className="border-1 h-10 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
                                                 value={sourceUI}
                                                 onChange={(e) => setSourceUI(e.target.value)}
                                             />
@@ -116,7 +130,7 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
                                             <label>Amount $</label>
                                             <input 
                                                 placeholder="1000" 
-                                                className="border-1 h-10 rounded-lg p-2"
+                                                className="border-1 h-10 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
                                                 type="number"
                                                 value={amountUI}
                                                 onChange={(e) => {
@@ -135,7 +149,7 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
                                         <label>Date</label>
                                         <input 
                                             type="date" 
-                                            className="border-1 h-10 rounded-lg p-2"
+                                            className="border-1 h-10 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
                                             value={dateUI}
                                             onChange={(e) => setDateUI(e.target.value)}
                                         />
@@ -151,7 +165,7 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
                                                 setErrorMessage("")
                                                 setShowError(false);
                                             }} 
-                                            className="border-1 w-20 h-10 rounded-lg cursor-pointer"
+                                            className="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
                                         >
                                             Cancel
                                         </button>
@@ -164,7 +178,7 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
                                                 Recurring Every Month
                                         </label>
                                         <button 
-                                            className="border-1 w-20 h-10 rounded-lg bg-indigo-600 text-white cursor-pointer hover:bg-indigo-700"
+                                            className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors cursor-pointer"
                                             type="submit"
                                         >
                                             Save
