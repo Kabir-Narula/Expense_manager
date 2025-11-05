@@ -4,6 +4,7 @@ import { MdAttachMoney, MdSavings } from "react-icons/md";
 import { FiDollarSign } from "react-icons/fi";
 import InviteMemberModal from "../components/InviteMemberModal";
 import { useAccount } from "../src/context/AccountContext.jsx";
+import Notifications from "../components/Notification.jsx";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -95,6 +96,8 @@ function Dashboard() {
           </h1>
           <p className="text-gray-500">Your Financial Dashboard</p>
         </div>
+        <div className="flex items-center space-x-4">
+        <Notifications />
         {isOwner && currentAccount?.type === 'shared' && (
           <button onClick={() => setInviteOpen(true)} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
             Invite Member
@@ -109,6 +112,7 @@ function Dashboard() {
       {inviteOpen && (
         <InviteMemberModal open={inviteOpen} onClose={() => setInviteOpen(false)} onInvited={() => {}} />
       )}
+      </div>
 
       {/* Financial Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
