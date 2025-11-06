@@ -8,6 +8,10 @@
   };
 
   export const formatDateToSend = (dateToFormat) => {
+    console.log("format date function: " + dateToFormat)
+    if (!dateToFormat) {
+      return "";
+    }
     let formattedDate = "";
     const date = new Date(`${dateToFormat}`.replace(/-/g, '\/').replace(/T.+/, ''));
     const year = date.getFullYear();

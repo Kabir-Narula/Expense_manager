@@ -9,6 +9,7 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
   if (type === "editIncome") {
     formattedStartDate = formatDateToSend(incomeData.date);
     formattedEndDate = formatDateToSend(incomeData.endDate);
+    console.log("end date: " + formattedEndDate);
   }
 
   const [sourceUI, setSourceUI] = useState(
@@ -27,6 +28,7 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
   const recurrenceOptions = ["once", "bi-weekly", "monthly"];
   const [endOption, setEndOption] = useState("noEndDate");
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -40,6 +42,7 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
         date: startDateUI,
         recurring: recurringUI,
         endDate: endDateUI,
+        head: true
       };
       let res;
       if (type === "addIncome") {
@@ -156,6 +159,7 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
                     className="border rounded-md px-2 py-1 text-sm mt-4 mb-4 max-w-35"
                     value={recurringUI}
                     onChange={(e) => setRecurringUI(e.target.value)}
+                    disabled={incomeData.recurring === "once" && incomeData.head === false}
                   >
                     {recurrenceOptions.map((item) => (
                       <option key={item} value={item}>
@@ -197,6 +201,14 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
                       </div>
                     </>
                   )}
+                  {incomeData.recurring === "once" && incomeData.head === false && (
+                    <p className="text-green-600">
+                      This is part of a recurring income. To edit the recurring income,
+                      go to the most recent recurring entry and make changes there.
+                    </p>
+                  )
+
+                  }
                 </div>
                 <hr className="mt-5" />
                 {showError && <p className="text-red-600">{errorMessage}</p>}
