@@ -4,7 +4,7 @@ import api from "../src/Utils/api";
 export default function EditExpense ({open, closeModal, type, expenseData }) {
     // format the date: 
     let formattedDate = ""
-    if (type === "editExpense"){
+    if (type === "editExpense" && expenseData?.date){
 
         const date = new Date(`${expenseData.date}`.replace(/-/g, '\/').replace(/T.+/, ''));
         const year = date.getFullYear();
@@ -13,12 +13,13 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
         formattedDate = `${year}-${month}-${day}`;
     }
 
-    const [categoryUI, setCategoryUI] = useState(type === "editExpense" ? expenseData.category : "");
-    const [amountUI, setAmountUI] = useState( type === "editExpense" ? (expenseData.amount / 100).toFixed(2) : "");
+    const [categoryUI, setCategoryUI] = useState(type === "editExpense" && expenseData ? expenseData.category : "");
+    const [amountUI, setAmountUI] = useState( type === "editExpense" && expenseData ? (expenseData.amount / 100).toFixed(2) : "");
     const [dateUI, setDateUI] = useState(formattedDate);
     const [showError, setShowError] = useState(false); 
     const [errorMessage, setErrorMessage] = useState("");
-    const [recurringUI, setRecurringUI] = useState(type === "editExpense" ? expenseData.recurring : false);
+    const [recurringUI, setRecurringUI] = useState(type === "editExpense" && expenseData ? expenseData.recurring : false);
+    const [tagsUI, setTagsUI] = useState(type === "editExpense" && expenseData ? (expenseData.tags?.join(', ') || '') : "");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -31,16 +32,19 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
                 category: categoryUI,
                 amount: cents,
                 date: dateUI,
+                tags: tagsUI,
                 recurring: recurringUI,
                 startDate: dateUI,
             };
             let res;
             if (type === "addExpense") {
                 res = await api.post("/expense/add", formData);
-            } else if (type ==="editExpense") {
+            } else if (type ==="editExpense" && expenseData?._id) {
                 res = await api.put(`/expense/${expenseData._id}`, formData);
-            } else if (type === "deleteExpense") {
+            } else if (type === "deleteExpense" && expenseData?._id) {
                 res = await api.delete(`/expense/${expenseData._id}`);
+            } else {
+                throw new Error("Invalid operation or missing expense data");
             }
             if (res.status === 200) {
                 closeModal();
@@ -56,7 +60,7 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
     if (!open) return null
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75">
-            <div className="flex flex-col bg-white justify-center gap-5 p-5 rounded-xl shadow-xl w-full max-w-xl border-solid max-h-80 h-80">
+            <div className="flex flex-col bg-white justify-center gap-5 p-5 rounded-xl shadow-xl w-full max-w-xl border-solid max-h-[500px] overflow-y-auto">
                 {
                     type === "deleteExpense" ? (
                         <>                        
@@ -136,6 +140,15 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
                                             className="border-1 h-10 rounded-lg p-2"
                                             value={dateUI}
                                             onChange={(e) => setDateUI(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col w-full mt-4">
+                                        <label>Tags (comma-separated)</label>
+                                        <input 
+                                            placeholder="work, urgent, personal" 
+                                            className="border-1 h-10 rounded-lg p-2"
+                                            value={tagsUI}
+                                            onChange={(e) => setTagsUI(e.target.value)}
                                         />
                                     </div>
                                     <hr className="mt-5"/>

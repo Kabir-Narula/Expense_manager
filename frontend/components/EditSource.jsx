@@ -19,6 +19,7 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
     const [dateUI, setDateUI] = useState(formattedDate);
     const [showError, setShowError] = useState(false); 
     const [errorMessage, setErrorMessage] = useState("");
+    const [tagsUI, setTagsUI] = useState(type === "editIncome" ? (incomeData.tags?.join(', ') || '') : "");
 
     const [recurringUI, setRecurringUI] = useState(type === "editIncome" ? incomeData.recurring : false);
     
@@ -33,6 +34,7 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
                 source: sourceUI,
                 amount: cents,
                 date: dateUI,
+                tags: tagsUI,
                 recurring: recurringUI,
                 startDate: dateUI,
             };
@@ -58,7 +60,7 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
     if (!open) return null
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75">
-            <div className="flex flex-col bg-white justify-center gap-5 p-5 rounded-xl shadow-xl w-full max-w-xl border-solid max-h-80 h-80">
+            <div className="flex flex-col bg-white justify-center gap-5 p-5 rounded-xl shadow-xl w-full max-w-xl border-solid max-h-[500px] overflow-y-auto">
                 {
                     type === "deleteIncome" ? (
                         <>                        
@@ -138,6 +140,15 @@ export default function EditSource ({open, closeModal, type, incomeData }) {
                                             className="border-1 h-10 rounded-lg p-2"
                                             value={dateUI}
                                             onChange={(e) => setDateUI(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col w-full mt-4">
+                                        <label>Tags (comma-separated)</label>
+                                        <input 
+                                            placeholder="work, bonus, salary" 
+                                            className="border-1 h-10 rounded-lg p-2"
+                                            value={tagsUI}
+                                            onChange={(e) => setTagsUI(e.target.value)}
                                         />
                                     </div>
                                     <hr className="mt-5"/>

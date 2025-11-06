@@ -21,6 +21,8 @@ export default function IncomeByYear() {
     const { currentAccountId, user, isOwner } = useAccount();
     const [members, setMembers] = useState([]);
     const [memberFilter, setMemberFilter] = useState("all");
+    const [allTags, setAllTags] = useState([]);
+    const [selectedTag, setSelectedTag] = useState("");
 
     const [refreshKey, setRefreshKey] = useState(0); // trigger re-fetch
 
@@ -46,22 +48,43 @@ export default function IncomeByYear() {
         fetchMembers();
     }, [currentAccountId]);
 
-    // Fetch year data on mount and when refreshKey or memberFilter changes
+    // Fetch year data on mount and when refreshKey or memberFilter/selectedTag changes
     useEffect(() => {
         const fetchYearData = async () => {
             try {
                 let res = await api.get("/income/get")
                 if (res.status === 200) {
-                    
                     const incomeDocuments = res.data;
-                    const withFilter = memberFilter === "all"
+                    
+                    // Extract all unique tags
+                    const tagsSet = new Set();
+                    incomeDocuments.forEach(item => {
+                        if (item.tags && Array.isArray(item.tags)) {
+                            item.tags.forEach(tag => tagsSet.add(tag));
+                        }
+                    });
+                    setAllTags(Array.from(tagsSet).sort());
+                    
+                    // Apply member filter
+                    const withMemberFilter = memberFilter === "all"
                         ? incomeDocuments
                         : incomeDocuments.filter((i) => i.createdBy?._id === memberFilter);
-                    const filtered = incomeDocuments.filter(item => {
+                    
+                    // Apply tag filter
+                    let tagFiltered = withMemberFilter;
+                    if (selectedTag) {
+                        tagFiltered = withMemberFilter.filter(item => 
+                            item.tags && item.tags.includes(selectedTag)
+                        );
+                    }
+                    
+                    // Apply year filter
+                    const filtered = tagFiltered.filter(item => {
                         const itemDate = parseDateToLocal(item.date);
                         return itemDate.getFullYear() === Number(year);
                     });
-                    const groupedData = (memberFilter === "all" ? filtered : withFilter.filter(item => parseDateToLocal(item.date).getFullYear() === Number(year))).reduce((acc, item) => {
+                    
+                    const groupedData = filtered.reduce((acc, item) => {
                         const date = parseDateToLocal(item.date);
                         const month = date.toLocaleDateString("default", { month: "long" });
                         if (!acc[month]) acc[month] = { income: [] };
@@ -75,7 +98,7 @@ export default function IncomeByYear() {
             }
         };
         fetchYearData();
-    }, [year, refreshKey, memberFilter]);
+    }, [year, refreshKey, memberFilter, selectedTag]);
 
     return (
         <>
@@ -84,22 +107,39 @@ export default function IncomeByYear() {
                     <h1 className="text-2xl font-bold text-gray-800">Income for {year}</h1>
                     <AddSourceButton func={() => { setOpen(true); setType("addIncome") }} text="Add Income"/>
                 </div>
-                                {/* Member filter */}
-                                {members.length > 0 && (
-                                        <div className="mb-4">
-                                                <label className="text-sm text-gray-600 mr-2">Filter by member:</label>
-                                                <select
-                                                    className="border rounded-md px-2 py-1 text-sm"
-                                                    value={memberFilter}
-                                                    onChange={(e) => setMemberFilter(e.target.value)}
-                                                >
-                                                    <option value="all">All</option>
-                                                    {members.map((m) => (
-                                                        <option key={m.userId} value={m.userId}>{m.fullName || m.email}</option>
-                                                    ))}
-                                                </select>
+                                {/* Filters */}
+                                <div className="mb-4 flex gap-4 flex-wrap">
+                                    {allTags.length > 0 && (
+                                        <div>
+                                            <label className="text-sm text-gray-600 mr-2">Filter by tag:</label>
+                                            <select
+                                                className="border rounded-md px-2 py-1 text-sm"
+                                                value={selectedTag}
+                                                onChange={(e) => setSelectedTag(e.target.value)}
+                                            >
+                                                <option value="">All</option>
+                                                {allTags.map((tag) => (
+                                                    <option key={tag} value={tag}>{tag}</option>
+                                                ))}
+                                            </select>
                                         </div>
-                                )}
+                                    )}
+                                    {members.length > 0 && (
+                                        <div>
+                                            <label className="text-sm text-gray-600 mr-2">Filter by member:</label>
+                                            <select
+                                                className="border rounded-md px-2 py-1 text-sm"
+                                                value={memberFilter}
+                                                onChange={(e) => setMemberFilter(e.target.value)}
+                                            >
+                                                <option value="all">All</option>
+                                                {members.map((m) => (
+                                                    <option key={m.userId} value={m.userId}>{m.fullName || m.email}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
+                                </div>
                 {open &&
                     <EditSource
                         open={open}
@@ -142,7 +182,21 @@ export default function IncomeByYear() {
                                                             key={item._id}
                                                             className="border-b last:border-b-0 hover:bg-gray-50"
                                                         >
-                                                            <td className="py-4">{item.source}</td>
+                                                            <td className="py-4">
+                                                                {item.source}
+                                                                {item.tags && item.tags.length > 0 && (
+                                                                    <div className="flex flex-wrap gap-1 mt-1">
+                                                                        {item.tags.map((tag, idx) => (
+                                                                            <span 
+                                                                                key={idx}
+                                                                                className="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700"
+                                                                            >
+                                                                                {tag}
+                                                                            </span>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+                                                            </td>
                                                             <td className="py-4">
                                                                 {/* Format date as a human-readable string */}
                                                                 {item.date ? new Date(item.date.slice(0, 10) + 'T00:00:00').toLocaleDateString("en-US", {

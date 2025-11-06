@@ -6,7 +6,7 @@ export const addExpense = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const { icon, category, amount, date, recurring, startDate } = req.body;
+    const { icon, category, amount, date, recurring, startDate, tags } = req.body;
 
     if (!category || isNaN(amount) || !date) {
       return res.status(400).json({ message: "All fields are required." });
@@ -26,12 +26,17 @@ export const addExpense = async (req, res) => {
 
     const canonicalStart = new Date(yy, mm - 1, dd);
 
+    // Process tags: convert comma-separated string to array, trim whitespace
+    const tagsArray = tags 
+      ? tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
+      : [];
     const newExpense = new Expense({
       userId,
       icon,
       category,
       amount,
       date: canonicalStart,
+      tags: tagsArray,
       recurring,
       startDate: canonicalStart,
       accountId: req.account?._id,
@@ -53,6 +58,7 @@ export const addExpense = async (req, res) => {
           icon,
           category,
           amount,
+          tags: tagsArray,
           date: monthDate,
           recurring: true,
           accountId: req.account?._id,
@@ -76,7 +82,7 @@ export const getAllExpense = async (req, res) => {
 
   try {
     const accountId = req.account?._id;
-    const { createdBy } = req.query;
+    const { createdBy, tags } = req.query;
     const query = [];
     if (accountId) {
       query.push({ accountId });
@@ -88,6 +94,10 @@ export const getAllExpense = async (req, res) => {
     const filter = query.length ? { $or: query } : {};
     if (createdBy) {
       filter.createdBy = createdBy;
+    }
+    if (tags) {
+      const tagArray = Array.isArray(tags) ? tags : [tags];
+      filter.tags = { $in: tagArray };
     }
     const expenses = await Expense.find(filter).sort({ date: -1 }).populate("createdBy", "fullName email");
     res.status(200).json(expenses);
@@ -123,7 +133,7 @@ export const updateExpense = async (req, res) => {
   const expenseId = req.params.id;
 
   try {
-    const { icon, category, amount, date } = req.body;
+    const { icon, category, amount, date, tags } = req.body;
 
     if (!category || isNaN(amount) || !date) {
       return res.status(400).json({ message: "All fields are required." });
@@ -144,10 +154,17 @@ export const updateExpense = async (req, res) => {
     const isCreator = (existing.createdBy && existing.createdBy.toString() === req.user._id.toString()) || legacyPersonal;
     if (!isOwner && !isCreator) return res.status(403).json({ message: "Not allowed" });
 
+    // Process tags: convert comma-separated string to array, trim whitespace
+    // Process tags
+    const tagsArray = tags 
+      ? (Array.isArray(tags) ? tags : tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0))
+      : [];
+
     existing.icon = icon;
     existing.category = category;
     existing.amount = amount;
     existing.date = new Date(date);
+    existing.tags = tagsArray;
     await existing.save();
     res.status(200).json(existing);
   } catch (error) {

@@ -8,7 +8,7 @@ export const addIncome = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const { icon, source, amount, date, recurring, startDate } = req.body;
+    const { icon, source, amount, date, recurring, startDate, tags } = req.body;
 
 
     if (!source || isNaN(amount) || !date) {
@@ -28,12 +28,18 @@ export const addIncome = async (req, res) => {
     
     const canonicalStart = new Date(yy, mm - 1, dd);
 
+    // Process tags: convert comma-separated string to array, trim whitespace
+    const tagsArray = tags 
+      ? tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
+      : [];
+
     const newIncome = new Income({
       userId,
       icon,
       source,
       amount,
       date: canonicalStart,
+      tags: tagsArray,
       recurring,
       startDate: canonicalStart,
       accountId: req.account?._id,
@@ -58,6 +64,7 @@ export const addIncome = async (req, res) => {
           icon,
           source, 
           amount, 
+          tags: tagsArray,
           date: monthDate,
           recurring: true,
           accountId: req.account?._id,
@@ -79,7 +86,7 @@ export const getAllIncome = async (req, res) => {
   const userId = req.user.id;
   try {
     const accountId = req.account?._id;
-    const { createdBy } = req.query;
+    const { createdBy, tags } = req.query;
     const query = [];
     if (accountId) {
       query.push({ accountId });
@@ -91,6 +98,11 @@ export const getAllIncome = async (req, res) => {
     const filter = query.length ? { $or: query } : {};
     if (createdBy) {
       filter.createdBy = createdBy;
+    }
+    // Add tag filtering
+    if (tags) {
+      const tagArray = Array.isArray(tags) ? tags : [tags];
+      filter.tags = { $in: tagArray };
     }
     const incomes = await Income.find(filter).sort({ date: -1 }).populate("createdBy", "fullName email");
     res.status(200).json(incomes);
@@ -127,7 +139,7 @@ export const updateIncome = async (req, res) => {
   const incomeId = req.params.id;
 
   try {
-    const { icon, source, amount, date } = req.body;
+    const { icon, source, amount, date, tags } = req.body;
 
     if (!source || isNaN(amount) || !date) {
       return res.status(400).json({ message: "All fields are required." });
@@ -150,10 +162,16 @@ export const updateIncome = async (req, res) => {
     const isCreator = (existing.createdBy && existing.createdBy.toString() === req.user._id.toString()) || legacyPersonal;
     if (!isOwner && !isCreator) return res.status(403).json({ message: "Not allowed" });
 
+    // Process tags: convert comma-separated string to array, trim whitespace
+    const tagsArray = tags 
+      ? (Array.isArray(tags) ? tags : tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0))
+      : [];
+
     existing.icon = icon;
     existing.source = source;
     existing.amount = amount;
     existing.date = new Date(date);
+    existing.tags = tagsArray;
     await existing.save();
     res.status(200).json(existing);
   } catch (error) {
