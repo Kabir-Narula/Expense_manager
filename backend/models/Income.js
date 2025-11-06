@@ -10,6 +10,7 @@ const IncomeSchema = new mongoose.Schema(
     // Recurring support
     recurring: {type: String},
     endDate: {type: mongoose.Schema.Types.Mixed, required: false},
+    head: {type: Boolean, default: true},
     // Shared accounts
     accountId: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },

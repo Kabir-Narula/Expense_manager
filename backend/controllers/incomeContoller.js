@@ -7,7 +7,8 @@ export const addIncome = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const { icon, source, amount, date, recurring, endDate} = req.body;
+    const { icon, source, amount, date, recurring, endDate, head} = req.body;
+    console.log("End date from adding income: " + endDate)
     if (!source || isNaN(amount) || !date) {
       return res.status(400).json({ message: "All fields are required." });
     }
@@ -15,6 +16,7 @@ export const addIncome = async (req, res) => {
       return res.status(400).json({ message: "Please provide value more than 0." });
     }
     const finalStartDate = new Date(date)
+
     const finalEndDate = endDate? new Date(endDate) : ""
     const newIncome = new Income({
       userId,
@@ -24,6 +26,7 @@ export const addIncome = async (req, res) => {
       date: finalStartDate,
       recurring,
       endDate: finalEndDate,
+      head,
       accountId: req.account?._id,
       createdBy: req.user._id,
     });
@@ -39,6 +42,7 @@ export const getAllIncome = async (req, res) => {
   const userId = req.user.id;
   const { range, start, end } = req.query;
   let startDate, endDate;
+  const today = new Date();
   try {
     const accountId = req.account?._id;
     const { createdBy } = req.query
@@ -82,12 +86,71 @@ export const getAllIncome = async (req, res) => {
         return res.status(400).json({message: "Incorrect date range. Make sure the start date is before the end date."})
       }
     }
+    /*
+      Check for income that is reoccurring monthly or bi-weekly. To avoid creating
+      duplicates, only select documents that have a true "head" flag. Once it is duplicated
+      with a new date, assign the current income.head = false and set the newIncome.head = true. 
+    */
+    const recurringIncomes = await Income.find({recurring: {$in: ["monthly", "bi-weekly"]}, head: true});
+    for ( const income of recurringIncomes) {
+      
+      // get the date of when the most recent document was added. 
+      const lastDate = new Date(income.date);
+      
+      let nextDate;
+      
+      
+      if (income.recurring === "bi-weekly") {
+        // if its bi-weekly, get the next bi-weekly date by using the last date.
+        nextDate = new Date(lastDate); 
+      
+        nextDate.setDate(lastDate.getDate() + 14);
+      
+      } else if (income.recurring === "monthly") {
+      
+        nextDate = new Date(lastDate);
+      
+        nextDate.setDate(lastDate.getMonth() + 1);
+      
+      }
+
+      // if the current date is ahead of the next bi-weekly/monthly date, then create it.
+      // the head property of the newIncome object will be true.
+      if (today >= nextDate && (!endDate || !(today >= nextDate))) {
+      
+        const newIncome = new Income({
+          userId: income.userId,
+          icon: income.icon,
+          source: income.source,
+          amount: income.amount,
+          date: nextDate,
+          recurring: income.recurring,
+          endDate: income.finalEndDate,
+          head: true,
+          accountId: income.accountId,
+          createdBy: income.userId,
+        });
+
+      
+        await newIncome.save();
+        // the newIncome object is the new head. Therefore, the 
+        // previous income document that was used to verify if it should 
+        // be duplicated is no longer the head. 
+        income.head = false;
+
+        // prevent user from manipulating the older recurrent payments. 
+        income.recurring = "once";
+        console.log("new income recurring value" + income.recurring)
+      
+        await income.save();
+      }
+    }
     const incomes = await Income.find({
       ...filter, 
       date: {$gte: startDate, $lte: endDate},
     }).sort({ date: -1 }).populate("createdBy", "fullName email");
+    console.log("GET INCOME: " + JSON.stringify(incomes, null, 2))
     res.status(200).json(incomes);
-
   } catch (error) {
     res.status(500).json({ message: "Nothing to show!" });
   }
@@ -118,10 +181,14 @@ export const deleteIncome = async (req, res) => {
 export const updateIncome = async (req, res) => {
   const userId = req.user.id;
   const incomeId = req.params.id;
-
+  console.log("BODY: " + JSON.stringify(req.body, null, 2))
+  
   try {
-    const { icon, source, amount, date } = req.body;
+    const { icon, source, amount, date, recurring, endDate, head} = req.body;
+    const finalEndDate = endDate ? new Date(endDate) : ""
 
+    console.log("final end date: " + finalEndDate)
+    
     if (!source || isNaN(amount) || !date) {
       return res.status(400).json({ message: "All fields are required." });
     }
@@ -146,7 +213,12 @@ export const updateIncome = async (req, res) => {
     existing.icon = icon;
     existing.source = source;
     existing.amount = amount;
+    existing.recurring = recurring;
+    existing.endDate = finalEndDate;
+    existing.head = head;
+
     existing.date = new Date(date);
+
     await existing.save();
     res.status(200).json(existing);
   } catch (error) {
