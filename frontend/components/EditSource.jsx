@@ -2,6 +2,7 @@ import { useState } from "react";
 import api from "../src/Utils/api";
 import { formatDateToSend } from "../src/Utils/dateFormatter";
 
+
 export default function EditSource({ open, closeModal, type, incomeData }) {
   // format the date:
   let formattedStartDate = "";
@@ -9,7 +10,6 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
   if (type === "editIncome") {
     formattedStartDate = formatDateToSend(incomeData.date);
     formattedEndDate = formatDateToSend(incomeData.endDate);
-    console.log("end date: " + formattedEndDate);
   }
   const [sourceUI, setSourceUI] = useState(
     type === "editIncome" ? incomeData.source : "",
@@ -38,7 +38,6 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
       const floatVal = parseFloat(amountUI);
       let cents;
       cents = Math.round(floatVal * 100);
-      console.log("Start date UI: " + startDateUI);
       const formData = {
         icon: "",
         source: sourceUI,
@@ -155,6 +154,11 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
                     className="border-1 h-10 rounded-lg p-2"
                     value={startDateUI}
                     onChange={(e) => setStartDateUI(e.target.value)}
+                    disabled={
+                      type === "editIncome" &&
+                      incomeData.head === true &&
+                      incomeData.recurring !== "once"
+                    }
                   />
                 </div>
                 <div className="flex flex-col">
@@ -164,7 +168,8 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
                     onChange={(e) => setRecurringUI(e.target.value)}
                     disabled={
                       incomeData.recurring === "once" &&
-                      incomeData.head === false
+                      incomeData.head === false &&
+                      type === "editIncome"
                     }
                   >
                     {recurrenceOptions.map((item) => (

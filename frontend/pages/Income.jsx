@@ -8,6 +8,7 @@ import api from "../src/Utils/api";
 import { useAccount } from "../src/context/AccountContext.jsx";
 import { RxDividerVertical } from "react-icons/rx";
 import { FaMagnifyingGlass } from "react-icons/fa6";
+import { parseDateToLocal } from "../src/Utils/dateFormatter.js";
 
 export default function Income() {
   const { year } = useParams();
@@ -25,8 +26,8 @@ export default function Income() {
   const today = new Date();
   const yesterday = new Date();
   yesterday.setDate(today.getDate() - 1);
-  const todayStr = today.toISOString().split("T")[0];
-  const yesterdayStr = yesterday.toISOString().split("T")[0];
+  const todayStr = parseDateToLocal(today);
+  const yesterdayStr = parseDateToLocal(yesterday)
   const [customStartDateUI, setCustomStartDateUI] = useState(yesterdayStr);
   const [customEndDateUI, setCustomEndDateUI] = useState(todayStr);
   const [refreshKey, setRefreshKey] = useState(0); // trigger re-fetch
@@ -43,7 +44,6 @@ export default function Income() {
         if (incomeDocuments.length === 0) {
           setNoDataMessage("Nothing to show!");
         }
-        console.log(incomeDocuments);
         const withFilter =
           memberFilter === "all"
             ? incomeDocuments
@@ -75,6 +75,10 @@ export default function Income() {
     },
   ];
   useEffect(() => {
+    console.log("Yesterday string: " + yesterdayStr);
+    console.log("Yesterday: " + yesterday)
+  })
+  useEffect(() => {
     if (income) {
       setIncomeUI(income);
     }
@@ -94,7 +98,7 @@ export default function Income() {
   }, [currentAccountId]);
   // Fetch year data on mount and when refreshKey or memberFilter changes
   useEffect(() => {
-    const fetchYearData = async () => {
+    const fetchIncomeData = async () => {
       try {
         let res = await api.get(`income/get?range=${range}`);
         setNoDataMessage("");
@@ -113,7 +117,7 @@ export default function Income() {
         console.error("Failed to fetch year data:", error);
       }
     };
-    fetchYearData();
+    fetchIncomeData();
   }, [year, refreshKey, memberFilter, range]);
   return (
     <>

@@ -29,11 +29,9 @@ if (typeof window !== "undefined" && !window.localStorage) {
 vi.mock("../Utils/api", () => {
   return {
     default: {
-      get: vi
-        .fn()
-        .mockResolvedValue({
-          data: { fullName: "Test User", email: "test@example.com" },
-        }),
+      get: vi.fn().mockResolvedValue({
+        data: { fullName: "Test User", email: "test@example.com" },
+      }),
       post: vi.fn(),
     },
   };

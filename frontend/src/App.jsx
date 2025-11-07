@@ -17,8 +17,6 @@ import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/Signup";
 import EditProfile from "../pages/EditProfile";
 import ProtectedRoute from "../components/ProtectedRoutes";
-// import IncomeByYear from "../pages/IncomeByYear";
-import ExpenseByYear from "../pages/ExpenseByYear";
 import ManageAccount from "../pages/ManageAccount";
 
 const App = () => {
@@ -81,14 +79,6 @@ const App = () => {
               </ProtectedRoute>
             }
           /> */}
-          <Route
-            path="/expenses/:year"
-            element={
-              <ProtectedRoute>
-                <ExpenseByYear />
-              </ProtectedRoute>
-            }
-          />
           <Route
             path="/edit-profile"
             element={
