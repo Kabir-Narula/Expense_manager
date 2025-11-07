@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import Income from "../models/Income.js";
 import { json } from "express";
 import Account from "../models/Account.js";
+import { formatDate } from "../helpers/parseISODateToLocal.js";
 
 export const addIncome = async (req, res) => {
   const userId = req.user.id;
@@ -9,6 +10,7 @@ export const addIncome = async (req, res) => {
   try {
     const { icon, source, amount, date, recurring, endDate, head} = req.body;
     console.log("End date from adding income: " + endDate)
+    console.log("Date from adding income: " + date)
     if (!source || isNaN(amount) || !date) {
       return res.status(400).json({ message: "All fields are required." });
     }
@@ -96,60 +98,65 @@ export const getAllIncome = async (req, res) => {
       
       // get the date of when the most recent document was added. 
       const lastDate = new Date(income.date);
-      
       let nextDate;
-      
-      
+      let formattedNextDate;
       if (income.recurring === "bi-weekly") {
         // if its bi-weekly, get the next bi-weekly date by using the last date.
         nextDate = new Date(lastDate); 
-      
+        
         nextDate.setDate(lastDate.getDate() + 14);
-      
+        
       } else if (income.recurring === "monthly") {
       
         nextDate = new Date(lastDate);
-      
-        nextDate.setDate(lastDate.getMonth() + 1);
-      
+        nextDate.setMonth(lastDate.getMonth() + 1);
       }
+      const todayISOStr = today.toISOString().slice(0,10);
+      const nextDateISOStr = nextDate.toISOString().slice(0,10);
+      const endDateISOStr = income.endDate ? income.endDate.toISOString().slice(0,10) : "";
 
       // if the current date is ahead of the next bi-weekly/monthly date, then create it.
       // the head property of the newIncome object will be true.
-      if (today >= nextDate && (!endDate || !(today >= nextDate))) {
-      
-        const newIncome = new Income({
-          userId: income.userId,
-          icon: income.icon,
-          source: income.source,
-          amount: income.amount,
-          date: nextDate,
-          recurring: income.recurring,
-          endDate: income.finalEndDate,
-          head: true,
-          accountId: income.accountId,
-          createdBy: income.userId,
-        });
+      console.log("TODAY: " + todayISOStr)
+      console.log("income end date: " + endDateISOStr)
+      console.log("next day to add an income: " + nextDateISOStr)
 
-      
-        await newIncome.save();
-        // the newIncome object is the new head. Therefore, the 
-        // previous income document that was used to verify if it should 
-        // be duplicated is no longer the head. 
-        income.head = false;
-
-        // prevent user from manipulating the older recurrent payments. 
-        income.recurring = "once";
-        console.log("new income recurring value" + income.recurring)
-      
-        await income.save();
+      if (todayISOStr >= nextDateISOStr) {
+        if (!endDateISOStr || nextDateISOStr <= endDateISOStr) {
+          console.log("able to add")
+          const newIncome = new Income({
+            userId: income.userId,
+            icon: income.icon,
+            source: income.source,
+            amount: income.amount,
+            date: nextDate,
+            recurring: income.recurring,
+            endDate: income.endDate,
+            head: true,
+            accountId: income.accountId,
+            createdBy: income.userId,
+          });
+  
+        
+          await newIncome.save();
+          // the newIncome object is the new head. Therefore, the 
+          // previous income document that was used to verify if it should 
+          // be duplicated is no longer the head. 
+          income.head = false;
+  
+          // prevent user from manipulating the older recurrent payments. 
+          income.recurring = "once";
+          console.log("new income recurring value" + income.recurring)
+        
+          await income.save();
+        }
       }
     }
     const incomes = await Income.find({
       ...filter, 
       date: {$gte: startDate, $lte: endDate},
     }).sort({ date: -1 }).populate("createdBy", "fullName email");
-    console.log("GET INCOME: " + JSON.stringify(incomes, null, 2))
+    // console.log("GET INCOME: " + JSON.stringify(incomes, null, 2))
     res.status(200).json(incomes);
   } catch (error) {
     res.status(500).json({ message: "Nothing to show!" });
