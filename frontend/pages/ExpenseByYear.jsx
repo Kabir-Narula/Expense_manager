@@ -8,6 +8,8 @@ import { MdModeEdit } from "react-icons/md";
 import api from "../src/Utils/api";
 import { parseDateToLocal } from "../src/Utils/dateFormatter";
 import { useAccount } from "../src/context/AccountContext.jsx";
+import ExportButtons from "../src/components/ExportButtons";
+import { exportExpenseToCSV, exportExpenseToPDF } from "../src/Utils/exportUtils";
 
 export default function ExpenseByYear() {
     const { year } = useParams();
@@ -73,29 +75,56 @@ export default function ExpenseByYear() {
         fetchYearData();
     }, [year, refreshKey, memberFilter]);
 
+    // Export handlers
+    const handleExportCSV = () => {
+        if (!expenseUI || Object.keys(expenseUI).length === 0) {
+            return { success: false, message: 'No data to export' };
+        }
+        return exportExpenseToCSV(expenseUI, year, memberFilter);
+    };
+
+    const handleExportPDF = () => {
+        if (!expenseUI || Object.keys(expenseUI).length === 0) {
+            return { success: false, message: 'No data to export' };
+        }
+        return exportExpenseToPDF(expenseUI, year, memberFilter);
+    };
+
     return (
         <>
             <div className="md:ml-72 md:pt-8 pt-20 p-8 min-h-screen bg-gray-50">
-                <div className="flex justify-between items-center mb-8">
+                {/* Header with Title and Add Button */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <h1 className="text-2xl font-bold text-gray-800">Expenses for {year}</h1>
                     <AddSourceButton func={() => { setOpen(true); setType("addExpense") }} text="Add Expense"/>
                 </div>
-                                {/* Member filter */}
-                                {members.length > 0 && (
-                                        <div className="mb-4">
-                                                <label className="text-sm text-gray-600 mr-2">Filter by member:</label>
-                                                <select
-                                                    className="border rounded-md px-2 py-1 text-sm"
-                                                    value={memberFilter}
-                                                    onChange={(e) => setMemberFilter(e.target.value)}
-                                                >
-                                                    <option value="all">All</option>
-                                                    {members.map((m) => (
-                                                        <option key={m.userId} value={m.userId}>{m.fullName || m.email}</option>
-                                                    ))}
-                                                </select>
-                                        </div>
-                                )}
+
+                {/* Filter and Export Section */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm">
+                    {/* Member filter */}
+                    {members.length > 0 && (
+                        <div className="flex items-center gap-2">
+                            <label className="text-sm text-gray-600 font-medium">Filter by member:</label>
+                            <select
+                                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                value={memberFilter}
+                                onChange={(e) => setMemberFilter(e.target.value)}
+                            >
+                                <option value="all">All Members</option>
+                                {members.map((m) => (
+                                    <option key={m.userId} value={m.userId}>{m.fullName || m.email}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
+                    {/* Export Buttons */}
+                    <ExportButtons
+                        onExportCSV={handleExportCSV}
+                        onExportPDF={handleExportPDF}
+                        disabled={!expenseUI || Object.keys(expenseUI).length === 0}
+                    />
+                </div>
                 {open &&
                     <AddExpense
                         open={open}
@@ -104,7 +133,7 @@ export default function ExpenseByYear() {
                             setRefreshKey(prev => prev + 1); // trigger re-fetch after modal close
                         }}
                         type={type}
-                        incomeData={selectedExpense}
+                        expenseData={selectedExpense}
                     />
                 }
                 {
@@ -161,20 +190,27 @@ export default function ExpenseByYear() {
                                                              <td>
                                                                 <div className="flex justify-center gap-5">
                                                                     { (isOwner || item.createdBy?._id === user?._id) && (
-                                                                    <button onClick={() => {
-                                                                        setOpen(true);
-                                                                        setType("editExpense");
-                                                                        setSelectedExpense(item);
-                                                                    }}>
+                                                                    <button 
+                                                                        onClick={() => {
+                                                                            setOpen(true);
+                                                                            setType("editExpense");
+                                                                            setSelectedExpense(item);
+                                                                        }}
+                                                                        className="hover:scale-110 transition-transform"
+                                                                        aria-label="Edit expense"
+                                                                    >
                                                                         <MdModeEdit className="text-2xl text-green-500"/>
                                                                     </button>
                                                                     )}
                                                                     { (isOwner || item.createdBy?._id === user?._id) && (
-                                                                    <button onClick={() => {
-                                                                        setOpen(true);
-                                                                        setType("deleteExpense");
-                                                                        setSelectedExpense(item);
-                                                                    }}
+                                                                    <button 
+                                                                        onClick={() => {
+                                                                            setOpen(true);
+                                                                            setType("deleteExpense");
+                                                                            setSelectedExpense(item);
+                                                                        }}
+                                                                        className="hover:scale-110 transition-transform"
+                                                                        aria-label="Delete expense"
                                                                     >
                                                                         <FaTrashAlt className="text-2xl text-red-500"/>
                                                                     </button>

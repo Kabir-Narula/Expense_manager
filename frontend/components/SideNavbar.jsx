@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import api from "../src/Utils/api";
-import { FiMenu } from "react-icons/fi";
+import { FiMenu, FiX } from "react-icons/fi";
 import { CgMenuGridO } from "react-icons/cg";
 import { MdAttachMoney, MdBarChart, MdPerson } from "react-icons/md";
 import { FaHandHoldingUsd } from "react-icons/fa";
@@ -81,9 +81,19 @@ const SideNavbar = () => {
         } z-40`}
       >
         <div>
-          <div className="flex items-center mb-12 ml-2">
-            <RiDashboardLine className="w-8 h-8 text-indigo-400" />
-            <span className="ml-3 text-xl font-semibold text-white">FinDashboard</span>
+          <div className="flex items-center justify-between mb-12 ml-2">
+            <Link to="/dashboard" className="flex items-center hover:opacity-80 transition-opacity cursor-pointer">
+              <RiDashboardLine className="w-8 h-8 text-indigo-400" />
+              <span className="ml-3 text-xl font-semibold text-white">FinDashboard</span>
+            </Link>
+            {/* Close button for mobile */}
+            <button
+              onClick={() => setIsSmallScreen(false)}
+              className="md:hidden text-white hover:text-indigo-300 transition-colors"
+              aria-label="Close menu"
+            >
+              <FiX className="w-6 h-6" />
+            </button>
           </div>
 
           <AccountSwitcher />

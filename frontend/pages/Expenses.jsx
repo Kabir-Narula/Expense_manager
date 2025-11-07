@@ -56,21 +56,36 @@ function Expenses() {
         }
 
         {/* breakdown by year  */}
-        { Object.entries(groupedDataUI).map(([year, months]) => (
-          <div 
-            key={year}
-            className="bg-white border-1 rounded-xl shadow-sm p-2 m-4"
-            >
-            <Link 
-              className="flex justify-between items-center"
-              to={`/expenses/${year}`}
-              state={{expense: months}}
-            >
-              <p>{year}</p>
-              <IoIosArrowForward/>
-            </Link>
+        {Object.keys(groupedDataUI).length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 bg-white rounded-xl shadow-sm mx-4">
+            <div className="text-center max-w-md">
+              <div className="mb-4">
+                <svg className="w-24 h-24 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">No Expenses Recorded Yet</h3>
+              <p className="text-gray-500 mb-6">Start managing your finances by tracking your expenses. Monitor where your money goes and make better financial decisions.</p>
+              <AddSourceButton func={() => { setOpen(true); setType("addExpense") }} text="Add Your First Expense"/>
+            </div>
           </div>
-        ))}
+        ) : (
+          Object.entries(groupedDataUI).map(([year, months]) => (
+            <div 
+              key={year}
+              className="bg-white border-1 rounded-xl shadow-sm p-2 m-4"
+              >
+              <Link 
+                className="flex justify-between items-center"
+                to={`/expenses/${year}`}
+                state={{expense: months}}
+              >
+                <p>{year}</p>
+                <IoIosArrowForward/>
+              </Link>
+            </div>
+          ))
+        )}
       </div>
     </>
   );

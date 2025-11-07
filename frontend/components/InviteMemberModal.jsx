@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../src/Utils/api";
 import { useAccount } from "../src/context/AccountContext.jsx";
 
@@ -8,6 +8,17 @@ export default function InviteMemberModal({ open, onClose, onInvited }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') onClose?.();
+    };
+    if (open) {
+      window.addEventListener('keydown', handleEsc);
+    }
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [open, onClose]);
 
   if (!open) return null;
 
@@ -56,13 +67,16 @@ export default function InviteMemberModal({ open, onClose, onInvited }) {
         <h3 className="text-lg font-semibold mb-4">Invite Member</h3>
         <form onSubmit={submit} className="space-y-3">
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Email</label>
+            <label className="block text-sm text-gray-600 mb-1">
+              Email <span className="text-red-500">*</span>
+            </label>
             <input
               type="email"
-              className="w-full border rounded-md px-3 py-2"
+              className="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
               placeholder="member@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           <div>
@@ -77,8 +91,8 @@ export default function InviteMemberModal({ open, onClose, onInvited }) {
           </div>
           {error && <p className="text-red-600 text-sm">{error}</p>}
           <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={onClose} className="px-3 py-2 text-sm rounded-md bg-gray-100">Cancel</button>
-            <button type="submit" disabled={loading} className="px-3 py-2 text-sm rounded-md bg-indigo-600 text-white">{loading ? "Sending..." : "Send Invite"}</button>
+            <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors">Cancel</button>
+            <button type="submit" disabled={loading} className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors">{loading ? "Sending..." : "Send Invite"}</button>
           </div>
         </form>
       </div>
