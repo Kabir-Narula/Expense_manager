@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../../components/layouts/AuthLayout";
 import Input from "../../components/Inputs/Input";
 import api from "../../src/Utils/api";
+import { validateEmail, validatePassword } from "../../src/Utils/helper";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ const Signup = () => {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -23,13 +25,15 @@ const Signup = () => {
     const newErrors = {};
 
     if (!formData.name.trim()) newErrors.name = "Full name is required";
-    if (!formData.email.includes("@"))
-      newErrors.email = "Invalid email address";
-    if (formData.password.length < 8)
-      newErrors.password = "Password must be at least 8 characters";
-    if (formData.password !== formData.confirmPassword)
-      newErrors.confirmPassword = "Passwords don't match";
-
+    
+    const emailValidation = validateEmail(formData.email);
+    if (!emailValidation.isValid) newErrors.email = emailValidation.message;
+    
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.isValid) newErrors.password = passwordValidation.message;
+    
+    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords don't match";
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -38,6 +42,7 @@ const Signup = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
+    setLoading(true);
     try {
       const { data } = await api.post("/auth/register", {
         fullName: formData.name,
@@ -53,6 +58,8 @@ const Signup = () => {
           err.response?.data?.message ||
           "Registration failed. Please try again.",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,38 +78,42 @@ const Signup = () => {
             name="name"
             value={formData.name}
             onChange={handleInputChange}
-            label="Full Name"
+            label={<>Full Name <span className="text-red-500">*</span></>}
             placeholder="John Doe"
             error={errors.name}
+            required
           />
 
           <Input
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            label="Email Address"
+            label={<>Email Address <span className="text-red-500">*</span></>}
             placeholder="john@example.com"
             error={errors.email}
+            required
           />
 
           <Input
             name="password"
             value={formData.password}
             onChange={handleInputChange}
-            label="Password"
+            label={<>Password <span className="text-red-500">*</span></>}
             placeholder="••••••••"
             type="password"
             error={errors.password}
+            required
           />
 
           <Input
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleInputChange}
-            label="Confirm Password"
+            label={<>Confirm Password <span className="text-red-500">*</span></>}
             placeholder="••••••••"
             type="password"
             error={errors.confirmPassword}
+            required
           />
 
           {errors.general && (
@@ -111,9 +122,10 @@ const Signup = () => {
 
           <button
             type="submit"
-            className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+            disabled={loading}
+            className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
-            Create Account
+            {loading ? "Creating account..." : "Create Account"}
           </button>
 
           <p className="text-center text-sm text-gray-600 mt-4">

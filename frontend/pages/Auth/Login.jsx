@@ -8,10 +8,13 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
     try {
       const { data } = await api.post("/auth/login", { email, password });
       localStorage.setItem("token", data.token);
@@ -20,6 +23,8 @@ const Login = () => {
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -40,26 +45,29 @@ const Login = () => {
             name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            label="Email Address"
+            label={<>Email Address <span className="text-red-500">*</span></>}
             placeholder="john@example.com"
+            required
           />
 
           <Input
             name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            label="Password"
+            label={<>Password <span className="text-red-500">*</span></>}
             placeholder="••••••••"
             type="password"
+            required
           />
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <button
             type="submit"
-            className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90"
+            disabled={loading}
+            className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
           >
-            Sign In
+            {loading ? "Signing in..." : "Sign In"}
           </button>
 
           <p className="text-center text-sm text-gray-600">

@@ -12,37 +12,78 @@ function Dashboard() {
     totalExpenses: 0,
     transactions: [],
   });
+  const [loading, setLoading] = useState(true);
+  const [invitations, setInvitations] = useState([]);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  
+  // Get account context - must be declared before useEffect
+  const { isOwner, currentAccount, loadAccounts, setCurrentAccountId, currentAccountId } = useAccount();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         // Fetch user data from existing endpoint
         const userResponse = await api.get("/auth/getUser");
         setUser(userResponse.data);
 
-        // Mock data - replace with actual API calls when backend is ready
+        // Fetch real-time income data
+        const incomeResponse = await api.get("/income/get");
+        const incomes = incomeResponse.data || [];
+        
+        // Fetch real-time expense data
+        const expenseResponse = await api.get("/expense/get");
+        const expenses = expenseResponse.data || [];
+
+        // Calculate total income (amounts are in cents)
+        const totalIncome = incomes.reduce((sum, item) => sum + (item.amount || 0), 0);
+        
+        // Calculate total expenses (amounts are in cents)
+        const totalExpenses = expenses.reduce((sum, item) => sum + (item.amount || 0), 0);
+
+        // Combine and sort recent transactions (last 10)
+        const allTransactions = [
+          ...incomes.map(item => ({
+            _id: item._id,
+            description: item.source || 'Income',
+            amount: item.amount,
+            date: item.date,
+            type: 'income',
+            createdBy: item.createdBy
+          })),
+          ...expenses.map(item => ({
+            _id: item._id,
+            description: item.category || 'Expense',
+            amount: item.amount,
+            date: item.date,
+            type: 'expense',
+            createdBy: item.createdBy
+          }))
+        ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
+
         setFinancialData({
-          totalIncome: 430000,
-          totalExpenses: 320000,
-          transactions: [],
+          totalIncome,
+          totalExpenses,
+          transactions: allTransactions
         });
+
         // invitations
         const invRes = await api.get("/invitations");
         setInvitations(invRes.data?.invitations || []);
       } catch (err) {
-        localStorage.removeItem("token");
-        window.location.href = "/login";
+        console.error("Error fetching dashboard data:", err);
+        if (err?.response?.status === 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/login";
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
-
-  const [invitations, setInvitations] = useState([]);
-  const { isOwner, currentAccount, loadAccounts, setCurrentAccountId } =
-    useAccount();
-  const [inviteOpen, setInviteOpen] = useState(false);
-  const [creating, setCreating] = useState(false);
+  }, [currentAccountId]); // Refetch when account changes
 
   const createShared = async () => {
     try {
@@ -136,9 +177,13 @@ function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Total Income</p>
-              <p className="text-2xl font-bold text-gray-800 mt-2">
-                ${financialData.totalIncome.toLocaleString()}
-              </p>
+              {loading ? (
+                <div className="h-8 w-32 bg-gray-200 animate-pulse rounded mt-2"></div>
+              ) : (
+                <p className="text-2xl font-bold text-gray-800 mt-2">
+                  ${(financialData.totalIncome / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              )}
             </div>
             <div className="bg-green-100 p-3 rounded-lg">
               <MdAttachMoney className="w-6 h-6 text-green-600" />
@@ -150,9 +195,13 @@ function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Total Expenses</p>
-              <p className="text-2xl font-bold text-gray-800 mt-2">
-                ${financialData.totalExpenses.toLocaleString()}
-              </p>
+              {loading ? (
+                <div className="h-8 w-32 bg-gray-200 animate-pulse rounded mt-2"></div>
+              ) : (
+                <p className="text-2xl font-bold text-gray-800 mt-2">
+                  ${(financialData.totalExpenses / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              )}
             </div>
             <div className="bg-red-100 p-3 rounded-lg">
               <FiDollarSign className="w-6 h-6 text-red-600" />
@@ -164,12 +213,17 @@ function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Net Savings</p>
-              <p className="text-2xl font-bold text-gray-800 mt-2">
-                $
-                {(
-                  financialData.totalIncome - financialData.totalExpenses
-                ).toLocaleString()}
-              </p>
+              {loading ? (
+                <div className="h-8 w-32 bg-gray-200 animate-pulse rounded mt-2"></div>
+              ) : (
+                <p className={`text-2xl font-bold mt-2 ${
+                  financialData.totalIncome - financialData.totalExpenses >= 0 
+                    ? 'text-green-600' 
+                    : 'text-red-600'
+                }`}>
+                  ${((financialData.totalIncome - financialData.totalExpenses) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              )}
             </div>
             <div className="bg-indigo-100 p-3 rounded-lg">
               <MdSavings className="w-6 h-6 text-indigo-600" />
@@ -187,18 +241,72 @@ function Dashboard() {
           <table className="w-full">
             <thead>
               <tr className="text-left text-gray-500 border-b">
+                <th className="pb-4">Type</th>
                 <th className="pb-4">Description</th>
                 <th className="pb-4">Amount</th>
+                <th className="pb-4">Created By</th>
                 <th className="pb-4">Date</th>
               </tr>
             </thead>
             <tbody>
-              {financialData.transactions.length === 0 && (
+              {loading ? (
+                // Loading skeleton
+                [...Array(5)].map((_, i) => (
+                  <tr key={i} className="border-b last:border-b-0">
+                    <td className="py-4"><div className="h-4 w-16 bg-gray-200 animate-pulse rounded"></div></td>
+                    <td className="py-4"><div className="h-4 w-32 bg-gray-200 animate-pulse rounded"></div></td>
+                    <td className="py-4"><div className="h-4 w-20 bg-gray-200 animate-pulse rounded"></div></td>
+                    <td className="py-4"><div className="h-4 w-24 bg-gray-200 animate-pulse rounded"></div></td>
+                    <td className="py-4"><div className="h-4 w-28 bg-gray-200 animate-pulse rounded"></div></td>
+                  </tr>
+                ))
+              ) : financialData.transactions.length === 0 ? (
                 <tr>
-                  <td colSpan="3" className="py-4 text-center text-gray-500">
-                    No transactions found
+                  <td colSpan="5" className="py-8 text-center text-gray-500">
+                    No transactions found. Start by adding income or expenses!
                   </td>
                 </tr>
+              ) : (
+                financialData.transactions.map((transaction) => (
+                  <tr key={transaction._id} className="border-b last:border-b-0 hover:bg-gray-50">
+                    <td className="py-4">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        transaction.type === 'income' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {transaction.type === 'income' ? '↑ Income' : '↓ Expense'}
+                      </span>
+                    </td>
+                    <td className="py-4 text-gray-700">{transaction.description}</td>
+                    <td className={`py-4 font-medium ${
+                      transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {transaction.type === 'income' ? '+' : '-'}${(transaction.amount / 100).toFixed(2)}
+                    </td>
+                    <td className="py-4">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white font-semibold text-xs ${
+                          transaction.type === 'income' ? 'bg-green-500' : 'bg-red-500'
+                        }`}>
+                          {(transaction.createdBy?.fullName || transaction.createdBy?.email || "You").charAt(0).toUpperCase()}
+                        </div>
+                        <span className="text-sm text-gray-600">
+                          {transaction.createdBy?.fullName || transaction.createdBy?.email || "You"}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-4 text-gray-600 text-sm">
+                      {transaction.date 
+                        ? new Date(transaction.date.slice(0, 10) + 'T00:00:00').toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })
+                        : '-'}
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>

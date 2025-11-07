@@ -5,6 +5,7 @@ import {
   Navigate,
   useLocation,
 } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import "./App.css";
 
 import SideNavbar from "../components/SideNavbar";
@@ -25,81 +26,116 @@ const App = () => {
     location.pathname !== "/login" && location.pathname !== "/signup";
 
   return (
-    <div className="app-container">
-      {showNavbar && <SideNavbar />}
-      <div className={`main-content ${showNavbar ? "with-sidebar" : ""}`}>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/expenses"
-            element={
-              <ProtectedRoute>
-                <Expenses />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/income"
-            element={
-              <ProtectedRoute>
-                <Income />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/logout" element={<Logout />} />
-          <Route
-            path="/charts"
-            element={
-              <ProtectedRoute>
-                <Charts />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/analytics"
-            element={
-              <ProtectedRoute>
-                <Charts />
-              </ProtectedRoute>
-            }
-          />
-          {/* <Route
-            path="/income/:year"
-            element={
-              <ProtectedRoute>
-                <IncomeByYear />
-              </ProtectedRoute>
-            }
-          /> */}
-          <Route
-            path="/edit-profile"
-            element={
-              <ProtectedRoute>
-                <EditProfile />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/manage-account"
-            element={
-              <ProtectedRoute>
-                <ManageAccount />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-        </Routes>
+    <>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#fff',
+            color: '#363636',
+            padding: '16px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          },
+          success: {
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+      <div className="app-container">
+        {showNavbar && <SideNavbar />}
+        <div className={`main-content ${showNavbar ? "with-sidebar" : ""}`}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/expenses"
+              element={
+                <ProtectedRoute>
+                  <Expenses />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/income"
+              element={
+                <ProtectedRoute>
+                  <Income />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/logout" element={<Logout />} />
+            <Route
+              path="/charts"
+              element={
+                <ProtectedRoute>
+                  <Charts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/analytics"
+              element={
+                <ProtectedRoute>
+                  <Charts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/income/:year"
+              element={
+                <ProtectedRoute>
+                  <IncomeByYear />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/expenses/:year"
+              element={
+                <ProtectedRoute>
+                  <ExpenseByYear />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edit-profile"
+              element={
+                <ProtectedRoute>
+                  <EditProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/manage-account"
+              element={
+                <ProtectedRoute>
+                  <ManageAccount />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+          </Routes>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
