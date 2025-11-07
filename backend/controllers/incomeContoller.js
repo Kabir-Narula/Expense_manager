@@ -1,16 +1,10 @@
-import User from "../models/User.js";
 import Income from "../models/Income.js";
-import { json } from "express";
-import Account from "../models/Account.js";
-import { formatDate } from "../helpers/parseISODateToLocal.js";
 
 export const addIncome = async (req, res) => {
   const userId = req.user.id;
 
   try {
     const { icon, source, amount, date, recurring, endDate, head} = req.body;
-    console.log("End date from adding income: " + endDate)
-    console.log("Date from adding income: " + date)
     if (!source || isNaN(amount) || !date) {
       return res.status(400).json({ message: "All fields are required." });
     }
@@ -32,7 +26,6 @@ export const addIncome = async (req, res) => {
       accountId: req.account?._id,
       createdBy: req.user._id,
     });
-    console.log(JSON.stringify(newIncome, null,2))
     await newIncome.save()
     res.status(200).json(newIncome);
   } catch (err) {
@@ -77,7 +70,6 @@ export const getAllIncome = async (req, res) => {
           startDate.setFullYear(startDate.getFullYear() -1);
           break;
         default: 
-          console.log("in this range error")
           return res.status(400).json({error: "Invalid range date"});
       }
     }
@@ -99,7 +91,6 @@ export const getAllIncome = async (req, res) => {
       // get the date of when the most recent document was added. 
       const lastDate = new Date(income.date);
       let nextDate;
-      let formattedNextDate;
       if (income.recurring === "bi-weekly") {
         // if its bi-weekly, get the next bi-weekly date by using the last date.
         nextDate = new Date(lastDate); 
@@ -117,13 +108,9 @@ export const getAllIncome = async (req, res) => {
 
       // if the current date is ahead of the next bi-weekly/monthly date, then create it.
       // the head property of the newIncome object will be true.
-      console.log("TODAY: " + todayISOStr)
-      console.log("income end date: " + endDateISOStr)
-      console.log("next day to add an income: " + nextDateISOStr)
 
       if (todayISOStr >= nextDateISOStr) {
         if (!endDateISOStr || nextDateISOStr <= endDateISOStr) {
-          console.log("able to add")
           const newIncome = new Income({
             userId: income.userId,
             icon: income.icon,
@@ -146,7 +133,6 @@ export const getAllIncome = async (req, res) => {
   
           // prevent user from manipulating the older recurrent payments. 
           income.recurring = "once";
-          console.log("new income recurring value" + income.recurring)
         
           await income.save();
         }
@@ -156,7 +142,6 @@ export const getAllIncome = async (req, res) => {
       ...filter, 
       date: {$gte: startDate, $lte: endDate},
     }).sort({ date: -1 }).populate("createdBy", "fullName email");
-    // console.log("GET INCOME: " + JSON.stringify(incomes, null, 2))
     res.status(200).json(incomes);
   } catch (error) {
     res.status(500).json({ message: "Nothing to show!" });
@@ -188,13 +173,10 @@ export const deleteIncome = async (req, res) => {
 export const updateIncome = async (req, res) => {
   const userId = req.user.id;
   const incomeId = req.params.id;
-  console.log("BODY: " + JSON.stringify(req.body, null, 2))
   
   try {
     const { icon, source, amount, date, recurring, endDate, head} = req.body;
     const finalEndDate = endDate ? new Date(endDate) : ""
-
-    console.log("final end date: " + finalEndDate)
     
     if (!source || isNaN(amount) || !date) {
       return res.status(400).json({ message: "All fields are required." });
