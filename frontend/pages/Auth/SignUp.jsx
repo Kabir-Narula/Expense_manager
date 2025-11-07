@@ -9,24 +9,27 @@ const Signup = () => {
     name: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.name.trim()) newErrors.name = "Full name is required";
-    if (!formData.email.includes("@")) newErrors.email = "Invalid email address";
-    if (formData.password.length < 8) newErrors.password = "Password must be at least 8 characters";
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords don't match";
-    
+    if (!formData.email.includes("@"))
+      newErrors.email = "Invalid email address";
+    if (formData.password.length < 8)
+      newErrors.password = "Password must be at least 8 characters";
+    if (formData.password !== formData.confirmPassword)
+      newErrors.confirmPassword = "Passwords don't match";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -39,14 +42,16 @@ const Signup = () => {
       const { data } = await api.post("/auth/register", {
         fullName: formData.name,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       });
-      
+
       localStorage.setItem("token", data.token);
       navigate("/dashboard");
     } catch (err) {
       setErrors({
-        general: err.response?.data?.message || "Registration failed. Please try again."
+        general:
+          err.response?.data?.message ||
+          "Registration failed. Please try again.",
       });
     }
   };
@@ -55,7 +60,9 @@ const Signup = () => {
     <AuthLayout>
       <div className="w-full max-w-md mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Create Account</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Create Account
+          </h1>
           <p className="text-sm text-gray-600">Start tracking your expenses</p>
         </div>
 
@@ -111,7 +118,10 @@ const Signup = () => {
 
           <p className="text-center text-sm text-gray-600 mt-4">
             Already have an account?{" "}
-            <Link to="/login" className="text-primary font-semibold hover:underline">
+            <Link
+              to="/login"
+              className="text-primary font-semibold hover:underline"
+            >
               Log in
             </Link>
           </p>

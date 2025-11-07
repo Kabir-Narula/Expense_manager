@@ -1,4 +1,10 @@
-import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import "./App.css";
 
 import SideNavbar from "../components/SideNavbar";
@@ -17,7 +23,8 @@ import ManageAccount from "../pages/ManageAccount";
 
 const App = () => {
   const location = useLocation();
-  const showNavbar = location.pathname !== "/login" && location.pathname !== "/signup";
+  const showNavbar =
+    location.pathname !== "/login" && location.pathname !== "/signup";
 
   return (
     <div className="app-container">

@@ -11,7 +11,6 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
     formattedEndDate = formatDateToSend(incomeData.endDate);
     console.log("end date: " + formattedEndDate);
   }
-
   const [sourceUI, setSourceUI] = useState(
     type === "editIncome" ? incomeData.source : "",
   );
@@ -26,15 +25,20 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
     type === "editIncome" ? incomeData.recurring : "once",
   );
   const recurrenceOptions = ["once", "bi-weekly", "monthly"];
-  const [endOption, setEndOption] = useState("noEndDate");
-
-
+  const [endOption, setEndOption] = useState(
+    type === "editIncome"
+      ? incomeData.endDate
+        ? "customEndDate"
+        : "noEndDate"
+      : "noEndDate",
+  );
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const floatVal = parseFloat(amountUI);
       let cents;
       cents = Math.round(floatVal * 100);
+      console.log("Start date UI: " + startDateUI);
       const formData = {
         icon: "",
         source: sourceUI,
@@ -42,7 +46,7 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
         date: startDateUI,
         recurring: recurringUI,
         endDate: endDateUI,
-        head: true
+        head: true,
       };
       let res;
       if (type === "addIncome") {
@@ -62,7 +66,6 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
       setErrorMessage(error?.response?.data?.message);
     }
   };
-
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75 border-black">
@@ -159,7 +162,10 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
                     className="border rounded-md px-2 py-1 text-sm mt-4 mb-4 max-w-35"
                     value={recurringUI}
                     onChange={(e) => setRecurringUI(e.target.value)}
-                    disabled={incomeData.recurring === "once" && incomeData.head === false}
+                    disabled={
+                      incomeData.recurring === "once" &&
+                      incomeData.head === false
+                    }
                   >
                     {recurrenceOptions.map((item) => (
                       <option key={item} value={item}>
@@ -191,24 +197,28 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
                       </div>
                       <div className="flex justify-between mt-4">
                         <input
-                            type="radio"
-                            name="endOption"
-                            value="noEndDate"
-                            checked={endOption === "noEndDate"}
-                            onChange={(e) => setEndOption(e.target.value)}
+                          type="radio"
+                          name="endOption"
+                          value="noEndDate"
+                          checked={endOption === "noEndDate"}
+                          onChange={(e) => {
+                            setEndOption(e.target.value);
+                            setEndDateUI("");
+                          }}
                         />
                         <p>I will manually cancel recurring transactions</p>
                       </div>
                     </>
                   )}
-                  {incomeData.recurring === "once" && incomeData.head === false && (
-                    <p className="text-green-600">
-                      This is part of a recurring income. To edit the recurring income,
-                      go to the most recent recurring entry and make changes there.
-                    </p>
-                  )
-
-                  }
+                  {incomeData.recurring === "once" &&
+                    incomeData.head === false &&
+                    type === "editIncome" && (
+                      <p className="text-green-600">
+                        This is part of a recurring income. To edit the
+                        recurring income, go to the most recent recurring entry
+                        and make changes there.
+                      </p>
+                    )}
                 </div>
                 <hr className="mt-5" />
                 {showError && <p className="text-red-600">{errorMessage}</p>}

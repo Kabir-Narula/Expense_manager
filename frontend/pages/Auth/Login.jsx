@@ -27,8 +27,12 @@ const Login = () => {
     <AuthLayout>
       <div className="w-full max-w-md mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-          <p className="text-sm text-gray-600">Track your expenses efficiently</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Welcome Back
+          </h1>
+          <p className="text-sm text-gray-600">
+            Track your expenses efficiently
+          </p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
@@ -60,7 +64,10 @@ const Login = () => {
 
           <p className="text-center text-sm text-gray-600">
             Don't have an account?{" "}
-            <Link to="/signup" className="text-primary font-semibold hover:underline">
+            <Link
+              to="/signup"
+              className="text-primary font-semibold hover:underline"
+            >
               Sign up
             </Link>
           </p>

@@ -11,7 +11,7 @@ const AuthLayout = ({ children }) => {
           <LuTrendingUp className="text-primary" size={24} />
           Expense Tracker
         </h2>
-        
+
         <div className="flex-1 flex items-center justify-center">
           {children}
         </div>
@@ -19,19 +19,19 @@ const AuthLayout = ({ children }) => {
 
       <div className="hidden md:block w-[45%] xl:w-[50%] h-screen bg-gradient-to-br from-purple-50 to-indigo-50 relative overflow-hidden">
         {/* Animated Background Elements */}
-        <motion.div 
+        <motion.div
           className="w-48 h-48 rounded-[40px] bg-purple-600 absolute -top-7 -left-5"
           animate={{ y: [0, 20, 0] }}
           transition={{ duration: 6, repeat: Infinity }}
         />
-        
-        <motion.div 
+
+        <motion.div
           className="w-48 h-56 rounded-[40px] border-[20px] border-fuchsia-600/30 absolute top-[30%] -right-10"
           animate={{ rotate: [0, 5, 0] }}
           transition={{ duration: 8, repeat: Infinity }}
         />
-        
-        <motion.div 
+
+        <motion.div
           className="w-48 h-48 rounded-[40px] bg-violet-500/80 absolute -bottom-7 -left-5"
           animate={{ scale: [1, 1.05, 1] }}
           transition={{ duration: 5, repeat: Infinity }}
@@ -62,7 +62,9 @@ const AuthLayout = ({ children }) => {
 const StatsInfoCard = ({ icon, label, value, color }) => {
   return (
     <div className="flex gap-4 bg-white p-5 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100">
-      <div className={`${color} w-14 h-14 flex items-center justify-center rounded-xl text-white`}>
+      <div
+        className={`${color} w-14 h-14 flex items-center justify-center rounded-xl text-white`}
+      >
         {icon}
       </div>
       <div>

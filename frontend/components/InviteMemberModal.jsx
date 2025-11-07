@@ -31,7 +31,7 @@ export default function InviteMemberModal({ open, onClose, onInvited }) {
       setLoading(true);
       const response = await api.post(`/accounts/${currentAccountId}/invite`, {
         email: email.trim(),
-        message: message.trim()
+        message: message.trim(),
       });
 
       // Show success message
@@ -42,7 +42,8 @@ export default function InviteMemberModal({ open, onClose, onInvited }) {
       onInvited?.();
       onClose?.();
     } catch (e) {
-      const errorMsg = e?.response?.data?.message || "Failed to send invitation";
+      const errorMsg =
+        e?.response?.data?.message || "Failed to send invitation";
       setError(errorMsg);
       console.error("Invitation error:", e);
     } finally {
@@ -66,7 +67,9 @@ export default function InviteMemberModal({ open, onClose, onInvited }) {
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Message (optional)</label>
+            <label className="block text-sm text-gray-600 mb-1">
+              Message (optional)
+            </label>
             <textarea
               className="w-full border rounded-md px-3 py-2"
               rows={3}
@@ -77,8 +80,20 @@ export default function InviteMemberModal({ open, onClose, onInvited }) {
           </div>
           {error && <p className="text-red-600 text-sm">{error}</p>}
           <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={onClose} className="px-3 py-2 text-sm rounded-md bg-gray-100">Cancel</button>
-            <button type="submit" disabled={loading} className="px-3 py-2 text-sm rounded-md bg-indigo-600 text-white">{loading ? "Sending..." : "Send Invite"}</button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-3 py-2 text-sm rounded-md bg-gray-100"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-3 py-2 text-sm rounded-md bg-indigo-600 text-white"
+            >
+              {loading ? "Sending..." : "Send Invite"}
+            </button>
           </div>
         </form>
       </div>

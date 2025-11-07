@@ -1,4 +1,3 @@
-
 export default function AddSourceButton({ func, text }) {
   return (
     <button

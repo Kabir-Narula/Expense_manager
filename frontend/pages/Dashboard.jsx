@@ -10,7 +10,7 @@ function Dashboard() {
   const [financialData, setFinancialData] = useState({
     totalIncome: 0,
     totalExpenses: 0,
-    transactions: []
+    transactions: [],
   });
 
   useEffect(() => {
@@ -24,12 +24,11 @@ function Dashboard() {
         setFinancialData({
           totalIncome: 430000,
           totalExpenses: 320000,
-          transactions: []
+          transactions: [],
         });
         // invitations
         const invRes = await api.get("/invitations");
         setInvitations(invRes.data?.invitations || []);
-        
       } catch (err) {
         localStorage.removeItem("token");
         window.location.href = "/login";
@@ -40,7 +39,8 @@ function Dashboard() {
   }, []);
 
   const [invitations, setInvitations] = useState([]);
-  const { isOwner, currentAccount, loadAccounts, setCurrentAccountId } = useAccount();
+  const { isOwner, currentAccount, loadAccounts, setCurrentAccountId } =
+    useAccount();
   const [inviteOpen, setInviteOpen] = useState(false);
   const [creating, setCreating] = useState(false);
 
@@ -68,10 +68,16 @@ function Dashboard() {
       // Dispatch event for other components
       window.dispatchEvent(new Event("accountsUpdated"));
       // Show success message
-      alert(response.data?.message || "Invitation accepted! You can now access the shared account.");
+      alert(
+        response.data?.message ||
+          "Invitation accepted! You can now access the shared account.",
+      );
     } catch (e) {
       console.error("Failed to accept invitation:", e);
-      alert(e?.response?.data?.message || "Failed to accept invitation. Please try again.");
+      alert(
+        e?.response?.data?.message ||
+          "Failed to accept invitation. Please try again.",
+      );
     }
   };
 
@@ -82,7 +88,10 @@ function Dashboard() {
       alert("Invitation declined");
     } catch (e) {
       console.error("Failed to decline invitation:", e);
-      alert(e?.response?.data?.message || "Failed to decline invitation. Please try again.");
+      alert(
+        e?.response?.data?.message ||
+          "Failed to decline invitation. Please try again.",
+      );
     }
   };
 
@@ -95,19 +104,30 @@ function Dashboard() {
           </h1>
           <p className="text-gray-500">Your Financial Dashboard</p>
         </div>
-        {isOwner && currentAccount?.type === 'shared' && (
-          <button onClick={() => setInviteOpen(true)} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+        {isOwner && currentAccount?.type === "shared" && (
+          <button
+            onClick={() => setInviteOpen(true)}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+          >
             Invite Member
           </button>
         )}
-        {isOwner && currentAccount?.type === 'personal' && (
-          <button disabled={creating} onClick={createShared} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
-            {creating ? 'Creating...' : 'Create Shared Account'}
+        {isOwner && currentAccount?.type === "personal" && (
+          <button
+            disabled={creating}
+            onClick={createShared}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+          >
+            {creating ? "Creating..." : "Create Shared Account"}
           </button>
         )}
       </div>
       {inviteOpen && (
-        <InviteMemberModal open={inviteOpen} onClose={() => setInviteOpen(false)} onInvited={() => {}} />
+        <InviteMemberModal
+          open={inviteOpen}
+          onClose={() => setInviteOpen(false)}
+          onInvited={() => {}}
+        />
       )}
 
       {/* Financial Summary Cards */}
@@ -145,7 +165,10 @@ function Dashboard() {
             <div>
               <p className="text-gray-500 text-sm">Net Savings</p>
               <p className="text-2xl font-bold text-gray-800 mt-2">
-                ${(financialData.totalIncome - financialData.totalExpenses).toLocaleString()}
+                $
+                {(
+                  financialData.totalIncome - financialData.totalExpenses
+                ).toLocaleString()}
               </p>
             </div>
             <div className="bg-indigo-100 p-3 rounded-lg">
@@ -157,7 +180,9 @@ function Dashboard() {
 
       {/* Recent Transactions */}
       <div className="bg-white p-6 rounded-xl shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-800 mb-6">Recent Transactions</h2>
+        <h2 className="text-lg font-semibold text-gray-800 mb-6">
+          Recent Transactions
+        </h2>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -187,21 +212,35 @@ function Dashboard() {
             🔔 Pending Invitations ({invitations.length})
           </h2>
           <p className="text-sm text-gray-600 mb-4">
-            You have been invited to join shared account(s). Accept to become a member.
+            You have been invited to join shared account(s). Accept to become a
+            member.
           </p>
           <div className="space-y-3">
             {invitations.map((i) => (
-              <div key={i._id} className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200">
+              <div
+                key={i._id}
+                className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200"
+              >
                 <div className="flex-1">
                   <p className="text-base font-semibold text-gray-800">
                     {i.account?.name || "Shared Account"}
                   </p>
                   <p className="text-sm text-gray-600 mt-1">
-                    Invited by: <span className="font-medium">{i.inviter?.fullName || "Unknown"}</span>
-                    {i.inviter?.email && <span className="text-gray-500"> ({i.inviter.email})</span>}
+                    Invited by:{" "}
+                    <span className="font-medium">
+                      {i.inviter?.fullName || "Unknown"}
+                    </span>
+                    {i.inviter?.email && (
+                      <span className="text-gray-500">
+                        {" "}
+                        ({i.inviter.email})
+                      </span>
+                    )}
                   </p>
                   {i.message && (
-                    <p className="text-sm text-gray-500 mt-2 italic">"{i.message}"</p>
+                    <p className="text-sm text-gray-500 mt-2 italic">
+                      "{i.message}"
+                    </p>
                   )}
                 </div>
                 <div className="flex gap-2 ml-4">

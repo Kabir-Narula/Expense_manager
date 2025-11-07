@@ -1,12 +1,17 @@
 import React, { useState } from "react";
-import { FaRegEye, FaRegEyeSlash, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import {
+  FaRegEye,
+  FaRegEyeSlash,
+  FaCheckCircle,
+  FaTimesCircle,
+} from "react-icons/fa";
 
 const Input = ({ label, value, onChange, placeholder, type, name, error }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
   const getInputType = () => {
-    if (type === 'password') return showPassword ? 'text' : 'password';
+    if (type === "password") return showPassword ? "text" : "password";
     return type;
   };
 
@@ -15,11 +20,12 @@ const Input = ({ label, value, onChange, placeholder, type, name, error }) => {
       <label className="block text-sm font-medium text-gray-700 mb-2">
         {label}
       </label>
-      
-      <div className={`relative transition-all duration-200 ${
-        error ? "border-red-500" : 
-        isFocused ? "ring-2 ring-primary/20" : ""
-      }`}>
+
+      <div
+        className={`relative transition-all duration-200 ${
+          error ? "border-red-500" : isFocused ? "ring-2 ring-primary/20" : ""
+        }`}
+      >
         <input
           name={name}
           type={getInputType()}
@@ -39,12 +45,19 @@ const Input = ({ label, value, onChange, placeholder, type, name, error }) => {
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary"
             onClick={() => setShowPassword(!showPassword)}
           >
-            {showPassword ? <FaRegEyeSlash size={18} /> : <FaRegEye size={18} />}
+            {showPassword ? (
+              <FaRegEyeSlash size={18} />
+            ) : (
+              <FaRegEye size={18} />
+            )}
           </button>
         )}
 
         {error && (
-          <FaTimesCircle className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500" size={18} />
+          <FaTimesCircle
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500"
+            size={18}
+          />
         )}
       </div>
 
