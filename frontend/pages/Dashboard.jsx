@@ -47,9 +47,17 @@ function Dashboard() {
       if (incomeResponse.status === 200 && expenseResponse.status === 200) {
         const incomeDocuments = incomeResponse.data;
         const expenseDocuments = expenseResponse.data;
+        const filteredIncome =
+          memberFilter === "all"
+            ? incomeDocuments
+            : incomeDocuments.filter((i) => i.createdBy?._id === memberFilter);
+        const filteredExpense =
+          memberFilter === "all"
+            ? expenseDocuments
+            : expenseDocuments.filter((i) => i.createdBy?._id === memberFilter);
         const calculatedFinances = calculateFinancialData(
-          incomeDocuments,
-          expenseDocuments,
+          filteredIncome,
+          filteredExpense,
         );
         setFinancialData(calculatedFinances);
       }
@@ -59,10 +67,6 @@ function Dashboard() {
       );
     }
   };
-
-  useEffect(() => {
-    console.log("MEMBER FILTER: " + memberFilter)
-  }, [memberFilter])
 
   // Get account context - must be declared before useEffect
   const {
@@ -89,20 +93,17 @@ function Dashboard() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Fetch user data from existing endpoint
         const userResponse = await api.get("/auth/getUser");
         setUser(userResponse.data);
 
-        // Fetch real-time income data
         const incomeResponse = await api.get(`/income/get?range=${range}`);
         const incomes = incomeResponse.data || [];
 
-        // Fetch real-time expense data
         const expenseResponse = await api.get(`/expense/get?range=${range}`);
         const expenses = expenseResponse.data || [];
 
 
-        const filteredExpenses =
+        const filteredExpense =
           memberFilter === "all"
             ? expenses
             : expenses.filter((i) => i.createdBy?._id === memberFilter);
@@ -114,7 +115,7 @@ function Dashboard() {
 
         const calculatedFinances = calculateFinancialData(
           filteredIncome,
-          filteredExpenses,
+          filteredExpense,
         );
 
         setFinancialData(calculatedFinances);

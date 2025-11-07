@@ -16,6 +16,11 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import calculateFinancialData from "../src/Utils/calculateFinancialData";
+import DateRangeSelector from "../components/DateRangeSelector";
+import { useAccount } from "../src/context/AccountContext";
+import { parseDateToLocal} from "../src/Utils/dateFormatter";
+import ViewOptions from "../src/Utils/ViewOptions";
 
 const COLORS = [
   "#0088FE",
@@ -28,42 +33,128 @@ const COLORS = [
 ];
 
 function FinancialCharts() {
-  const [incomeData, setIncomeData] = useState([]);
+  const [user, setUser] = useState(null);
+  const [incomeData, setIncomeData] = useState([])
   const [expenseData, setExpenseData] = useState([]);
   const [monthlyData, setMonthlyData] = useState([]);
   const [expenseCategories, setExpenseCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [range, setRange] = useState("4w");
+  const [memberFilter, setMemberFilter] = useState("all");
+  const [members, setMembers] = useState([]);
+  const [customSearch, setCustomSearch] = useState(false);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+  const todayStr = parseDateToLocal(today);
+  const yesterdayStr = parseDateToLocal(yesterday);
+  const [customStartDateUI, setCustomStartDateUI] = useState(yesterdayStr);
+  const [customEndDateUI, setCustomEndDateUI] = useState(todayStr);
+  const [refreshKey, setRefreshKey] = useState(0); // trigger re-fetch
+  const [noDataMessage, setNoDataMessage] = useState("");
+  const [financialData, setFinancialData] = useState({
+    totalIncome: 0,
+    totalExpenses: 0,
+    transactions: [],
+  });
+  const {
+    isOwner,
+    currentAccount,
+    loadAccounts,
+    setCurrentAccountId,
+    currentAccountId,
+  } = useAccount();
+  const viewOptions = ViewOptions({ setRange });
+  const handleRangeSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setNoDataMessage("");
+      const incomeResponse = await api.get(
+        `income/get?start=${customStartDateUI}&end=${customEndDateUI}`,
+      );
+      const expenseResponse = await api.get(
+        `expense/get?start=${customStartDateUI}&end=${customEndDateUI}`,
+      );
+      if (incomeResponse.status === 200 && expenseResponse.status === 200) {
+        const incomeDocuments = incomeResponse.data;
+        const expenseDocuments = expenseResponse.data;
+        const filteredIncome =
+          memberFilter === "all"
+            ? incomeDocuments
+            : incomeDocuments.filter((i) => i.createdBy?._id === memberFilter);
+        const filteredExpense =
+          memberFilter === "all"
+            ? expenseDocuments
+            : expenseDocuments.filter((i) => i.createdBy?._id === memberFilter);
+        setIncomeData(filteredIncome);
+        setExpenseData(filteredExpense);
 
+      }
+    } catch (error) {
+      setNoDataMessage(
+        error.response?.data?.message || "An unexpected error occurred",
+      );
+    }
+  };
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        if (!currentAccountId) return;
+        const res = await api.get(`/accounts/${currentAccountId}/members`);
+        setMembers(res.data || []);
+      } catch (e) {
+        setMembers([]);
+      }
+    };
+    fetchMembers();
+  }, [currentAccountId]);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [incomeRes, expenseRes] = await Promise.all([
-          api.get("/income/get"),
-          api.get("/expense/get"),
-        ]);
+        setLoading(true);
+        const userResponse = await api.get("/auth/getUser");
+        setUser(userResponse.data);
 
-        if (incomeRes.status === 200) {
-          setIncomeData(incomeRes.data);
+        const incomeResponse = await api.get(`/income/get?range=${range}`);
+        const incomes = incomeResponse.data || [];
+
+        const expenseResponse = await api.get(`/expense/get?range=${range}`);
+        const expenses = expenseResponse.data || [];
+
+
+        const filteredExpenses =
+          memberFilter === "all"
+            ? expenses
+            : expenses.filter((i) => i.createdBy?._id === memberFilter);
+
+        const filteredIncome =
+          memberFilter === "all"
+            ? incomes
+            : incomes.filter((i) => i.createdBy?._id === memberFilter);
+        setIncomeData(filteredIncome);
+        setExpenseData(filteredExpenses);
+
+      } catch (err) {
+        console.error("Error fetching dashboard data:", err);
+        if (err?.response?.status === 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/login";
         }
-        if (expenseRes.status === 200) {
-          setExpenseData(expenseRes.data);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [memberFilter, range ]); // Refetch when account changes
+
 
   useEffect(() => {
     if (incomeData.length > 0 || expenseData.length > 0) {
       generateMonthlyData();
       generateExpenseCategories();
     }
-  }, [incomeData, expenseData]);
+  }, [incomeData, expenseData, range]);
 
   const generateMonthlyData = () => {
     const monthlyMap = {};
@@ -209,6 +300,19 @@ function FinancialCharts() {
           </div>
         </div>
       </div>
+      <DateRangeSelector
+        customSearch={customSearch}
+        viewOptions={viewOptions}
+        handleRangeSubmit={handleRangeSubmit}
+        noDataMessage={noDataMessage}
+        yesterdayStr={yesterdayStr}
+        todayStr={todayStr}
+        customEndDateUI={customEndDateUI}
+        customStartDateUI={customStartDateUI}
+        setCustomStartDateUI={setCustomStartDateUI}
+        setCustomEndDateUI={setCustomEndDateUI}
+        setCustomSearch={setCustomSearch}
+      />
 
       {monthlyData.length > 0 && (
         <div className="bg-white p-6 rounded-xl shadow-sm mb-8">
