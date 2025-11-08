@@ -32,8 +32,12 @@ const Login = () => {
     <AuthLayout>
       <div className="w-full max-w-md mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-          <p className="text-sm text-gray-600">Track your expenses efficiently</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Welcome Back
+          </h1>
+          <p className="text-sm text-gray-600">
+            Track your expenses efficiently
+          </p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
@@ -41,7 +45,11 @@ const Login = () => {
             name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            label={<>Email Address <span className="text-red-500">*</span></>}
+            label={
+              <>
+                Email Address <span className="text-red-500">*</span>
+              </>
+            }
             placeholder="john@example.com"
             required
           />
@@ -50,7 +58,11 @@ const Login = () => {
             name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            label={<>Password <span className="text-red-500">*</span></>}
+            label={
+              <>
+                Password <span className="text-red-500">*</span>
+              </>
+            }
             placeholder="••••••••"
             type="password"
             required
@@ -68,7 +80,10 @@ const Login = () => {
 
           <p className="text-center text-sm text-gray-600">
             Don't have an account?{" "}
-            <Link to="/signup" className="text-primary font-semibold hover:underline">
+            <Link
+              to="/signup"
+              className="text-primary font-semibold hover:underline"
+            >
               Sign up
             </Link>
           </p>

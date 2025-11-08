@@ -18,14 +18,20 @@ if (typeof window !== "undefined" && !window.localStorage) {
       },
     };
   };
-  Object.defineProperty(window, "localStorage", { value: createStorageMock(), configurable: true, writable: true });
+  Object.defineProperty(window, "localStorage", {
+    value: createStorageMock(),
+    configurable: true,
+    writable: true,
+  });
 }
 
 // Mock the API client to avoid real network calls
 vi.mock("../Utils/api", () => {
   return {
     default: {
-      get: vi.fn().mockResolvedValue({ data: { fullName: "Test User", email: "test@example.com" } }),
+      get: vi.fn().mockResolvedValue({
+        data: { fullName: "Test User", email: "test@example.com" },
+      }),
       post: vi.fn(),
     },
   };
@@ -85,7 +91,9 @@ describe("Protected Routes", () => {
     render(<AppWrapper />);
 
     // Dashboard should render after ProtectedRoute allows access
-    expect(await screen.findByText(/Your Financial Dashboard/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Your Financial Dashboard/i),
+    ).toBeInTheDocument();
   });
 
   it("redirects to /login when visiting /expenses without a token", async () => {
@@ -121,14 +129,18 @@ describe("Protected Routes", () => {
     render(<AppWrapper />);
 
     // Ensure dashboard is visible
-    expect(await screen.findByText(/Your Financial Dashboard/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Your Financial Dashboard/i),
+    ).toBeInTheDocument();
 
     // Click the mocked logout button in the mocked sidebar
     const logoutBtn = await screen.findByLabelText("mock-logout");
     fireEvent.click(logoutBtn);
 
     // Token removed and redirected to login
-    await waitFor(() => expect(window.localStorage.getItem("token")).toBeNull());
+    await waitFor(() =>
+      expect(window.localStorage.getItem("token")).toBeNull(),
+    );
     expect(await screen.findByText(/Welcome Back/i)).toBeInTheDocument();
   });
 

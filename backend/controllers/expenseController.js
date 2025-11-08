@@ -1,82 +1,48 @@
 
 import Expense from "../models/Expense.js"
 
-// Add Expense # EXPENSE CRUD Sprint 4
 export const addExpense = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const { icon, category, amount, date, recurring, startDate } = req.body;
-
+    const { icon, category, amount, date, recurring, endDate, head} = req.body;
     if (!category || isNaN(amount) || !date) {
       return res.status(400).json({ message: "All fields are required." });
     }
-
     if (amount <= 0 ) {
       return res.status(400).json({ message: "Please provide value more than 0." });
     }
+    const finalStartDate = new Date(date)
 
-    const dateStr = (startDate && String(startDate)) || String(date);
-    const ymd = dateStr.slice(0,10).split("-").map(n => Number(n));
-    const [yy, mm, dd] = ymd; 
-    
-    if (ymd.length < 3 || isNaN(yy) || isNaN(mm) || isNaN(dd)) {
-      return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD." });
-    }
-
-    const canonicalStart = new Date(yy, mm - 1, dd);
-
+    const finalEndDate = endDate? new Date(endDate) : ""
     const newExpense = new Expense({
       userId,
       icon,
       category,
       amount,
-      date: canonicalStart,
+      date: finalStartDate,
       recurring,
-      startDate: canonicalStart,
+      endDate: finalEndDate,
+      head,
       accountId: req.account?._id,
       createdBy: req.user._id,
     });
-
-    if (recurring) {
-      const recurringExpenses = [];
-      const startMonthIndex = canonicalStart.getMonth();
-      const startYear = canonicalStart.getFullYear();
-      const startDay = canonicalStart.getDate();
-      for (let m = startMonthIndex ; m < 12 ; m++) {
-        let monthDate = new Date(startYear, m, startDay);
-        if (monthDate.getDate() !== startDay) {
-          monthDate.setDate(0);
-        }
-        recurringExpenses.push({
-          userId,
-          icon,
-          category,
-          amount,
-          date: monthDate,
-          recurring: true,
-          accountId: req.account?._id,
-          createdBy: req.user._id,
-        });
-      }
-      
-      await Expense.insertMany(recurringExpenses);
-    } else {
-      await newExpense.save();
-    }
+    await newExpense.save()
     res.status(200).json(newExpense);
+
   } catch (err) {
     res.status(500).json({ message: err });
   }
 };
 
-// Get Expense # EXPENSE CRUD Sprint 4
 export const getAllExpense = async (req, res) => {
   const userId = req.user.id;
-
+  const { range, start, end } = req.query;
+  let startDate, endDate;
+  const today = new Date();
   try {
     const accountId = req.account?._id;
-    const { createdBy } = req.query;
+    const { createdBy } = req.query
     const query = [];
     if (accountId) {
       query.push({ accountId });
@@ -89,14 +55,90 @@ export const getAllExpense = async (req, res) => {
     if (createdBy) {
       filter.createdBy = createdBy;
     }
-    const expenses = await Expense.find(filter).sort({ date: -1 }).populate("createdBy", "fullName email");
+    startDate = new Date();
+    endDate = new Date();
+    if (range) {
+      switch (range) {
+        case "4w": 
+          startDate.setDate(startDate.getDate() - 28);
+          break;
+        case "3m":
+          startDate.setMonth(startDate.getMonth() - 3);
+          break;
+        case "6m":
+          startDate.setMonth(startDate.getMonth() - 6);
+          break;
+        case "12m": 
+          startDate.setFullYear(startDate.getFullYear() -1);
+          break;
+        default: 
+          return res.status(400).json({error: "Invalid range date"});
+      }
+    }
+    if (start && end) {
+      startDate = new Date(start);
+      endDate = new Date(end)
+      if (endDate <= startDate) {
+        return res.status(400).json({message: "Incorrect date range. Make sure the start date is before the end date."})
+      }
+    }
+
+    const recurringExpenses = await Expense.find({recurring: {$in: ["monthly", "bi-weekly"]}, head: true});
+    for ( const expense of recurringExpenses) {
+      
+      const lastDate = new Date(expense.date);
+      let nextDate;
+      let formattedNextDate;
+      if (expense.recurring === "bi-weekly") {
+        
+        nextDate = new Date(lastDate); 
+        
+        nextDate.setDate(lastDate.getDate() + 14);
+        
+      } else if (expense.recurring === "monthly") {
+      
+        nextDate = new Date(lastDate);
+        nextDate.setMonth(lastDate.getMonth() + 1);
+      }
+      const todayISOStr = today.toISOString().slice(0,10);
+      const nextDateISOStr = nextDate.toISOString().slice(0,10);
+      const endDateISOStr = expense.endDate ? expense.endDate.toISOString().slice(0,10) : "";
+
+      if (todayISOStr >= nextDateISOStr) {
+        if (!endDateISOStr || nextDateISOStr <= endDateISOStr) {
+          const newExpense = new Expense({
+            userId: expense.userId,
+            icon: expense.icon,
+            category: expense.category,
+            amount: expense.amount,
+            date: nextDate,
+            recurring: expense.recurring,
+            endDate: expense.endDate,
+            head: true,
+            accountId: expense.accountId,
+            createdBy: expense.userId,
+          });
+  
+          await newExpense.save();
+
+          expense.head = false;
+  
+          expense.recurring = "once";        
+        
+          await expense.save();
+        }
+      }
+    }
+    const expenses = await Expense.find({
+      ...filter, 
+      date: {$gte: startDate, $lte: endDate},
+    }).sort({ date: -1 }).populate("createdBy", "fullName email");
     res.status(200).json(expenses);
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: "Nothing to show!" })
   }
-};
+}
 
-// Delete Expense # EXPENSE CRUD Sprint 4
 export const deleteExpense = async (req, res) => {
   try {
     const doc = await Expense.findById(req.params.id);
@@ -117,14 +159,14 @@ export const deleteExpense = async (req, res) => {
   }
 };
 
-// Update Expense # EXPENSE CRUD Sprint 4
 export const updateExpense = async (req, res) => {
   const userId = req.user.id;
   const expenseId = req.params.id;
-
+  
   try {
-    const { icon, category, amount, date } = req.body;
-
+    const { icon, category, amount, date, recurring, endDate, head} = req.body;
+    const finalEndDate = endDate ? new Date(endDate) : ""
+    
     if (!category || isNaN(amount) || !date) {
       return res.status(400).json({ message: "All fields are required." });
     }
@@ -134,12 +176,14 @@ export const updateExpense = async (req, res) => {
     }
 
     const existing = await Expense.findById(expenseId);
-    if (!existing) return res.status(404).json({ message: "Expense not found" });
+    if (!existing) return res.status(404).json({ message: "expense not found" });
 
+    // Check account membership and scope
     const inAccount = req.account && existing.accountId && existing.accountId.toString() === req.account._id.toString();
     const legacyPersonal = (!existing.accountId && req.account && req.account.type === "personal" && existing.userId.toString() === req.user._id.toString());
     if (!inAccount && !legacyPersonal) return res.status(403).json({ message: "Forbidden" });
 
+    // Permission: owner can edit any; member can edit own
     const isOwner = req.account && req.account.owner.toString() === req.user._id.toString();
     const isCreator = (existing.createdBy && existing.createdBy.toString() === req.user._id.toString()) || legacyPersonal;
     if (!isOwner && !isCreator) return res.status(403).json({ message: "Not allowed" });
@@ -147,7 +191,12 @@ export const updateExpense = async (req, res) => {
     existing.icon = icon;
     existing.category = category;
     existing.amount = amount;
+    existing.recurring = recurring;
+    existing.endDate = finalEndDate;
+    existing.head = head;
+
     existing.date = new Date(date);
+
     await existing.save();
     res.status(200).json(existing);
   } catch (error) {

@@ -12,12 +12,12 @@ export default function InviteMemberModal({ open, onClose, onInvited }) {
   // Handle ESC key to close modal
   useEffect(() => {
     const handleEsc = (e) => {
-      if (e.key === 'Escape') onClose?.();
+      if (e.key === "Escape") onClose?.();
     };
     if (open) {
-      window.addEventListener('keydown', handleEsc);
+      window.addEventListener("keydown", handleEsc);
     }
-    return () => window.removeEventListener('keydown', handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
   }, [open, onClose]);
 
   if (!open) return null;
@@ -42,7 +42,7 @@ export default function InviteMemberModal({ open, onClose, onInvited }) {
       setLoading(true);
       const response = await api.post(`/accounts/${currentAccountId}/invite`, {
         email: email.trim(),
-        message: message.trim()
+        message: message.trim(),
       });
 
       // Show success message
@@ -53,7 +53,8 @@ export default function InviteMemberModal({ open, onClose, onInvited }) {
       onInvited?.();
       onClose?.();
     } catch (e) {
-      const errorMsg = e?.response?.data?.message || "Failed to send invitation";
+      const errorMsg =
+        e?.response?.data?.message || "Failed to send invitation";
       setError(errorMsg);
       console.error("Invitation error:", e);
     } finally {
@@ -80,7 +81,9 @@ export default function InviteMemberModal({ open, onClose, onInvited }) {
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Message (optional)</label>
+            <label className="block text-sm text-gray-600 mb-1">
+              Message (optional)
+            </label>
             <textarea
               className="w-full border rounded-md px-3 py-2"
               rows={3}
@@ -91,8 +94,20 @@ export default function InviteMemberModal({ open, onClose, onInvited }) {
           </div>
           {error && <p className="text-red-600 text-sm">{error}</p>}
           <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors">Cancel</button>
-            <button type="submit" disabled={loading} className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors">{loading ? "Sending..." : "Send Invite"}</button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+            >
+              {loading ? "Sending..." : "Send Invite"}
+            </button>
           </div>
         </form>
       </div>

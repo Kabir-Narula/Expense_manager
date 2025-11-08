@@ -1,91 +1,274 @@
 // import React from "react";
-import { useState, useEffect } from "react";
-import AddExpense from "../components/AddExpense";
+import { useParams, useLocation } from "react-router-dom";
 import AddSourceButton from "../components/AddSourceButton";
+import { useState, useEffect } from "react";
+import AddExpense from "../components/AddExpense.jsx";
+import { FaTrashAlt } from "react-icons/fa";
+import { MdModeEdit } from "react-icons/md";
 import api from "../src/Utils/api";
-import { Link } from "react-router-dom";
-import { IoIosArrowForward } from "react-icons/io";
+import { useAccount } from "../src/context/AccountContext.jsx";
+import { parseDateToLocal } from "../src/Utils/dateFormatter.js";
+import {
+  exportExpenseToCSV,
+  exportExpenseToPDF,
+} from "../src/Utils/exportUtils.js";
+import ExportButtons from "../src/components/ExportButtons.jsx";
+import DateRangeSelector from "../components/DateRangeSelector.jsx";
+import ViewOptions from "../src/Utils/ViewOptions.js";
 
 function Expenses() {
+  const { year } = useParams();
+  const location = useLocation();
+  const { expense } = location.state || {};
   const [open, setOpen] = useState(false);
   const [type, setType] = useState("");
-  const [groupedDataUI, setGroupedDataUI] = useState({});
+  const [expenseUI, setExpenseUI] = useState(null);
+  const [selectedExpense, setSelectedExpense] = useState({});
+  const { currentAccountId, user, isOwner } = useAccount();
+  const [members, setMembers] = useState([]);
+  const [memberFilter, setMemberFilter] = useState("all");
+  const [range, setRange] = useState("4w");
+  const [customSearch, setCustomSearch] = useState(false);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+  const todayStr = parseDateToLocal(today);
+  const yesterdayStr = parseDateToLocal(yesterday);
+  const [customStartDateUI, setCustomStartDateUI] = useState(yesterdayStr);
+  const [customEndDateUI, setCustomEndDateUI] = useState(todayStr);
+  const [refreshKey, setRefreshKey] = useState(0); // trigger re-fetch
+  const [noDataMessage, setNoDataMessage] = useState("");
+  const viewOptions = ViewOptions({ setRange });
+  // Export handlers
+  const handleExportCSV = () => {
+    if (!expenseUI || expenseUI.length === 0) {
+      return { success: false, message: "No data to export" };
+    }
+    return exportExpenseToCSV(expenseUI, year, memberFilter);
+  };
+
+  const handleExportPDF = () => {
+    if (!expenseUI || expenseUI.length === 0) {
+      return { success: false, message: "No data to export" };
+    }
+    return exportExpenseToPDF(expenseUI, year, memberFilter);
+  };
+  const handleRangeSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setNoDataMessage("");
+      const res = await api.get(
+        `expense/get?start=${customStartDateUI}&end=${customEndDateUI}`,
+      );
+      if (res.status === 200) {
+        const expenseDocuments = res.data;
+        if (expenseDocuments.length === 0) {
+          setNoDataMessage("Nothing to show!");
+        }
+        const withFilter =
+          memberFilter === "all"
+            ? expenseDocuments
+            : expenseDocuments.filter((i) => i.createdBy?._id === memberFilter);
+        setExpenseUI(withFilter);
+      }
+    } catch (error) {
+      setNoDataMessage(
+        error.response?.data?.message || "An unexpected error occurred",
+      );
+    }
+  };
+  useEffect(() => {
+    if (expense) {
+      setExpenseUI(expense);
+    }
+  }, [expense]);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        if (!currentAccountId) return;
+        const res = await api.get(`/accounts/${currentAccountId}/members`);
+        setMembers(res.data || []);
+      } catch (e) {
+        setMembers([]);
+      }
+    };
+    fetchMembers();
+  }, [currentAccountId]);
 
   useEffect(() => {
     const fetchExpenseData = async () => {
       try {
-        let res = await api.get("/expense/get")
+        let res = await api.get(`expense/get?range=${range}`);
+        setNoDataMessage("");
         if (res.status === 200) {
-          const groupedData = res.data.reduce((acc, item) => {
-            const date = new Date(item.date);
-            const year = date.getFullYear();
-            const month = date.toLocaleDateString("default", {month: "long"});
-
-            if (!acc[year]) 
-              acc[year] = {};
-
-            if (!acc[year][month]) 
-              acc[year][month] = { income: [] }
-            
-            acc[year][month].income.push(item);
-            
-            return acc;
-          
-          }, {})
-          setGroupedDataUI(groupedData);
+          const expenseDocuments = res.data;
+          const withFilter =
+            memberFilter === "all"
+              ? expenseDocuments
+              : expenseDocuments.filter(
+                  (i) => i.createdBy?._id === memberFilter,
+                );
+          console.log(withFilter);
+          setExpenseUI(withFilter);
         }
       } catch (error) {
-        console.log(error.message);
+        console.error("Failed to fetch year data:", error);
       }
-    } 
+    };
     fetchExpenseData();
-  }, [open])
+  }, [year, refreshKey, memberFilter, range]);
 
   return (
     <>
-    <div className="md:ml-72 md:pt-8 pt-20 p-8 min-h-screen bg-gray-50">
-        {/* Header */}
+      <div className="md:ml-72 md:pt-8 pt-20 p-8 min-h-screen bg-gray-50">
         <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">Expense Tracking</h1>
-          </div>
-          <AddSourceButton func={() => { setOpen(true); setType("addExpense") }} text="Add Expense"/>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Expense Transactions
+          </h1>
+          <AddSourceButton
+            func={() => {
+              setOpen(true);
+              setType("addExpense");
+            }}
+            text="Add Expense"
+          />
         </div>
-        {open &&
-          <AddExpense open={open} closeModal={() => setOpen(false)} type={type}/>
-        }
-
-        {/* breakdown by year  */}
-        {Object.keys(groupedDataUI).length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 bg-white rounded-xl shadow-sm mx-4">
-            <div className="text-center max-w-md">
-              <div className="mb-4">
-                <svg className="w-24 h-24 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">No Expenses Recorded Yet</h3>
-              <p className="text-gray-500 mb-6">Start managing your finances by tracking your expenses. Monitor where your money goes and make better financial decisions.</p>
-              <AddSourceButton func={() => { setOpen(true); setType("addExpense") }} text="Add Your First Expense"/>
-            </div>
-          </div>
-        ) : (
-          Object.entries(groupedDataUI).map(([year, months]) => (
-            <div 
-              key={year}
-              className="bg-white border-1 rounded-xl shadow-sm p-2 m-4"
+        {/* Member filter */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm">
+          {members.length > 0 && (
+            <div className="mb-4">
+              <label className="text-sm text-gray-600 mr-2">
+                Filter by member:
+              </label>
+              <select
+                className="border rounded-md px-2 py-1 text-sm"
+                value={memberFilter}
+                onChange={(e) => setMemberFilter(e.target.value)}
               >
-              <Link 
-                className="flex justify-between items-center"
-                to={`/expenses/${year}`}
-                state={{expense: months}}
-              >
-                <p>{year}</p>
-                <IoIosArrowForward/>
-              </Link>
+                <option value="all">All</option>
+                {members.map((m) => (
+                  <option key={m.userId} value={m.userId}>
+                    {m.fullName || m.email}
+                  </option>
+                ))}
+              </select>
             </div>
-          ))
+          )}
+          <ExportButtons
+            onExportCSV={handleExportCSV}
+            onExportPDF={handleExportPDF}
+            disabled={!expenseUI || expenseUI.length === 0}
+          />
+        </div>
+        {/* setting date ranges */}
+        <DateRangeSelector
+          customSearch={customSearch}
+          viewOptions={viewOptions}
+          handleRangeSubmit={handleRangeSubmit}
+          noDataMessage={noDataMessage}
+          yesterdayStr={yesterdayStr}
+          todayStr={todayStr}
+          customEndDateUI={customEndDateUI}
+          customStartDateUI={customStartDateUI}
+          setCustomStartDateUI={setCustomStartDateUI}
+          setCustomEndDateUI={setCustomEndDateUI}
+          setCustomSearch={setCustomSearch}
+        />
+        <br />
+        {open && (
+          <AddExpense
+            open={open}
+            closeModal={() => {
+              setOpen(false);
+              setRefreshKey((prev) => prev + 1); // trigger re-fetch after modal close
+            }}
+            type={type}
+            expenseData={selectedExpense}
+          />
         )}
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="text-left text-gray-500 border-b">
+                <th className="pb-4">Source</th>
+                <th className="pb-4">Date</th>
+                <th className="pb-4">Amount</th>
+                <th className="pb-4">Created By</th>
+              </tr>
+            </thead>
+            <tbody>
+              {expenseUI &&
+                expenseUI.length > 0 &&
+                expenseUI.map((item) => (
+                  <tr
+                    key={item._id}
+                    className="border-b last:border-b-0 hover:bg-gray-50"
+                  >
+                    <td className="py-4">{item.category}</td>
+                    <td className="py-4">
+                      {item.date
+                        ? new Date(
+                            item.date.slice(0, 10) + "T00:00:00",
+                          ).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })
+                        : ""}
+                    </td>
+                    <td className="py-4 font-medium">
+                      ${(item.amount / 100).toFixed(2)}
+                    </td>
+                    <td className="py-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-semibold text-sm">
+                          {(
+                            item.createdBy?.fullName ||
+                            item.createdBy?.email ||
+                            "You"
+                          )
+                            .charAt(0)
+                            .toUpperCase()}
+                        </div>
+                        <span className="text-sm text-gray-700">
+                          {item.createdBy?.fullName ||
+                            item.createdBy?.email ||
+                            "You"}
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="flex justify-center gap-5">
+                        {(isOwner || item.createdBy?._id === user?._id) && (
+                          <button
+                            onClick={() => {
+                              setOpen(true);
+                              setType("editExpense");
+                              setSelectedExpense(item);
+                            }}
+                          >
+                            <MdModeEdit className="text-2xl text-green-500" />
+                          </button>
+                        )}
+                        {(isOwner || item.createdBy?._id === user?._id) && (
+                          <button
+                            onClick={() => {
+                              setOpen(true);
+                              setType("deleteExpense");
+                              setSelectedExpense(item);
+                            }}
+                          >
+                            <FaTrashAlt className="text-2xl text-red-500" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );

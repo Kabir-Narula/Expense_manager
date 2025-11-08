@@ -1,4 +1,10 @@
-import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import "./App.css";
 
@@ -12,13 +18,14 @@ import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/Signup";
 import EditProfile from "../pages/EditProfile";
 import ProtectedRoute from "../components/ProtectedRoutes";
+import ManageAccount from "../pages/ManageAccount";
 import IncomeByYear from "../pages/IncomeByYear";
 import ExpenseByYear from "../pages/ExpenseByYear";
-import ManageAccount from "../pages/ManageAccount";
 
 const App = () => {
   const location = useLocation();
-  const showNavbar = location.pathname !== "/login" && location.pathname !== "/signup";
+  const showNavbar =
+    location.pathname !== "/login" && location.pathname !== "/signup";
 
   return (
     <>
@@ -27,22 +34,23 @@ const App = () => {
         toastOptions={{
           duration: 3000,
           style: {
-            background: '#fff',
-            color: '#363636',
-            padding: '16px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            background: "#fff",
+            color: "#363636",
+            padding: "16px",
+            borderRadius: "8px",
+            boxShadow:
+              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
           },
           success: {
             iconTheme: {
-              primary: '#10b981',
-              secondary: '#fff',
+              primary: "#10b981",
+              secondary: "#fff",
             },
           },
           error: {
             iconTheme: {
-              primary: '#ef4444',
-              secondary: '#fff',
+              primary: "#ef4444",
+              secondary: "#fff",
             },
           },
         }}

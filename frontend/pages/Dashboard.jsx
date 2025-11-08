@@ -4,74 +4,125 @@ import { MdAttachMoney, MdSavings } from "react-icons/md";
 import { FiDollarSign } from "react-icons/fi";
 import InviteMemberModal from "../components/InviteMemberModal";
 import { useAccount } from "../src/context/AccountContext.jsx";
+import DateRangeSelector from "../components/DateRangeSelector.jsx";
+import { parseDateToLocal } from "../src/Utils/dateFormatter.js";
+import ViewOptions from "../src/Utils/ViewOptions.js";
+import calculateFinancialData from "../src/Utils/calculateFinancialData.js";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
   const [financialData, setFinancialData] = useState({
     totalIncome: 0,
     totalExpenses: 0,
-    transactions: []
+    transactions: [],
   });
   const [loading, setLoading] = useState(true);
   const [invitations, setInvitations] = useState([]);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [creating, setCreating] = useState(false);
-  
+  const [range, setRange] = useState("4w");
+  const [customSearch, setCustomSearch] = useState(false);
+  const [memberFilter, setMemberFilter] = useState("all");
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+  const todayStr = parseDateToLocal(today);
+  const yesterdayStr = parseDateToLocal(yesterday);
+  const [customStartDateUI, setCustomStartDateUI] = useState(yesterdayStr);
+  const [customEndDateUI, setCustomEndDateUI] = useState(todayStr);
+  const [noDataMessage, setNoDataMessage] = useState("");
+  const viewOptions = ViewOptions({ setRange });
+  const [members, setMembers] = useState([]);
+
+  const handleRangeSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setNoDataMessage("");
+      const incomeResponse = await api.get(
+        `income/get?start=${customStartDateUI}&end=${customEndDateUI}`,
+      );
+      const expenseResponse = await api.get(
+        `expense/get?start=${customStartDateUI}&end=${customEndDateUI}`,
+      );
+      if (incomeResponse.status === 200 && expenseResponse.status === 200) {
+        const incomeDocuments = incomeResponse.data;
+        const expenseDocuments = expenseResponse.data;
+        const filteredIncome =
+          memberFilter === "all"
+            ? incomeDocuments
+            : incomeDocuments.filter((i) => i.createdBy?._id === memberFilter);
+        const filteredExpense =
+          memberFilter === "all"
+            ? expenseDocuments
+            : expenseDocuments.filter((i) => i.createdBy?._id === memberFilter);
+        const calculatedFinances = calculateFinancialData(
+          filteredIncome,
+          filteredExpense,
+        );
+        setFinancialData(calculatedFinances);
+      }
+    } catch (error) {
+      setNoDataMessage(
+        error.response?.data?.message || "An unexpected error occurred",
+      );
+    }
+  };
+
   // Get account context - must be declared before useEffect
-  const { isOwner, currentAccount, loadAccounts, setCurrentAccountId, currentAccountId } = useAccount();
+  const {
+    isOwner,
+    currentAccount,
+    loadAccounts,
+    setCurrentAccountId,
+    currentAccountId,
+  } = useAccount();
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        if (!currentAccountId) return;
+        const res = await api.get(`/accounts/${currentAccountId}/members`);
+        setMembers(res.data || []);
+      } catch (e) {
+        setMembers([]);
+      }
+    };
+    fetchMembers();
+  }, [currentAccountId]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Fetch user data from existing endpoint
         const userResponse = await api.get("/auth/getUser");
         setUser(userResponse.data);
 
-        // Fetch real-time income data
-        const incomeResponse = await api.get("/income/get");
+        const incomeResponse = await api.get(`/income/get?range=${range}`);
         const incomes = incomeResponse.data || [];
-        
-        // Fetch real-time expense data
-        const expenseResponse = await api.get("/expense/get");
+
+        const expenseResponse = await api.get(`/expense/get?range=${range}`);
         const expenses = expenseResponse.data || [];
 
-        // Calculate total income (amounts are in cents)
-        const totalIncome = incomes.reduce((sum, item) => sum + (item.amount || 0), 0);
-        
-        // Calculate total expenses (amounts are in cents)
-        const totalExpenses = expenses.reduce((sum, item) => sum + (item.amount || 0), 0);
 
-        // Combine and sort recent transactions (last 10)
-        const allTransactions = [
-          ...incomes.map(item => ({
-            _id: item._id,
-            description: item.source || 'Income',
-            amount: item.amount,
-            date: item.date,
-            type: 'income',
-            createdBy: item.createdBy
-          })),
-          ...expenses.map(item => ({
-            _id: item._id,
-            description: item.category || 'Expense',
-            amount: item.amount,
-            date: item.date,
-            type: 'expense',
-            createdBy: item.createdBy
-          }))
-        ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
+        const filteredExpense =
+          memberFilter === "all"
+            ? expenses
+            : expenses.filter((i) => i.createdBy?._id === memberFilter);
 
-        setFinancialData({
-          totalIncome,
-          totalExpenses,
-          transactions: allTransactions
-        });
+        const filteredIncome =
+          memberFilter === "all"
+            ? incomes
+            : incomes.filter((i) => i.createdBy?._id === memberFilter);
+
+        const calculatedFinances = calculateFinancialData(
+          filteredIncome,
+          filteredExpense,
+        );
+
+        setFinancialData(calculatedFinances);
 
         // invitations
         const invRes = await api.get("/invitations");
         setInvitations(invRes.data?.invitations || []);
-        
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
         if (err?.response?.status === 401) {
@@ -84,7 +135,7 @@ function Dashboard() {
     };
 
     fetchData();
-  }, [currentAccountId]); // Refetch when account changes
+  }, [memberFilter, range ]); // Refetch when account changes
 
   const createShared = async () => {
     try {
@@ -110,10 +161,16 @@ function Dashboard() {
       // Dispatch event for other components
       window.dispatchEvent(new Event("accountsUpdated"));
       // Show success message
-      alert(response.data?.message || "Invitation accepted! You can now access the shared account.");
+      alert(
+        response.data?.message ||
+          "Invitation accepted! You can now access the shared account.",
+      );
     } catch (e) {
       console.error("Failed to accept invitation:", e);
-      alert(e?.response?.data?.message || "Failed to accept invitation. Please try again.");
+      alert(
+        e?.response?.data?.message ||
+          "Failed to accept invitation. Please try again.",
+      );
     }
   };
 
@@ -124,7 +181,10 @@ function Dashboard() {
       alert("Invitation declined");
     } catch (e) {
       console.error("Failed to decline invitation:", e);
-      alert(e?.response?.data?.message || "Failed to decline invitation. Please try again.");
+      alert(
+        e?.response?.data?.message ||
+          "Failed to decline invitation. Please try again.",
+      );
     }
   };
 
@@ -137,21 +197,31 @@ function Dashboard() {
           </h1>
           <p className="text-gray-500">Your Financial Dashboard</p>
         </div>
-        {isOwner && currentAccount?.type === 'shared' && (
-          <button onClick={() => setInviteOpen(true)} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+        {isOwner && currentAccount?.type === "shared" && (
+          <button
+            onClick={() => setInviteOpen(true)}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+          >
             Invite Member
           </button>
         )}
-        {isOwner && currentAccount?.type === 'personal' && (
-          <button disabled={creating} onClick={createShared} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
-            {creating ? 'Creating...' : 'Create Shared Account'}
+        {isOwner && currentAccount?.type === "personal" && (
+          <button
+            disabled={creating}
+            onClick={createShared}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+          >
+            {creating ? "Creating..." : "Create Shared Account"}
           </button>
         )}
       </div>
       {inviteOpen && (
-        <InviteMemberModal open={inviteOpen} onClose={() => setInviteOpen(false)} onInvited={() => {}} />
+        <InviteMemberModal
+          open={inviteOpen}
+          onClose={() => setInviteOpen(false)}
+          onInvited={() => {}}
+        />
       )}
-
       {/* Financial Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -162,7 +232,11 @@ function Dashboard() {
                 <div className="h-8 w-32 bg-gray-200 animate-pulse rounded mt-2"></div>
               ) : (
                 <p className="text-2xl font-bold text-gray-800 mt-2">
-                  ${(financialData.totalIncome / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  $
+                  {(financialData.totalIncome / 100).toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </p>
               )}
             </div>
@@ -180,7 +254,11 @@ function Dashboard() {
                 <div className="h-8 w-32 bg-gray-200 animate-pulse rounded mt-2"></div>
               ) : (
                 <p className="text-2xl font-bold text-gray-800 mt-2">
-                  ${(financialData.totalExpenses / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  $
+                  {(financialData.totalExpenses / 100).toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </p>
               )}
             </div>
@@ -197,12 +275,21 @@ function Dashboard() {
               {loading ? (
                 <div className="h-8 w-32 bg-gray-200 animate-pulse rounded mt-2"></div>
               ) : (
-                <p className={`text-2xl font-bold mt-2 ${
-                  financialData.totalIncome - financialData.totalExpenses >= 0 
-                    ? 'text-green-600' 
-                    : 'text-red-600'
-                }`}>
-                  ${((financialData.totalIncome - financialData.totalExpenses) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <p
+                  className={`text-2xl font-bold mt-2 ${
+                    financialData.totalIncome - financialData.totalExpenses >= 0
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  $
+                  {(
+                    (financialData.totalIncome - financialData.totalExpenses) /
+                    100
+                  ).toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </p>
               )}
             </div>
@@ -213,9 +300,47 @@ function Dashboard() {
         </div>
       </div>
 
+      {/* MEMBER SELECTOR */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm">
+        {members.length > 0 && (
+          <div className="mb-4">
+            <label className="text-sm text-gray-600 mr-2">
+              Filter by member:
+            </label>
+            <select
+              className="border rounded-md px-2 py-1 text-sm"
+              value={memberFilter}
+              onChange={(e) => setMemberFilter(e.target.value)}
+            >
+              <option value="all">All</option>
+              {members.map((m) => (
+                <option key={m.userId} value={m.userId}>
+                  {m.fullName || m.email}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
+      <DateRangeSelector
+        customSearch={customSearch}
+        viewOptions={viewOptions}
+        handleRangeSubmit={handleRangeSubmit}
+        noDataMessage={noDataMessage}
+        yesterdayStr={yesterdayStr}
+        todayStr={todayStr}
+        customEndDateUI={customEndDateUI}
+        customStartDateUI={customStartDateUI}
+        setCustomStartDateUI={setCustomStartDateUI}
+        setCustomEndDateUI={setCustomEndDateUI}
+        setCustomSearch={setCustomSearch}
+      />
+      <br />
       {/* Recent Transactions */}
       <div className="bg-white p-6 rounded-xl shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-800 mb-6">Recent Transactions</h2>
+        <h2 className="text-lg font-semibold text-gray-800 mb-6">
+          Recent Transactions
+        </h2>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -232,11 +357,21 @@ function Dashboard() {
                 // Loading skeleton
                 [...Array(5)].map((_, i) => (
                   <tr key={i} className="border-b last:border-b-0">
-                    <td className="py-4"><div className="h-4 w-16 bg-gray-200 animate-pulse rounded"></div></td>
-                    <td className="py-4"><div className="h-4 w-32 bg-gray-200 animate-pulse rounded"></div></td>
-                    <td className="py-4"><div className="h-4 w-20 bg-gray-200 animate-pulse rounded"></div></td>
-                    <td className="py-4"><div className="h-4 w-24 bg-gray-200 animate-pulse rounded"></div></td>
-                    <td className="py-4"><div className="h-4 w-28 bg-gray-200 animate-pulse rounded"></div></td>
+                    <td className="py-4">
+                      <div className="h-4 w-16 bg-gray-200 animate-pulse rounded"></div>
+                    </td>
+                    <td className="py-4">
+                      <div className="h-4 w-32 bg-gray-200 animate-pulse rounded"></div>
+                    </td>
+                    <td className="py-4">
+                      <div className="h-4 w-20 bg-gray-200 animate-pulse rounded"></div>
+                    </td>
+                    <td className="py-4">
+                      <div className="h-4 w-24 bg-gray-200 animate-pulse rounded"></div>
+                    </td>
+                    <td className="py-4">
+                      <div className="h-4 w-28 bg-gray-200 animate-pulse rounded"></div>
+                    </td>
                   </tr>
                 ))
               ) : financialData.transactions.length === 0 ? (
@@ -247,42 +382,70 @@ function Dashboard() {
                 </tr>
               ) : (
                 financialData.transactions.map((transaction) => (
-                  <tr key={transaction._id} className="border-b last:border-b-0 hover:bg-gray-50">
+                  <tr
+                    key={transaction._id}
+                    className="border-b last:border-b-0 hover:bg-gray-50"
+                  >
                     <td className="py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        transaction.type === 'income' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {transaction.type === 'income' ? '↑ Income' : '↓ Expense'}
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          transaction.type === "income"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {transaction.type === "income"
+                          ? "↑ Income"
+                          : "↓ Expense"}
                       </span>
                     </td>
-                    <td className="py-4 text-gray-700">{transaction.description}</td>
-                    <td className={`py-4 font-medium ${
-                      transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {transaction.type === 'income' ? '+' : '-'}${(transaction.amount / 100).toFixed(2)}
+                    <td className="py-4 text-gray-700">
+                      {transaction.description}
+                    </td>
+                    <td
+                      className={`py-4 font-medium ${
+                        transaction.type === "income"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {transaction.type === "income" ? "+" : "-"}$
+                      {(transaction.amount / 100).toFixed(2)}
                     </td>
                     <td className="py-4">
                       <div className="flex items-center gap-2">
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white font-semibold text-xs ${
-                          transaction.type === 'income' ? 'bg-green-500' : 'bg-red-500'
-                        }`}>
-                          {(transaction.createdBy?.fullName || transaction.createdBy?.email || "You").charAt(0).toUpperCase()}
+                        <div
+                          className={`w-6 h-6 rounded-full flex items-center justify-center text-white font-semibold text-xs ${
+                            transaction.type === "income"
+                              ? "bg-green-500"
+                              : "bg-red-500"
+                          }`}
+                        >
+                          {(
+                            transaction.createdBy?.fullName ||
+                            transaction.createdBy?.email ||
+                            "You"
+                          )
+                            .charAt(0)
+                            .toUpperCase()}
                         </div>
                         <span className="text-sm text-gray-600">
-                          {transaction.createdBy?.fullName || transaction.createdBy?.email || "You"}
+                          {transaction.createdBy?.fullName ||
+                            transaction.createdBy?.email ||
+                            "You"}
                         </span>
                       </div>
                     </td>
                     <td className="py-4 text-gray-600 text-sm">
-                      {transaction.date 
-                        ? new Date(transaction.date.slice(0, 10) + 'T00:00:00').toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
+                      {transaction.date
+                        ? new Date(
+                            transaction.date.slice(0, 10) + "T00:00:00",
+                          ).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
                           })
-                        : '-'}
+                        : "-"}
                     </td>
                   </tr>
                 ))
@@ -299,21 +462,35 @@ function Dashboard() {
             🔔 Pending Invitations ({invitations.length})
           </h2>
           <p className="text-sm text-gray-600 mb-4">
-            You have been invited to join shared account(s). Accept to become a member.
+            You have been invited to join shared account(s). Accept to become a
+            member.
           </p>
           <div className="space-y-3">
             {invitations.map((i) => (
-              <div key={i._id} className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200">
+              <div
+                key={i._id}
+                className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200"
+              >
                 <div className="flex-1">
                   <p className="text-base font-semibold text-gray-800">
                     {i.account?.name || "Shared Account"}
                   </p>
                   <p className="text-sm text-gray-600 mt-1">
-                    Invited by: <span className="font-medium">{i.inviter?.fullName || "Unknown"}</span>
-                    {i.inviter?.email && <span className="text-gray-500"> ({i.inviter.email})</span>}
+                    Invited by:{" "}
+                    <span className="font-medium">
+                      {i.inviter?.fullName || "Unknown"}
+                    </span>
+                    {i.inviter?.email && (
+                      <span className="text-gray-500">
+                        {" "}
+                        ({i.inviter.email})
+                      </span>
+                    )}
                   </p>
                   {i.message && (
-                    <p className="text-sm text-gray-500 mt-2 italic">"{i.message}"</p>
+                    <p className="text-sm text-gray-500 mt-2 italic">
+                      "{i.message}"
+                    </p>
                   )}
                 </div>
                 <div className="flex gap-2 ml-4">

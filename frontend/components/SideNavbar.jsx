@@ -58,9 +58,10 @@ const SideNavbar = () => {
       console.log("SideNavbar received profile update:", event.detail);
       setUser(event.detail);
     };
-    
-    window.addEventListener('profileUpdated', handleProfileUpdate);
-    return () => window.removeEventListener('profileUpdated', handleProfileUpdate);
+
+    window.addEventListener("profileUpdated", handleProfileUpdate);
+    return () =>
+      window.removeEventListener("profileUpdated", handleProfileUpdate);
   }, []);
 
   return (
@@ -82,9 +83,14 @@ const SideNavbar = () => {
       >
         <div>
           <div className="flex items-center justify-between mb-12 ml-2">
-            <Link to="/dashboard" className="flex items-center hover:opacity-80 transition-opacity cursor-pointer">
+            <Link
+              to="/dashboard"
+              className="flex items-center hover:opacity-80 transition-opacity cursor-pointer"
+            >
               <RiDashboardLine className="w-8 h-8 text-indigo-400" />
-              <span className="ml-3 text-xl font-semibold text-white">FinDashboard</span>
+              <span className="ml-3 text-xl font-semibold text-white">
+                FinDashboard
+              </span>
             </Link>
             {/* Close button for mobile */}
             <button
@@ -105,23 +111,33 @@ const SideNavbar = () => {
               { to: "/expenses", icon: <FaHandHoldingUsd />, text: "Expenses" },
               { to: "/charts", icon: <MdBarChart />, text: "Analytics" },
               { to: "/edit-profile", icon: <MdPerson />, text: "Edit Profile" },
-              { to: "/manage-account", icon: <MdPerson />, text: "Manage Account" },
+              {
+                to: "/manage-account",
+                icon: <MdPerson />,
+                text: "Manage Account",
+              },
             ].map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
                 className={`flex items-center px-4 py-3.5 rounded-xl text-indigo-200 hover:bg-indigo-800 hover:text-white transition-all group ${
-                  location.pathname === link.to ? "bg-indigo-800 text-white border-l-4 border-indigo-400" : ""
+                  location.pathname === link.to
+                    ? "bg-indigo-800 text-white border-l-4 border-indigo-400"
+                    : ""
                 }`}
               >
                 <span
                   className={`text-xl mr-4 group-hover:text-indigo-300 ${
-                    location.pathname === link.to ? "text-indigo-300" : "text-indigo-400"
+                    location.pathname === link.to
+                      ? "text-indigo-300"
+                      : "text-indigo-400"
                   }`}
                 >
                   {link.icon}
                 </span>
-                <span className="text-sm font-medium tracking-wide">{link.text}</span>
+                <span className="text-sm font-medium tracking-wide">
+                  {link.text}
+                </span>
               </Link>
             ))}
             <button
@@ -141,15 +157,23 @@ const SideNavbar = () => {
             <div className="flex items-center px-2">
               <img
                 className="w-10 h-10 rounded-full border-2 border-indigo-400"
-                src={user.profileImageURL ? `http://localhost:8000${user.profileImageURL}` : defaultAvatar}
+                src={
+                  user.profileImageURL
+                    ? `http://localhost:8000${user.profileImageURL}`
+                    : defaultAvatar
+                }
                 alt="User profile"
                 onError={(e) => {
                   e.target.src = defaultAvatar;
                 }}
               />
               <div className="ml-3">
-                <p className="text-sm font-medium text-white">{user.fullName || "Guest User"}</p>
-                <p className="text-xs text-indigo-400">{user.email || "user@example.com"}</p>
+                <p className="text-sm font-medium text-white">
+                  {user.fullName || "Guest User"}
+                </p>
+                <p className="text-xs text-indigo-400">
+                  {user.email || "user@example.com"}
+                </p>
               </div>
             </div>
           )}
