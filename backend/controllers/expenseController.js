@@ -5,7 +5,7 @@ export const addExpense = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const { icon, category, amount, date, recurring, endDate, head} = req.body;
+    const { icon, category, amount, date, tags, recurring, endDate, head} = req.body;
     if (!category || isNaN(amount) || !date) {
       return res.status(400).json({ message: "All fields are required." });
     }
@@ -15,12 +15,16 @@ export const addExpense = async (req, res) => {
     const finalStartDate = new Date(date)
 
     const finalEndDate = endDate? new Date(endDate) : ""
+    const tagsArray = tags 
+      ? tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
+      : [];
     const newExpense = new Expense({
       userId,
       icon,
       category,
       amount,
       date: finalStartDate,
+      tags: tagsArray,
       recurring,
       endDate: finalEndDate,
       head,
@@ -36,13 +40,12 @@ export const addExpense = async (req, res) => {
 };
 
 export const getAllExpense = async (req, res) => {
-  const userId = req.user.id;
   const { range, start, end } = req.query;
   let startDate, endDate;
   const today = new Date();
   try {
     const accountId = req.account?._id;
-    const { createdBy } = req.query
+    const { createdBy, tags } = req.query;
     const query = [];
     if (accountId) {
       query.push({ accountId });
@@ -54,6 +57,10 @@ export const getAllExpense = async (req, res) => {
     const filter = query.length ? { $or: query } : {};
     if (createdBy) {
       filter.createdBy = createdBy;
+    }
+    if (tags) {
+      const tagArray = Array.isArray(tags) ? tags : [tags];
+      filter.tags = { $in: tagArray };
     }
     startDate = new Date();
     endDate = new Date();
@@ -88,7 +95,6 @@ export const getAllExpense = async (req, res) => {
       
       const lastDate = new Date(expense.date);
       let nextDate;
-      let formattedNextDate;
       if (expense.recurring === "bi-weekly") {
         
         nextDate = new Date(lastDate); 
@@ -112,6 +118,7 @@ export const getAllExpense = async (req, res) => {
             category: expense.category,
             amount: expense.amount,
             date: nextDate,
+            tags: expense.tags,
             recurring: expense.recurring,
             endDate: expense.endDate,
             head: true,
@@ -164,7 +171,7 @@ export const updateExpense = async (req, res) => {
   const expenseId = req.params.id;
   
   try {
-    const { icon, category, amount, date, recurring, endDate, head} = req.body;
+    const { icon, category, amount, date, tags, recurring, endDate, head} = req.body;
     const finalEndDate = endDate ? new Date(endDate) : ""
     
     if (!category || isNaN(amount) || !date) {
@@ -188,6 +195,12 @@ export const updateExpense = async (req, res) => {
     const isCreator = (existing.createdBy && existing.createdBy.toString() === req.user._id.toString()) || legacyPersonal;
     if (!isOwner && !isCreator) return res.status(403).json({ message: "Not allowed" });
 
+    // Process tags: convert comma-separated string to array, trim whitespace
+    // Process tags
+    const tagsArray = tags 
+      ? (Array.isArray(tags) ? tags : tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0))
+      : [];
+
     existing.icon = icon;
     existing.category = category;
     existing.amount = amount;
@@ -196,7 +209,7 @@ export const updateExpense = async (req, res) => {
     existing.head = head;
 
     existing.date = new Date(date);
-
+    existing.tags = tagsArray;
     await existing.save();
     res.status(200).json(existing);
   } catch (error) {

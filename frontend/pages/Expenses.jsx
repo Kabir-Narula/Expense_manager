@@ -27,6 +27,8 @@ function Expenses() {
   const { currentAccountId, user, isOwner } = useAccount();
   const [members, setMembers] = useState([]);
   const [memberFilter, setMemberFilter] = useState("all");
+  const [allTags, setAllTags] = useState([]);
+  const [selectedTag, setSelectedTag] = useState("");
   const [range, setRange] = useState("4w");
   const [customSearch, setCustomSearch] = useState(false);
   const today = new Date();
@@ -103,21 +105,35 @@ function Expenses() {
         setNoDataMessage("");
         if (res.status === 200) {
           const expenseDocuments = res.data;
-          const withFilter =
+          // Extract all unique tags
+          const tagsSet = new Set();
+          expenseDocuments.forEach((item) => {
+            if (item.tags && Array.isArray(item.tags)) {
+              item.tags.forEach((tag) => tagsSet.add(tag));
+            }
+          });
+          setAllTags(Array.from(tagsSet).sort());
+          const withMemberFilter =
             memberFilter === "all"
               ? expenseDocuments
               : expenseDocuments.filter(
                   (i) => i.createdBy?._id === memberFilter,
                 );
-          console.log(withFilter);
-          setExpenseUI(withFilter);
+          // Apply tag filter
+          let withTagAndMemberFilter = withMemberFilter;
+          if (selectedTag) {
+            withTagAndMemberFilter = memberFilter.filter(
+              (item) => item.tags && item.tags.includes(selectedTag),
+            );
+          }
+          setExpenseUI(withTagAndMemberFilter);
         }
       } catch (error) {
         console.error("Failed to fetch year data:", error);
       }
     };
     fetchExpenseData();
-  }, [year, refreshKey, memberFilter, range]);
+  }, [year, refreshKey, memberFilter, range, selectedTag]);
 
   return (
     <>
@@ -136,25 +152,49 @@ function Expenses() {
         </div>
         {/* Member filter */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm">
-          {members.length > 0 && (
-            <div className="mb-4">
-              <label className="text-sm text-gray-600 mr-2">
-                Filter by member:
-              </label>
-              <select
-                className="border rounded-md px-2 py-1 text-sm"
-                value={memberFilter}
-                onChange={(e) => setMemberFilter(e.target.value)}
-              >
-                <option value="all">All</option>
-                {members.map((m) => (
-                  <option key={m.userId} value={m.userId}>
-                    {m.fullName || m.email}
-                  </option>
-                ))}
-              </select>
+          <div className="flex gap-4">
+            <div className="mb-4 flex gap-4 flex-wrap">
+              {allTags.length > 0 && (
+                <div>
+                  <label className="text-sm text-gray-600 mr-2">
+                    Filter by tag:
+                  </label>
+                  <select
+                    className="border rounded-md px-2 py-1 text-sm"
+                    value={selectedTag}
+                    onChange={(e) => setSelectedTag(e.target.value)}
+                  >
+                    <option value="">All</option>
+                    {allTags.map((tag) => (
+                      <option key={tag} value={tag}>
+                        {tag}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
-          )}
+            {/* Filters */}
+            {members.length > 0 && (
+              <div className="mb-4">
+                <label className="text-sm text-gray-600 mr-2">
+                  Filter by member:
+                </label>
+                <select
+                  className="border rounded-md px-2 py-1 text-sm"
+                  value={memberFilter}
+                  onChange={(e) => setMemberFilter(e.target.value)}
+                >
+                  <option value="all">All</option>
+                  {members.map((m) => (
+                    <option key={m.userId} value={m.userId}>
+                      {m.fullName || m.email}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
           <ExportButtons
             onExportCSV={handleExportCSV}
             onExportPDF={handleExportPDF}
@@ -205,6 +245,21 @@ function Expenses() {
                     key={item._id}
                     className="border-b last:border-b-0 hover:bg-gray-50"
                   >
+                    <td className="py-4">
+                      {item.category}
+                      {item.tags && item.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {item.tags.map((tag, idx) => (
+                            <span
+                              key={idx}
+                              className="px-2 py-0.5 text-xs rounded-full bg-indigo-100 text-indigo-700"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </td>
                     <td className="py-4">{item.category}</td>
                     <td className="py-4">
                       {item.date

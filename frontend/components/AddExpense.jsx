@@ -43,6 +43,11 @@ export default function EditExpense({ open, closeModal, type, expenseData }) {
         : "noEndDate"
       : "noEndDate",
   );
+  const [tagsUI, setTagsUI] = useState(
+    type === "editExpense" && expenseData
+      ? expenseData.tags?.join(", ") || ""
+      : "",
+  );
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -55,6 +60,7 @@ export default function EditExpense({ open, closeModal, type, expenseData }) {
         amount: cents,
         date: startDateUI,
         recurring: recurringUI,
+        tags: tagsUI,
         endDate: endDateUI,
         head: true,
       };
@@ -79,7 +85,7 @@ export default function EditExpense({ open, closeModal, type, expenseData }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75 border-black">
-      <div className="flex flex-col bg-white justify-center gap-5 p-5 rounded-xl shadow-xl w-full max-w-xl border-solid max-h-120 border-red-50">
+      <div className="flex flex-col bg-white justify-center gap-5 p-5 rounded-xl shadow-xl w-full max-w-xl border-solid max-h-150 border-red-50">
         {type === "deleteExpense" ? (
           <>
             <div>
@@ -171,6 +177,15 @@ export default function EditExpense({ open, closeModal, type, expenseData }) {
                       expenseData.head === true &&
                       expenseData.recurring !== "once"
                     }
+                  />
+                </div>
+                <div className="flex flex-col w-full mt-4">
+                  <label>Tags (comma-separated)</label>
+                  <input
+                    placeholder="work, urgent, personal"
+                    className="border-1 h-10 rounded-lg p-2"
+                    value={tagsUI}
+                    onChange={(e) => setTagsUI(e.target.value)}
                   />
                 </div>
                 <div className="flex flex-col">

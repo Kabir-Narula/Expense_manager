@@ -19,8 +19,6 @@ import Signup from "../pages/Auth/Signup";
 import EditProfile from "../pages/EditProfile";
 import ProtectedRoute from "../components/ProtectedRoutes";
 import ManageAccount from "../pages/ManageAccount";
-import IncomeByYear from "../pages/IncomeByYear";
-import ExpenseByYear from "../pages/ExpenseByYear";
 
 const App = () => {
   const location = useLocation();
@@ -98,22 +96,6 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <Charts />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/income/:year"
-              element={
-                <ProtectedRoute>
-                  <IncomeByYear />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/expenses/:year"
-              element={
-                <ProtectedRoute>
-                  <ExpenseByYear />
                 </ProtectedRoute>
               }
             />

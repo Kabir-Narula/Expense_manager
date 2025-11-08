@@ -44,6 +44,9 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
         : "noEndDate"
       : "noEndDate",
   );
+  const [tagsUI, setTagsUI] = useState(
+    type === "editIncome" ? incomeData.tags?.join(", ") || "" : "",
+  );
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -55,6 +58,7 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
         source: sourceUI,
         amount: cents,
         date: startDateUI,
+        tags: tagsUI,
         recurring: recurringUI,
         endDate: endDateUI,
         head: true,
@@ -80,7 +84,7 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75 border-black">
-      <div className="flex flex-col bg-white justify-center gap-5 p-5 rounded-xl shadow-xl w-full max-w-xl border-solid max-h-120 border-red-50">
+      <div className="flex flex-col bg-white justify-center gap-5 p-5 rounded-xl shadow-xl w-full max-w-xl border-solid max-h-150 border-red-50">
         {type === "deleteIncome" ? (
           <>
             <div>
@@ -171,6 +175,15 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
                       incomeData.head === true &&
                       incomeData.recurring !== "once"
                     }
+                  />
+                </div>
+                <div className="flex flex-col w-full mt-4">
+                  <label>Tags (comma-separated)</label>
+                  <input
+                    placeholder="work, bonus, salary"
+                    className="border-1 h-10 rounded-lg p-2"
+                    value={tagsUI}
+                    onChange={(e) => setTagsUI(e.target.value)}
                   />
                 </div>
                 <div className="flex flex-col">

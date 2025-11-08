@@ -35,6 +35,8 @@ export default function Income() {
   const [refreshKey, setRefreshKey] = useState(0); // trigger re-fetch
   const [noDataMessage, setNoDataMessage] = useState("");
   const viewOptions = ViewOptions({ setRange });
+  const [allTags, setAllTags] = useState([]);
+  const [selectedTag, setSelectedTag] = useState("");
 
   // Export handlers
   const handleExportCSV = () => {
@@ -101,20 +103,35 @@ export default function Income() {
         setNoDataMessage("");
         if (res.status === 200) {
           const incomeDocuments = res.data;
-          const withFilter =
+          // Extract all unique tags
+          const tagsSet = new Set();
+          incomeDocuments.forEach((item) => {
+            if (item.tags && Array.isArray(item.tags)) {
+              item.tags.forEach((tag) => tagsSet.add(tag));
+            }
+          });
+          setAllTags(Array.from(tagsSet).sort());
+          const withMemberFilter =
             memberFilter === "all"
               ? incomeDocuments
               : incomeDocuments.filter(
                   (i) => i.createdBy?._id === memberFilter,
                 );
-          setIncomeUI(withFilter);
+          // Apply tag filter
+          let withTagAndMemberFilter = withMemberFilter;
+          if (selectedTag) {
+            withTagAndMemberFilter = withMemberFilter.filter(
+              (item) => item.tags && item.tags.includes(selectedTag),
+            );
+          }
+          setIncomeUI(withTagAndMemberFilter);
         }
       } catch (error) {
         console.error("Failed to fetch year data:", error);
       }
     };
     fetchIncomeData();
-  }, [year, refreshKey, memberFilter, range]);
+  }, [year, refreshKey, memberFilter, range, selectedTag]);
   return (
     <>
       <div className="md:ml-72 md:pt-8 pt-20 p-8 min-h-screen bg-gray-50">
@@ -130,27 +147,52 @@ export default function Income() {
             text="Add Income"
           />
         </div>
+
         {/* Member filter */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm">
-          {members.length > 0 && (
-            <div className="mb-4">
-              <label className="text-sm text-gray-600 mr-2">
-                Filter by member:
-              </label>
-              <select
-                className="border rounded-md px-2 py-1 text-sm"
-                value={memberFilter}
-                onChange={(e) => setMemberFilter(e.target.value)}
-              >
-                <option value="all">All</option>
-                {members.map((m) => (
-                  <option key={m.userId} value={m.userId}>
-                    {m.fullName || m.email}
-                  </option>
-                ))}
-              </select>
+          <div className="flex gap-4">
+            {members.length > 0 && (
+              <div className="mb-4">
+                <label className="text-sm text-gray-600 mr-2">
+                  Filter by member:
+                </label>
+                <select
+                  className="border rounded-md px-2 py-1 text-sm"
+                  value={memberFilter}
+                  onChange={(e) => setMemberFilter(e.target.value)}
+                >
+                  <option value="all">All</option>
+                  {members.map((m) => (
+                    <option key={m.userId} value={m.userId}>
+                      {m.fullName || m.email}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {/* Filters */}
+            <div className="mb-4 flex gap-4 flex-wrap">
+              {allTags.length > 0 && (
+                <div>
+                  <label className="text-sm text-gray-600 mr-2">
+                    Filter by tag:
+                  </label>
+                  <select
+                    className="border rounded-md px-2 py-1 text-sm"
+                    value={selectedTag}
+                    onChange={(e) => setSelectedTag(e.target.value)}
+                  >
+                    <option value="">All</option>
+                    {allTags.map((tag) => (
+                      <option key={tag} value={tag}>
+                        {tag}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
-          )}
+          </div>
           <ExportButtons
             onExportCSV={handleExportCSV}
             onExportPDF={handleExportPDF}
@@ -200,6 +242,21 @@ export default function Income() {
                     key={item._id}
                     className="border-b last:border-b-0 hover:bg-gray-50"
                   >
+                    <td className="py-4">
+                      {item.source}
+                      {item.tags && item.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {item.tags.map((tag, idx) => (
+                            <span
+                              key={idx}
+                              className="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </td>
                     <td className="py-4">{item.source}</td>
                     <td className="py-4">
                       {item.date

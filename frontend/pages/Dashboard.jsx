@@ -102,7 +102,6 @@ function Dashboard() {
         const expenseResponse = await api.get(`/expense/get?range=${range}`);
         const expenses = expenseResponse.data || [];
 
-
         const filteredExpense =
           memberFilter === "all"
             ? expenses
@@ -135,7 +134,7 @@ function Dashboard() {
     };
 
     fetchData();
-  }, [memberFilter, range ]); // Refetch when account changes
+  }, [memberFilter, range]); // Refetch when account changes
 
   const createShared = async () => {
     try {

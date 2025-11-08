@@ -19,7 +19,7 @@ import {
 import calculateFinancialData from "../src/Utils/calculateFinancialData";
 import DateRangeSelector from "../components/DateRangeSelector";
 import { useAccount } from "../src/context/AccountContext";
-import { parseDateToLocal} from "../src/Utils/dateFormatter";
+import { parseDateToLocal } from "../src/Utils/dateFormatter";
 import ViewOptions from "../src/Utils/ViewOptions";
 
 const COLORS = [
@@ -34,7 +34,7 @@ const COLORS = [
 
 function FinancialCharts() {
   const [user, setUser] = useState(null);
-  const [incomeData, setIncomeData] = useState([])
+  const [incomeData, setIncomeData] = useState([]);
   const [expenseData, setExpenseData] = useState([]);
   const [monthlyData, setMonthlyData] = useState([]);
   const [expenseCategories, setExpenseCategories] = useState([]);
@@ -88,7 +88,6 @@ function FinancialCharts() {
             : expenseDocuments.filter((i) => i.createdBy?._id === memberFilter);
         setIncomeData(filteredIncome);
         setExpenseData(filteredExpense);
-
       }
     } catch (error) {
       setNoDataMessage(
@@ -121,7 +120,6 @@ function FinancialCharts() {
         const expenseResponse = await api.get(`/expense/get?range=${range}`);
         const expenses = expenseResponse.data || [];
 
-
         const filteredExpenses =
           memberFilter === "all"
             ? expenses
@@ -133,7 +131,6 @@ function FinancialCharts() {
             : incomes.filter((i) => i.createdBy?._id === memberFilter);
         setIncomeData(filteredIncome);
         setExpenseData(filteredExpenses);
-
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
         if (err?.response?.status === 401) {
@@ -146,8 +143,7 @@ function FinancialCharts() {
     };
 
     fetchData();
-  }, [memberFilter, range ]); // Refetch when account changes
-
+  }, [memberFilter, range]); // Refetch when account changes
 
   useEffect(() => {
     if (incomeData.length > 0 || expenseData.length > 0) {
