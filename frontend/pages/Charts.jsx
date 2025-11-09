@@ -309,7 +309,7 @@ function FinancialCharts() {
         setCustomEndDateUI={setCustomEndDateUI}
         setCustomSearch={setCustomSearch}
       />
-
+      <br />
       {monthlyData.length > 0 && (
         <div className="bg-white p-6 rounded-xl shadow-sm mb-8">
           <h2 className="text-xl font-semibold mb-4">
