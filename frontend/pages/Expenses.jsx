@@ -15,6 +15,7 @@ import {
 import ExportButtons from "../src/components/ExportButtons.jsx";
 import DateRangeSelector from "../components/DateRangeSelector.jsx";
 import ViewOptions from "../src/Utils/ViewOptions.js";
+import Pagination from "../components/pagination.jsx";
 
 function Expenses() {
   const { year } = useParams();
@@ -41,6 +42,8 @@ function Expenses() {
   const [refreshKey, setRefreshKey] = useState(0); // trigger re-fetch
   const [noDataMessage, setNoDataMessage] = useState("");
   const viewOptions = ViewOptions({ setRange });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(15);
   // Export handlers
   const handleExportCSV = () => {
     if (!expenseUI || expenseUI.length === 0) {
@@ -134,6 +137,13 @@ function Expenses() {
     };
     fetchExpenseData();
   }, [year, refreshKey, memberFilter, range, selectedTag]);
+
+  const paginatedExpense = expenseUI?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  ) || [];
+
+  const totalPages = Math.ceil((expenseUI?.length || 0) / itemsPerPage);
 
   return (
     <>
@@ -238,9 +248,9 @@ function Expenses() {
               </tr>
             </thead>
             <tbody>
-              {expenseUI &&
-                expenseUI.length > 0 &&
-                expenseUI.map((item) => (
+              {paginatedExpense &&
+                paginatedExpense.length > 0 &&
+                paginatedExpense.map((item) => (
                   <tr
                     key={item._id}
                     className="border-b last:border-b-0 hover:bg-gray-50"
@@ -323,6 +333,13 @@ function Expenses() {
                 ))}
             </tbody>
           </table>
+          {expenseUI && expenseUI.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              setCurrentPage={setCurrentPage}
+            />
+          )}
         </div>
       </div>
     </>

@@ -11,6 +11,7 @@ import { exportIncomeToCSV, exportIncomeToPDF } from "../src/Utils/exportUtils";
 import ExportButtons from "../src/components/ExportButtons";
 import DateRangeSelector from "../components/DateRangeSelector.jsx";
 import ViewOptions from "../src/Utils/ViewOptions.js";
+import Pagination from "../components/pagination.jsx";
 
 export default function Income() {
   const { year } = useParams();
@@ -37,6 +38,8 @@ export default function Income() {
   const viewOptions = ViewOptions({ setRange });
   const [allTags, setAllTags] = useState([]);
   const [selectedTag, setSelectedTag] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
 
   // Export handlers
   const handleExportCSV = () => {
@@ -132,6 +135,13 @@ export default function Income() {
     };
     fetchIncomeData();
   }, [year, refreshKey, memberFilter, range, selectedTag]);
+  const paginatedIncome =
+    incomeUI?.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage,
+    ) || [];
+
+  const totalPages = Math.ceil((incomeUI?.length || 0) / itemsPerPage);
   return (
     <>
       <div className="md:ml-72 md:pt-8 pt-20 p-8 min-h-screen bg-gray-50">
@@ -235,9 +245,9 @@ export default function Income() {
               </tr>
             </thead>
             <tbody>
-              {incomeUI &&
-                incomeUI.length > 0 &&
-                incomeUI.map((item) => (
+              {paginatedIncome &&
+                paginatedIncome.length > 0 &&
+                paginatedIncome.map((item) => (
                   <tr
                     key={item._id}
                     className="border-b last:border-b-0 hover:bg-gray-50"
@@ -320,6 +330,13 @@ export default function Income() {
                 ))}
             </tbody>
           </table>
+          {incomeUI && incomeUI.length > 0 && (
+            <Pagination
+              setCurrentPage={setCurrentPage}
+              currentPage={currentPage}
+              totalPages={totalPages}
+            />
+          )}
         </div>
       </div>
     </>
