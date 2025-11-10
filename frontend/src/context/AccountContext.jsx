@@ -7,7 +7,7 @@ export const AccountProvider = ({ children }) => {
   const [personal, setPersonal] = useState(null);
   const [shared, setShared] = useState([]);
   const [currentAccountId, setCurrentAccountId] = useState(
-    () => localStorage.getItem("currentAccountId") || null
+    () => localStorage.getItem("currentAccountId") || null,
   );
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
@@ -20,7 +20,10 @@ export const AccountProvider = ({ children }) => {
       setShared(data.shared || []);
 
       // Get all valid account IDs
-      const all = [data.personal?._id, ...(data.shared || []).map(a => a._id)].filter(Boolean);
+      const all = [
+        data.personal?._id,
+        ...(data.shared || []).map((a) => a._id),
+      ].filter(Boolean);
 
       // Check if current account is still valid
       const persisted = localStorage.getItem("currentAccountId");
@@ -108,7 +111,9 @@ export const AccountProvider = ({ children }) => {
     loading,
   };
 
-  return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>;
+  return (
+    <AccountContext.Provider value={value}>{children}</AccountContext.Provider>
+  );
 };
 
 export const useAccount = () => {

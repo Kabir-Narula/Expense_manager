@@ -7,9 +7,11 @@ const IncomeSchema = new mongoose.Schema(
     source: { type: String, required: true },
     amount: { type: Number, required: true },
     date: { type: Date, default: Date.now },
+    tags: {type: [String], default: []},
     // Recurring support
-    recurring: { type: Boolean, default: false },
-    startDate: { type: Date },
+    recurring: {type: String},
+    endDate: {type: mongoose.Schema.Types.Mixed, required: false},
+    head: {type: Boolean, default: true},
     // Shared accounts
     accountId: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
