@@ -64,7 +64,6 @@ export const exportIncomeToCSV = (incomeData, year, memberFilter = "all") => {
           Amount: formatCurrency(data.amount),
           "Created By":
             data.createdBy?.fullName || data.createdBy?.email || "You",
-          Icon: data.icon || "",
           Recurring: data.recurring,
         });
       }
@@ -126,7 +125,6 @@ export const exportExpenseToCSV = (expenseData, year, memberFilter = "all") => {
           Amount: formatCurrency(data.amount),
           "Created By":
             data.createdBy?.fullName || data.createdBy?.email || "You",
-          Icon: data.icon || "",
           Recurring: data.recurring,
         });
       }
