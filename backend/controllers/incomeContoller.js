@@ -113,13 +113,19 @@ export const getAllIncome = async (req, res) => {
         nextDate.setMonth(lastDate.getMonth() + 1);
       }
       const todayISOStr = today.toISOString().slice(0,10);
-      const nextDateISOStr = nextDate.toISOString().slice(0,10);
+      var nextDateISOStr = nextDate.toISOString().slice(0,10);
       const endDateISOStr = income.endDate ? income.endDate.toISOString().slice(0,10) : "";
 
       // if the current date is ahead of the next bi-weekly/monthly date, then create it.
       // the head property of the newIncome object will be true.
-
-      if (todayISOStr >= nextDateISOStr) {
+      var prevDoc = income;
+      while (todayISOStr >= nextDateISOStr) {
+        // set previous document head to false. If we are in this loop,
+        // it means we are creating a new document and we need to change
+        // the head. 
+        prevDoc.head = false;
+        prevDoc.recurring = "once";
+        await prevDoc.save();
         if (!endDateISOStr || nextDateISOStr <= endDateISOStr) {
           const newIncome = new Income({
             userId: income.userId,
@@ -134,17 +140,19 @@ export const getAllIncome = async (req, res) => {
             accountId: income.accountId,
             createdBy: income.userId,
           });
-  
-        
           await newIncome.save();
-          // the newIncome object is the new head. Therefore, the 
-          // previous income document that was used to verify if it should 
-          // be duplicated is no longer the head. 
-          income.head = false;
-  
-          // prevent user from manipulating the older recurrent payments. 
-          income.recurring = "once";
-        
+          if (income.recurring === "monthly") {
+            nextDate.setMonth(nextDate.getMonth() + 1);
+          } else {
+            nextDate.setDate(nextDate.getDate() + 14);
+          }
+
+          nextDateISOStr = nextDate.toISOString().slice(0,10);
+
+          // store a reference to the most recently created document
+          // for manipulation if another loop is needed.
+          prevDoc = newIncome;
+
           await income.save();
         }
       }
@@ -230,3 +238,58 @@ export const updateIncome = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
+export const getUpcomingIncome = async (req, res) => {
+  try {
+    const accountId = req.account?._id;
+    const { createdBy, tags, range } = req.query;
+    const query = [];
+    if (accountId) {
+      query.push({ accountId });
+    }
+    // Legacy: include personal legacy records for personal context
+    if (!accountId || (req.account && req.account.type === "personal")) {
+      query.push({ accountId: { $exists: false }, userId: req.user._id });
+    }
+    const filter = query.length ? { $or: query } : {};
+    if (createdBy) {
+      filter.createdBy = createdBy;
+    }
+    // Add tag filtering
+    if (tags) {
+      const tagArray = Array.isArray(tags) ? tags : [tags];
+      filter.tags = { $in: tagArray };
+    }
+
+    const recurringIncomes = await Income.find({
+      ...filter,
+      recurring: { $in: ["monthly", "bi-weekly"] },
+      head: true 
+    });
+
+    const futureIncomes = new Map();
+    for (const income of recurringIncomes) {
+      if (!futureIncomes[`${income._id} - ${income.date.toISOString()}`]) {
+        futureIncomes.set(`${income._id} - ${income.date.toISOString()}`, []);
+     }
+     const lastDate = new Date(income.date);
+      let nextDate;
+      if (income.recurring === "bi-weekly") {
+        nextDate = new Date(lastDate); 
+        nextDate.setDate(lastDate.getDate() + 14);
+      } else if (income.recurring === "monthly") {
+        nextDate = new Date(lastDate);
+        nextDate.setMonth(lastDate.getMonth() + 1);
+      }
+      const todayISOStr = new Date().toISOString().slice(0,10);
+      var nextDateISOStr = nextDate.toISOString().slice(0,10);
+      const endDateISOStr = income.endDate ? income.endDate.toISOString().slice(0,10) : "";
+      
+      if (todayISOStr < nextDateISOStr && (!endDateISOStr || nextDateISOStr <= endDateISOStr)) {
+        
+      }
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Nothing to show!" });
+  }
+}
