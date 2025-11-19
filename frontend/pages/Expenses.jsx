@@ -58,6 +58,16 @@ function Expenses() {
     }
     return exportExpenseToPDF(expenseUI, year, memberFilter);
   };
+  const handleClearFilters = () => {
+    setMemberFilter("all");
+    setSelectedTag("");
+    setRange("4w");
+    setCustomSearch(false);
+    setCustomStartDateUI(yesterdayStr);
+    setCustomEndDateUI(todayStr);
+    setCurrentPage(1);
+  };
+
   const handleRangeSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -205,6 +215,18 @@ function Expenses() {
               )}
             </div>
           </div>
+          <button
+            onClick={handleClearFilters}
+            disabled={
+              memberFilter === "all" &&
+              !selectedTag &&
+              range === "4w" &&
+              !customSearch
+            }
+            className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 transition-all duration-200 hover:border-gray-400 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:text-gray-700 disabled:hover:shadow-none"
+          >
+            Clear Filters
+          </button>
           <ExportButtons
             onExportCSV={handleExportCSV}
             onExportPDF={handleExportPDF}
