@@ -267,7 +267,6 @@ export default function Income() {
                         </div>
                       )}
                     </td>
-                    <td className="py-4">{item.source}</td>
                     <td className="py-4">
                       {item.date
                         ? new Date(
