@@ -30,6 +30,12 @@ app.use(cors());
 
 // Middleware
 app.use(express.json());
+app.use((req, res, next) => {
+  if (req.method === "GET" && req.path.startsWith("/api/v1")) {
+    res.set("Cache-Control", "public, max-age=300");
+  }
+  next();
+});
 
 // Routes
 app.use("/api/v1/auth", authRoutes);
