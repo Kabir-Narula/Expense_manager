@@ -86,45 +86,52 @@ const ExportButtons = ({
   };
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      {/* Export Label */}
-      <div className="flex items-center gap-2 text-gray-600">
-        <Download className="w-4 h-4" />
-        <span className="text-sm font-medium hidden sm:inline">Export:</span>
-      </div>
-
+    <div className={`flex items-center gap-2 ${className}`}>
       {/* CSV Export Button */}
       <button
         onClick={handleCSVExport}
         disabled={disabled || isExportingCSV}
         className={`
-          group relative flex items-center gap-2 px-4 py-2 
-          bg-white border border-gray-300 rounded-lg
-          text-sm font-medium text-gray-700
+          group relative flex items-center gap-2 px-4 py-2.5 
+          bg-white border-2 border-emerald-200 rounded-xl
+          text-sm font-semibold text-emerald-700
           transition-all duration-200
-          hover:border-green-500 hover:text-green-600 hover:shadow-md
-          focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
-          disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300
-          disabled:hover:text-gray-700 disabled:hover:shadow-none
-          ${isExportingCSV ? "cursor-wait" : ""}
+          hover:bg-emerald-50 hover:border-emerald-400 hover:shadow-lg hover:shadow-emerald-500/20
+          focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2
+          disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white
+          disabled:hover:border-emerald-200 disabled:hover:shadow-none
+          ${isExportingCSV ? "cursor-wait animate-pulse" : ""}
         `}
         aria-label="Export to CSV"
       >
-        <FileSpreadsheet
-          className={`w-4 h-4 transition-transform duration-200 group-hover:scale-110 ${isExportingCSV ? "animate-pulse" : ""}`}
-        />
+        {isExportingCSV ? (
+          <svg
+            className="animate-spin h-4 w-4"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+        ) : (
+          <FileSpreadsheet className="w-4 h-4 transition-transform duration-200 group-hover:scale-110 group-hover:rotate-12" />
+        )}
         <span className="hidden sm:inline">
-          {isExportingCSV ? "Exporting..." : "CSV"}
+          {isExportingCSV ? "Exporting..." : "Export CSV"}
         </span>
-
-        {/* Tooltip for mobile */}
-        <span
-          className="sm:hidden absolute -top-8 left-1/2 transform -translate-x-1/2 
-          bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 
-          group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap"
-        >
-          Export CSV
-        </span>
+        <Download className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-y-0.5 transition-all hidden sm:inline" />
       </button>
 
       {/* PDF Export Button */}
@@ -132,33 +139,46 @@ const ExportButtons = ({
         onClick={handlePDFExport}
         disabled={disabled || isExportingPDF}
         className={`
-          group relative flex items-center gap-2 px-4 py-2 
-          bg-white border border-gray-300 rounded-lg
-          text-sm font-medium text-gray-700
+          group relative flex items-center gap-2 px-4 py-2.5 
+          bg-white border-2 border-red-200 rounded-xl
+          text-sm font-semibold text-red-700
           transition-all duration-200
-          hover:border-red-500 hover:text-red-600 hover:shadow-md
+          hover:bg-red-50 hover:border-red-400 hover:shadow-lg hover:shadow-red-500/20
           focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
-          disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300
-          disabled:hover:text-gray-700 disabled:hover:shadow-none
-          ${isExportingPDF ? "cursor-wait" : ""}
+          disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white
+          disabled:hover:border-red-200 disabled:hover:shadow-none
+          ${isExportingPDF ? "cursor-wait animate-pulse" : ""}
         `}
         aria-label="Export to PDF"
       >
-        <FileText
-          className={`w-4 h-4 transition-transform duration-200 group-hover:scale-110 ${isExportingPDF ? "animate-pulse" : ""}`}
-        />
+        {isExportingPDF ? (
+          <svg
+            className="animate-spin h-4 w-4"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+        ) : (
+          <FileText className="w-4 h-4 transition-transform duration-200 group-hover:scale-110 group-hover:rotate-12" />
+        )}
         <span className="hidden sm:inline">
-          {isExportingPDF ? "Exporting..." : "PDF"}
+          {isExportingPDF ? "Exporting..." : "Export PDF"}
         </span>
-
-        {/* Tooltip for mobile */}
-        <span
-          className="sm:hidden absolute -top-8 left-1/2 transform -translate-x-1/2 
-          bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 
-          group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap"
-        >
-          Export PDF
-        </span>
+        <Download className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-y-0.5 transition-all hidden sm:inline" />
       </button>
     </div>
   );
