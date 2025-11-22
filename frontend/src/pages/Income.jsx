@@ -258,6 +258,12 @@ export default function Income() {
                 Clear Filters
               </button>
 
+              <button
+                className="px-3 py-2 border-2 border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 hover:border-gray-300 transition-all cursor-pointer bg-white"
+                >
+                  Upcoming Transactions
+              </button>
+
               {/* Custom Search Toggle */}
               <button
                 className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-50 rounded-lg transition-all"
