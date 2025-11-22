@@ -15,59 +15,15 @@ export default function TransactionsTable({
   itemsPerPage = 15,
 }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
-
-  const getSortKey = (key) => {
-    setSortConfig((prev) => {
-      if (prev.key === key) {
-        return { key, direction: prev.direction === "asc" ? "desc" : "asc" };
-      }
-      return { key, direction: "asc" };
-    });
-  };
-
-  const sortedData = useMemo(() => {
-    if (!data) return [];
-    if (!sortConfig.key) return data;
-
-    const sorted = [...data].sort((a, b) => {
-      const { key, direction } = sortConfig;
-      let aVal;
-      let bVal;
-
-      if (key === "name") {
-        aVal = type === "income" ? a.source : a.category;
-        bVal = type === "income" ? b.source : b.category;
-      } else if (key === "date") {
-        aVal = a.date ? new Date(a.date) : new Date(0);
-        bVal = b.date ? new Date(b.date) : new Date(0);
-      } else if (key === "amount") {
-        aVal = a.amount || 0;
-        bVal = b.amount || 0;
-      } else if (key === "createdBy") {
-        const aName = a.createdBy?.fullName || a.createdBy?.email || "";
-        const bName = b.createdBy?.fullName || b.createdBy?.email || "";
-        aVal = aName.toLowerCase();
-        bVal = bName.toLowerCase();
-      } else {
-        return 0;
-      }
-
-      if (aVal < bVal) return direction === "asc" ? -1 : 1;
-      if (aVal > bVal) return direction === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    return sorted;
-  }, [data, sortConfig, type]);
 
   const paginatedData = useMemo(() => {
+    const source = data || [];
     const start = (currentPage - 1) * itemsPerPage;
     const end = currentPage * itemsPerPage;
-    return sortedData.slice(start, end);
-  }, [sortedData, currentPage, itemsPerPage]);
+    return source.slice(start, end);
+  }, [data, currentPage, itemsPerPage]);
 
-  const totalPages = Math.ceil((sortedData.length || 0) / itemsPerPage) || 1;
+  const totalPages = Math.ceil(((data?.length) || 0) / itemsPerPage) || 1;
 
   const isIncome = type === "income";
 
@@ -109,15 +65,6 @@ export default function TransactionsTable({
     if (onDelete) onDelete(item);
   };
 
-  const renderSortIndicator = (key) => {
-    if (sortConfig.key !== key) return null;
-    return (
-      <span className="ml-1 text-[10px] align-middle">
-        {sortConfig.direction === "asc" ? "▲" : "▼"}
-      </span>
-    );
-  };
-
   const hasData = data && data.length > 0;
 
   return (
@@ -149,33 +96,17 @@ export default function TransactionsTable({
         <table className="w-full">
           <thead>
             <tr className="text-left text-gray-600 bg-gray-50/50 border-b border-gray-100">
-              <th
-                className="px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer select-none"
-                onClick={() => getSortKey("name")}
-              >
+              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">
                 {isIncome ? "Source" : "Category"}
-                {renderSortIndicator("name")}
               </th>
-              <th
-                className="px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer select-none"
-                onClick={() => getSortKey("date")}
-              >
+              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">
                 Date
-                {renderSortIndicator("date")}
               </th>
-              <th
-                className="px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer select-none"
-                onClick={() => getSortKey("amount")}
-              >
+              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">
                 Amount
-                {renderSortIndicator("amount")}
               </th>
-              <th
-                className="px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer select-none"
-                onClick={() => getSortKey("createdBy")}
-              >
+              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">
                 Created By
-                {renderSortIndicator("createdBy")}
               </th>
               <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-center">
                 Actions
@@ -293,7 +224,7 @@ export default function TransactionsTable({
       </div>
 
       {/* Pagination */}
-      {hasData && sortedData.length > 0 && (
+      {hasData && (data?.length || 0) > 0 && (
         <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
           <Pagination
             setCurrentPage={setCurrentPage}
