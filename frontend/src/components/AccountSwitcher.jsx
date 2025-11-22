@@ -19,7 +19,9 @@ export default function AccountSwitcher() {
   if (loading) return null;
   if (!allAccounts || allAccounts.length <= 1) return null; // no need to show if only personal
 
-  const currentAccount = allAccounts.find(acc => acc._id === currentAccountId);
+  const currentAccount = allAccounts.find(
+    (acc) => acc._id === currentAccountId,
+  );
 
   return (
     <div className="mb-6 px-1">
@@ -27,11 +29,13 @@ export default function AccountSwitcher() {
       <div className="relative group">
         {/* Icon and Type Badge Combined */}
         <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none flex items-center gap-2">
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-            currentAccount?.type === "personal"
-              ? "bg-indigo-700/70"
-              : "bg-primary/30"
-          }`}>
+          <div
+            className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+              currentAccount?.type === "personal"
+                ? "bg-indigo-700/70"
+                : "bg-primary/30"
+            }`}
+          >
             {currentAccount?.type === "personal" ? (
               <MdPerson className="w-4.5 h-4.5 text-white" />
             ) : (
@@ -47,12 +51,22 @@ export default function AccountSwitcher() {
         >
           {allAccounts.map((acc) => {
             const memberCount = acc.members?.length || 0;
-            const displayName = acc.name || (acc.type === "personal" ? "Personal" : "Shared Account");
-            const suffix = acc.type === "shared" && memberCount > 0 ? ` • ${memberCount} member${memberCount !== 1 ? 's' : ''}` : '';
-            
+            const displayName =
+              acc.name ||
+              (acc.type === "personal" ? "Personal" : "Shared Account");
+            const suffix =
+              acc.type === "shared" && memberCount > 0
+                ? ` • ${memberCount} member${memberCount !== 1 ? "s" : ""}`
+                : "";
+
             return (
-              <option key={acc._id} value={acc._id} className="bg-indigo-900 text-white py-2">
-                {displayName}{suffix}
+              <option
+                key={acc._id}
+                value={acc._id}
+                className="bg-indigo-900 text-white py-2"
+              >
+                {displayName}
+                {suffix}
               </option>
             );
           })}
@@ -60,8 +74,18 @@ export default function AccountSwitcher() {
 
         {/* Dropdown arrow */}
         <div className="absolute right-3 top-1/2 -translate-y-1/2 text-indigo-400 group-hover:text-primary-light pointer-events-none transition-colors">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2.5}
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </div>
 
@@ -71,4 +95,3 @@ export default function AccountSwitcher() {
     </div>
   );
 }
-

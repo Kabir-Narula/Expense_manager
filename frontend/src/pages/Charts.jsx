@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { MdBarChart, MdTrendingUp, MdTrendingDown, MdFilterList, MdCalendarToday } from "react-icons/md";
+import {
+  MdBarChart,
+  MdTrendingUp,
+  MdTrendingDown,
+  MdFilterList,
+  MdCalendarToday,
+} from "react-icons/md";
 import { FiDollarSign, FiPieChart } from "react-icons/fi";
 import api from "../utils/api";
 import {
@@ -274,7 +280,9 @@ function FinancialCharts() {
         <div className="card-stat group">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-gray-600 text-sm font-medium mb-1">Total Income</p>
+              <p className="text-gray-600 text-sm font-medium mb-1">
+                Total Income
+              </p>
               <p className="text-3xl font-bold text-gray-900">
                 ${totalIncome.toFixed(2)}
               </p>
@@ -292,7 +300,9 @@ function FinancialCharts() {
         <div className="card-stat group">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-gray-600 text-sm font-medium mb-1">Total Expenses</p>
+              <p className="text-gray-600 text-sm font-medium mb-1">
+                Total Expenses
+              </p>
               <p className="text-3xl font-bold text-gray-900">
                 ${totalExpenses.toFixed(2)}
               </p>
@@ -310,16 +320,28 @@ function FinancialCharts() {
         <div className="card-stat group">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-gray-600 text-sm font-medium mb-1">Net Savings</p>
-              <p className={`text-3xl font-bold ${totalSavings >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+              <p className="text-gray-600 text-sm font-medium mb-1">
+                Net Savings
+              </p>
+              <p
+                className={`text-3xl font-bold ${totalSavings >= 0 ? "text-emerald-600" : "text-red-600"}`}
+              >
                 ${totalSavings.toFixed(2)}
               </p>
-              <div className={`mt-2 flex items-center gap-1 text-sm font-medium ${totalSavings >= 0 ? "text-emerald-600" : "text-red-600"}`}>
-                {totalSavings >= 0 ? <MdTrendingUp className="w-4 h-4" /> : <MdTrendingDown className="w-4 h-4" />}
+              <div
+                className={`mt-2 flex items-center gap-1 text-sm font-medium ${totalSavings >= 0 ? "text-emerald-600" : "text-red-600"}`}
+              >
+                {totalSavings >= 0 ? (
+                  <MdTrendingUp className="w-4 h-4" />
+                ) : (
+                  <MdTrendingDown className="w-4 h-4" />
+                )}
                 {totalSavings >= 0 ? "Surplus" : "Deficit"}
               </div>
             </div>
-            <div className={`bg-gradient-to-br p-4 rounded-2xl shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 ${totalSavings >= 0 ? "from-blue-500 to-indigo-600 shadow-blue-500/30 group-hover:shadow-blue-500/40" : "from-orange-500 to-red-600 shadow-orange-500/30 group-hover:shadow-orange-500/40"}`}>
+            <div
+              className={`bg-gradient-to-br p-4 rounded-2xl shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 ${totalSavings >= 0 ? "from-blue-500 to-indigo-600 shadow-blue-500/30 group-hover:shadow-blue-500/40" : "from-orange-500 to-red-600 shadow-orange-500/30 group-hover:shadow-orange-500/40"}`}
+            >
               <FiPieChart className="w-7 h-7 text-white" />
             </div>
           </div>
@@ -363,12 +385,32 @@ function FinancialCharts() {
               <MdCalendarToday className="w-4 h-4" />
               Custom Date
               {customSearch ? (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 15l7-7 7 7"
+                  />
                 </svg>
               ) : (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               )}
             </button>
@@ -376,7 +418,9 @@ function FinancialCharts() {
 
           {/* Right Side: View Options */}
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-700 hidden sm:inline">Period:</span>
+            <span className="text-sm font-medium text-gray-700 hidden sm:inline">
+              Period:
+            </span>
             <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
               {viewOptions.map((item) => (
                 <button
@@ -399,7 +443,10 @@ function FinancialCharts() {
             exit={{ height: 0, opacity: 0 }}
             className="mt-4 pt-4 border-t-2 border-gray-100"
           >
-            <form onSubmit={handleRangeSubmit} className="flex flex-col sm:flex-row items-end gap-3">
+            <form
+              onSubmit={handleRangeSubmit}
+              className="flex flex-col sm:flex-row items-end gap-3"
+            >
               <div className="flex-1 w-full sm:w-auto">
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
                   From Date
@@ -433,8 +480,16 @@ function FinancialCharts() {
             </form>
             {noDataMessage && (
               <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-sm">
-                <svg className="w-4 h-4 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                <svg
+                  className="w-4 h-4 text-red-600 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 <p className="text-red-700 font-medium">{noDataMessage}</p>
               </div>
@@ -459,25 +514,22 @@ function FinancialCharts() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={monthlyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis 
-                  dataKey="month" 
+                <XAxis
+                  dataKey="month"
                   tick={{ fontSize: 12 }}
                   stroke="#9ca3af"
                 />
-                <YAxis 
-                  tick={{ fontSize: 12 }}
-                  stroke="#9ca3af"
-                />
-                <Tooltip 
+                <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" />
+                <Tooltip
                   formatter={(value) => [`$${value.toFixed(2)}`, ""]}
                   contentStyle={{
                     backgroundColor: "#fff",
                     border: "1px solid #e5e7eb",
                     borderRadius: "12px",
-                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                   }}
                 />
-                <Legend 
+                <Legend
                   wrapperStyle={{ fontSize: "14px", fontWeight: "600" }}
                 />
                 <Line
@@ -515,7 +567,9 @@ function FinancialCharts() {
           >
             <div className="flex items-center gap-2 mb-6">
               <span className="w-1 h-8 bg-gradient-to-b from-red-500 to-rose-600 rounded-full"></span>
-              <h2 className="text-xl font-bold text-gray-900">Expense Categories</h2>
+              <h2 className="text-xl font-bold text-gray-900">
+                Expense Categories
+              </h2>
             </div>
             <div className="h-96">
               <ResponsiveContainer width="100%" height="100%">
@@ -538,16 +592,18 @@ function FinancialCharts() {
                       />
                     ))}
                   </Pie>
-                  <Tooltip 
+                  <Tooltip
                     formatter={(value) => [`$${value}`, "Amount"]}
                     contentStyle={{
                       backgroundColor: "#fff",
                       border: "1px solid #e5e7eb",
                       borderRadius: "12px",
-                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                     }}
                   />
-                  <Legend wrapperStyle={{ fontSize: "14px", fontWeight: "600" }} />
+                  <Legend
+                    wrapperStyle={{ fontSize: "14px", fontWeight: "600" }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -571,25 +627,24 @@ function FinancialCharts() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis 
-                    dataKey="month" 
+                  <XAxis
+                    dataKey="month"
                     tick={{ fontSize: 12 }}
                     stroke="#9ca3af"
                   />
-                  <YAxis 
-                    tick={{ fontSize: 12 }}
-                    stroke="#9ca3af"
-                  />
+                  <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" />
                   <Tooltip
                     formatter={(value) => [`$${value.toFixed(2)}`, ""]}
                     contentStyle={{
                       backgroundColor: "#fff",
                       border: "1px solid #e5e7eb",
                       borderRadius: "12px",
-                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                     }}
                   />
-                  <Legend wrapperStyle={{ fontSize: "14px", fontWeight: "600" }} />
+                  <Legend
+                    wrapperStyle={{ fontSize: "14px", fontWeight: "600" }}
+                  />
                   <Bar
                     dataKey="savings"
                     fill="#6366f1"
@@ -617,7 +672,8 @@ function FinancialCharts() {
             No Financial Data Available
           </h2>
           <p className="text-gray-600 mb-6 max-w-md mx-auto">
-            Start tracking your finances by adding income and expense entries to see detailed analytics and insights.
+            Start tracking your finances by adding income and expense entries to
+            see detailed analytics and insights.
           </p>
           <div className="flex gap-3 justify-center flex-wrap">
             <a
@@ -642,4 +698,3 @@ function FinancialCharts() {
 }
 
 export default FinancialCharts;
-

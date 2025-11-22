@@ -9,10 +9,10 @@ function Logout() {
     // Clear all auth data
     localStorage.removeItem("token");
     localStorage.removeItem("currentAccountId");
-    
+
     // Show success message
     toast.success("Logged out successfully!");
-    
+
     // Redirect to login
     navigate("/login", { replace: true });
   }, [navigate]);
@@ -28,4 +28,3 @@ function Logout() {
 }
 
 export default Logout;
-

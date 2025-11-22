@@ -93,7 +93,8 @@ const CreateSharedAccountModal = ({ isOpen, onClose, onSubmit, loading }) => {
                   About Shared Accounts
                 </p>
                 <p className="text-xs text-blue-800">
-                  You'll be the owner and can invite members to view and manage transactions together. Members can add expenses and income.
+                  You'll be the owner and can invite members to view and manage
+                  transactions together. Members can add expenses and income.
                 </p>
               </div>
             </div>
@@ -162,4 +163,3 @@ const CreateSharedAccountModal = ({ isOpen, onClose, onSubmit, loading }) => {
 };
 
 export default CreateSharedAccountModal;
-

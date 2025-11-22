@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { formatDistanceToNow } from 'date-fns';
-import { Bell, X, Check, AlertCircle } from 'lucide-react';
-import { MdNotifications, MdNotificationsActive } from 'react-icons/md';
-import api from '../utils/api';
+import React, { useState, useEffect, useRef } from "react";
+import { formatDistanceToNow } from "date-fns";
+import { Bell, X, Check, AlertCircle } from "lucide-react";
+import { MdNotifications, MdNotificationsActive } from "react-icons/md";
+import api from "../utils/api";
 
 const Notifications = () => {
   const [user, setUser] = useState(null);
@@ -12,13 +12,13 @@ const Notifications = () => {
   const [error, setError] = useState(null);
   const dropdownRef = useRef(null);
 
-   useEffect(() => {
+  useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data } = await api.get('/auth/getUser');
+        const { data } = await api.get("/auth/getUser");
         setUser(data);
       } catch (err) {
-        console.error('Error fetching user:', err);
+        console.error("Error fetching user:", err);
       }
     };
 
@@ -28,15 +28,15 @@ const Notifications = () => {
   const fetchNotifications = async () => {
     console.log(user);
     if (!user?._id) return;
-    
+
     try {
       setIsLoading(true);
       console.log(user._id);
       const response = await api.get(`/notifications/${user._id}`);
       setNotifications(response.data.data);
     } catch (err) {
-      setError('Failed to fetch notifications');
-      console.error('Error fetching notifications:', err);
+      setError("Failed to fetch notifications");
+      console.error("Error fetching notifications:", err);
     } finally {
       setIsLoading(false);
     }
@@ -48,27 +48,34 @@ const Notifications = () => {
     }
   }, [user?._id]);
 
-
   const markAsRead = async (notificationId, e) => {
     e?.stopPropagation?.();
     try {
       console.log(notificationId);
       await api.put(`/notifications/${notificationId}`);
-      setNotifications(notifications.map(notif => 
-        notif._id === notificationId ? { ...notif, readAt: new Date() } : notif
-      ));
+      setNotifications(
+        notifications.map((notif) =>
+          notif._id === notificationId
+            ? { ...notif, readAt: new Date() }
+            : notif,
+        ),
+      );
     } catch (err) {
-      console.error('Error marking notification as read:', err);
+      console.error("Error marking notification as read:", err);
     }
   };
 
   const markAllAsRead = async () => {
     try {
-      const unreadIds = notifications.filter(n => !n.readAt).map(n => n._id);
-      await Promise.all(unreadIds.map(id => api.put(`/notifications/${id}`)));
-      setNotifications(notifications.map(notif => ({ ...notif, readAt: new Date() })));
+      const unreadIds = notifications
+        .filter((n) => !n.readAt)
+        .map((n) => n._id);
+      await Promise.all(unreadIds.map((id) => api.put(`/notifications/${id}`)));
+      setNotifications(
+        notifications.map((notif) => ({ ...notif, readAt: new Date() })),
+      );
     } catch (err) {
-      console.error('Error marking all as read:', err);
+      console.error("Error marking all as read:", err);
     }
   };
 
@@ -81,17 +88,17 @@ const Notifications = () => {
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  const unreadCount = notifications.filter(n => !n.readAt).length;
+  const unreadCount = notifications.filter((n) => !n.readAt).length;
 
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Notification Button */}
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 group"
         aria-label="Notifications"
@@ -101,11 +108,11 @@ const Notifications = () => {
         ) : (
           <MdNotifications className="h-6 w-6 text-gray-600 group-hover:text-primary group-hover:scale-110 transition-all" />
         )}
-        
+
         {/* Unread Badge */}
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 min-w-[20px] h-5 flex items-center justify-center bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold rounded-full px-1.5 shadow-lg shadow-red-500/30 animate-bounce">
-            {unreadCount > 9 ? '9+' : unreadCount}
+            {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
@@ -135,7 +142,7 @@ const Notifications = () => {
                     Clear all
                   </button>
                 )}
-                <button 
+                <button
                   onClick={() => setIsOpen(false)}
                   className="text-white/80 hover:text-white hover:bg-white/20 p-1 rounded-lg transition-all"
                 >
@@ -144,13 +151,15 @@ const Notifications = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Notifications List */}
           <div className="max-h-[28rem] overflow-y-auto custom-scrollbar">
             {isLoading ? (
               <div className="p-8 text-center">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-primary"></div>
-                <p className="mt-3 text-sm text-gray-500 font-medium">Loading notifications...</p>
+                <p className="mt-3 text-sm text-gray-500 font-medium">
+                  Loading notifications...
+                </p>
               </div>
             ) : error ? (
               <div className="p-8 text-center">
@@ -162,16 +171,20 @@ const Notifications = () => {
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Bell className="h-8 w-8 text-gray-400" />
                 </div>
-                <p className="text-sm text-gray-500 font-medium">No notifications yet</p>
-                <p className="text-xs text-gray-400 mt-1">We'll notify you when something arrives</p>
+                <p className="text-sm text-gray-500 font-medium">
+                  No notifications yet
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  We'll notify you when something arrives
+                </p>
               </div>
             ) : (
               <ul className="divide-y divide-gray-100">
                 {notifications.map((notification) => (
-                  <li 
+                  <li
                     key={notification._id}
                     className={`p-4 hover:bg-gray-50 transition-all duration-200 cursor-pointer relative group ${
-                      !notification.readAt ? 'bg-blue-50/50' : ''
+                      !notification.readAt ? "bg-blue-50/50" : ""
                     }`}
                     onClick={() => markAsRead(notification._id)}
                   >
@@ -179,14 +192,16 @@ const Notifications = () => {
                     {!notification.readAt && (
                       <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary to-primary-light"></div>
                     )}
-                    
+
                     <div className="flex gap-3">
                       {/* Icon */}
-                      <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${
-                        !notification.readAt 
-                          ? 'bg-gradient-to-br from-primary to-primary-light text-white' 
-                          : 'bg-gray-100 text-gray-400'
-                      }`}>
+                      <div
+                        className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${
+                          !notification.readAt
+                            ? "bg-gradient-to-br from-primary to-primary-light text-white"
+                            : "bg-gray-100 text-gray-400"
+                        }`}
+                      >
                         {notification.data.amount ? (
                           <span className="text-lg font-bold">$</span>
                         ) : (
@@ -197,20 +212,24 @@ const Notifications = () => {
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start gap-2 mb-1">
-                          <p className={`font-semibold text-sm ${
-                            !notification.readAt ? 'text-gray-900' : 'text-gray-600'
-                          }`}>
+                          <p
+                            className={`font-semibold text-sm ${
+                              !notification.readAt
+                                ? "text-gray-900"
+                                : "text-gray-600"
+                            }`}
+                          >
                             {notification.data.title}
                           </p>
                           {!notification.readAt && (
                             <span className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-1.5"></span>
                           )}
                         </div>
-                        
+
                         <p className="text-sm text-gray-600 mb-2 line-clamp-2">
                           {notification.data.message}
                         </p>
-                        
+
                         <div className="flex items-center justify-between">
                           {notification.data.amount && (
                             <span className="text-sm font-bold text-primary">
@@ -218,7 +237,10 @@ const Notifications = () => {
                             </span>
                           )}
                           <span className="text-xs text-gray-400 font-medium ml-auto">
-                            {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                            {formatDistanceToNow(
+                              new Date(notification.createdAt),
+                              { addSuffix: true },
+                            )}
                           </span>
                         </div>
                       </div>

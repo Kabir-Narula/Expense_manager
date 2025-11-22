@@ -199,7 +199,7 @@ function Dashboard() {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Welcome back, {user?.fullName?.split(' ')[0] || 'User'}! 👋
+              Welcome back, {user?.fullName?.split(" ")[0] || "User"}! 👋
             </h1>
             <p className="text-gray-600 mt-1">Here's your financial overview</p>
           </div>
@@ -210,8 +210,18 @@ function Dashboard() {
                 onClick={() => setInviteOpen(true)}
                 className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-primary-light text-white rounded-xl font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-200"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                  />
                 </svg>
                 Invite Member
               </button>
@@ -221,8 +231,18 @@ function Dashboard() {
                 onClick={() => setCreateAccountModalOpen(true)}
                 className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-primary-light text-white rounded-xl font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-200"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
                 </svg>
                 Create Shared Account
               </button>
@@ -237,8 +257,18 @@ function Dashboard() {
             <div className="flex items-center gap-4">
               {members.length > 0 && (
                 <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  <svg
+                    className="w-5 h-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                    />
                   </svg>
                   <select
                     className="px-3 py-2 border-2 border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:border-primary focus:ring-2 focus:ring-primary/10 hover:border-gray-300 transition-all cursor-pointer bg-white"
@@ -260,17 +290,47 @@ function Dashboard() {
                 className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-lg transition-all"
                 onClick={() => setCustomSearch(!customSearch)}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
                 Custom Date
                 {customSearch ? (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 15l7-7 7 7"
+                    />
                   </svg>
                 ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 )}
               </button>
@@ -278,7 +338,9 @@ function Dashboard() {
 
             {/* Right Side: View Options */}
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-700 hidden sm:inline">Period:</span>
+              <span className="text-sm font-medium text-gray-700 hidden sm:inline">
+                Period:
+              </span>
               <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
                 {viewOptions.map((item) => (
                   <button
@@ -333,8 +395,16 @@ function Dashboard() {
               </form>
               {noDataMessage && (
                 <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-sm">
-                  <svg className="w-4 h-4 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  <svg
+                    className="w-4 h-4 text-red-600 flex-shrink-0"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                   <p className="text-red-700 font-medium">{noDataMessage}</p>
                 </div>
@@ -363,12 +433,15 @@ function Dashboard() {
         <div className="card-stat group slide-in-up">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-gray-600 text-sm font-medium mb-1">Total Income</p>
+              <p className="text-gray-600 text-sm font-medium mb-1">
+                Total Income
+              </p>
               {loading ? (
                 <div className="skeleton h-9 w-32 mt-2"></div>
               ) : (
                 <p className="text-3xl font-bold text-gray-900 mt-1">
-                  ${(financialData.totalIncome / 100).toLocaleString("en-US", {
+                  $
+                  {(financialData.totalIncome / 100).toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -381,15 +454,21 @@ function Dashboard() {
           </div>
         </div>
 
-        <div className="card-stat group slide-in-up" style={{ animationDelay: '0.1s' }}>
+        <div
+          className="card-stat group slide-in-up"
+          style={{ animationDelay: "0.1s" }}
+        >
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-gray-600 text-sm font-medium mb-1">Total Expenses</p>
+              <p className="text-gray-600 text-sm font-medium mb-1">
+                Total Expenses
+              </p>
               {loading ? (
                 <div className="skeleton h-9 w-32 mt-2"></div>
               ) : (
                 <p className="text-3xl font-bold text-gray-900 mt-1">
-                  ${(financialData.totalExpenses / 100).toLocaleString("en-US", {
+                  $
+                  {(financialData.totalExpenses / 100).toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -402,10 +481,15 @@ function Dashboard() {
           </div>
         </div>
 
-        <div className="card-stat group slide-in-up" style={{ animationDelay: '0.2s' }}>
+        <div
+          className="card-stat group slide-in-up"
+          style={{ animationDelay: "0.2s" }}
+        >
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-gray-600 text-sm font-medium mb-1">Net Savings</p>
+              <p className="text-gray-600 text-sm font-medium mb-1">
+                Net Savings
+              </p>
               {loading ? (
                 <div className="skeleton h-9 w-32 mt-2"></div>
               ) : (
@@ -416,7 +500,8 @@ function Dashboard() {
                       : "text-rose-600"
                   }`}
                 >
-                  ${(
+                  $
+                  {(
                     (financialData.totalIncome - financialData.totalExpenses) /
                     100
                   ).toLocaleString("en-US", {
@@ -426,11 +511,13 @@ function Dashboard() {
                 </p>
               )}
             </div>
-            <div className={`p-4 rounded-2xl shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 ${
-              financialData.totalIncome - financialData.totalExpenses >= 0
-                ? "bg-gradient-to-br from-indigo-400 to-indigo-600 shadow-indigo-500/30 group-hover:shadow-indigo-500/40"
-                : "bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30 group-hover:shadow-amber-500/40"
-            }`}>
+            <div
+              className={`p-4 rounded-2xl shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 ${
+                financialData.totalIncome - financialData.totalExpenses >= 0
+                  ? "bg-gradient-to-br from-indigo-400 to-indigo-600 shadow-indigo-500/30 group-hover:shadow-indigo-500/40"
+                  : "bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30 group-hover:shadow-amber-500/40"
+              }`}
+            >
               <MdSavings className="w-7 h-7 text-white" />
             </div>
           </div>
@@ -444,9 +531,7 @@ function Dashboard() {
             <span className="w-1 h-8 bg-gradient-to-b from-primary to-primary-light rounded-full"></span>
             Recent Transactions
           </h2>
-          <button className="btn-ghost text-sm">
-            View All
-          </button>
+          <button className="btn-ghost text-sm">View All</button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -463,7 +548,10 @@ function Dashboard() {
               {loading ? (
                 // Loading skeleton
                 [...Array(5)].map((_, i) => (
-                  <tr key={i} className="border-b border-gray-100 last:border-b-0">
+                  <tr
+                    key={i}
+                    className="border-b border-gray-100 last:border-b-0"
+                  >
                     <td className="py-4">
                       <div className="skeleton h-6 w-20"></div>
                     </td>
@@ -485,11 +573,25 @@ function Dashboard() {
                 <tr>
                   <td colSpan="5" className="py-12 text-center">
                     <div className="flex flex-col items-center gap-3">
-                      <svg className="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                      <svg
+                        className="w-16 h-16 text-gray-300"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                        />
                       </svg>
-                      <p className="text-gray-600 font-medium">No transactions found</p>
-                      <p className="text-sm text-gray-500">Start by adding income or expenses!</p>
+                      <p className="text-gray-600 font-medium">
+                        No transactions found
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Start by adding income or expenses!
+                      </p>
                     </div>
                   </td>
                 </tr>
@@ -500,16 +602,33 @@ function Dashboard() {
                     className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/80 transition-colors duration-150"
                   >
                     <td className="py-4">
-                      <span className={`badge ${
-                        transaction.type === "income"
-                          ? "badge-success"
-                          : "badge-danger"
-                      }`}>
-                        <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <span
+                        className={`badge ${
+                          transaction.type === "income"
+                            ? "badge-success"
+                            : "badge-danger"
+                        }`}
+                      >
+                        <svg
+                          className="w-3.5 h-3.5 mr-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           {transaction.type === "income" ? (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2.5}
+                              d="M7 11l5-5m0 0l5 5m-5-5v12"
+                            />
                           ) : (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2.5}
+                              d="M17 13l-5 5m0 0l-5-5m5 5V6"
+                            />
                           )}
                         </svg>
                         {transaction.type === "income" ? "Income" : "Expense"}
@@ -518,11 +637,13 @@ function Dashboard() {
                     <td className="py-4 text-gray-800 font-medium">
                       {transaction.description}
                     </td>
-                    <td className={`py-4 font-bold text-lg ${
-                      transaction.type === "income"
-                        ? "text-emerald-600"
-                        : "text-rose-600"
-                    }`}>
+                    <td
+                      className={`py-4 font-bold text-lg ${
+                        transaction.type === "income"
+                          ? "text-emerald-600"
+                          : "text-rose-600"
+                      }`}
+                    >
                       {transaction.type === "income" ? "+" : "-"}$
                       {(transaction.amount / 100).toFixed(2)}
                     </td>
@@ -568,8 +689,18 @@ function Dashboard() {
         <div className="bg-gradient-to-br from-amber-50 to-yellow-50 border-2 border-amber-200 p-6 rounded-2xl shadow-lg mt-8 scale-in">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              <svg
+                className="w-7 h-7 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                />
               </svg>
             </div>
             <div>
@@ -581,7 +712,7 @@ function Dashboard() {
               </p>
             </div>
           </div>
-          
+
           <div className="space-y-3 mt-5">
             {invitations.map((i) => (
               <div
@@ -614,8 +745,18 @@ function Dashboard() {
                     onClick={() => handleAccept(i._id)}
                     className="btn-success px-6"
                   >
-                    <svg className="w-4 h-4 mr-1.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-4 h-4 mr-1.5 inline"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                     Accept
                   </button>
@@ -623,8 +764,18 @@ function Dashboard() {
                     onClick={() => handleDecline(i._id)}
                     className="btn-secondary px-6"
                   >
-                    <svg className="w-4 h-4 mr-1.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-4 h-4 mr-1.5 inline"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                     Decline
                   </button>
@@ -639,4 +790,3 @@ function Dashboard() {
 }
 
 export default Dashboard;
-

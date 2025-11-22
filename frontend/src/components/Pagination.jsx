@@ -9,7 +9,7 @@ export default function Pagination({
   const getPageNumbers = () => {
     const pages = [];
     const maxVisible = 5;
-    
+
     if (totalPages <= maxVisible) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -17,28 +17,32 @@ export default function Pagination({
     } else {
       // Always show first page
       pages.push(1);
-      
+
       if (currentPage > 3) {
-        pages.push('...');
+        pages.push("...");
       }
-      
+
       // Show pages around current
-      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+      for (
+        let i = Math.max(2, currentPage - 1);
+        i <= Math.min(totalPages - 1, currentPage + 1);
+        i++
+      ) {
         if (!pages.includes(i)) {
           pages.push(i);
         }
       }
-      
+
       if (currentPage < totalPages - 2) {
-        pages.push('...');
+        pages.push("...");
       }
-      
+
       // Always show last page
       if (!pages.includes(totalPages)) {
         pages.push(totalPages);
       }
     }
-    
+
     return pages;
   };
 
@@ -57,8 +61,8 @@ export default function Pagination({
 
       {/* Page Numbers */}
       <div className="flex items-center gap-1">
-        {getPageNumbers().map((page, index) => (
-          page === '...' ? (
+        {getPageNumbers().map((page, index) =>
+          page === "..." ? (
             <span key={`ellipsis-${index}`} className="px-3 py-2 text-gray-400">
               ...
             </span>
@@ -68,16 +72,16 @@ export default function Pagination({
               onClick={() => setCurrentPage(page)}
               className={`min-w-[40px] px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
                 currentPage === page
-                  ? 'bg-gradient-to-r from-primary to-primary-light text-white shadow-md shadow-primary/25 scale-105'
-                  : 'bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-primary hover:text-primary'
+                  ? "bg-gradient-to-r from-primary to-primary-light text-white shadow-md shadow-primary/25 scale-105"
+                  : "bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-primary hover:text-primary"
               }`}
               aria-label={`Go to page ${page}`}
-              aria-current={currentPage === page ? 'page' : undefined}
+              aria-current={currentPage === page ? "page" : undefined}
             >
               {page}
             </button>
-          )
-        ))}
+          ),
+        )}
       </div>
 
       {/* Next Button */}
@@ -93,4 +97,3 @@ export default function Pagination({
     </div>
   );
 }
-

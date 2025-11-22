@@ -1,13 +1,20 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { MdPeople, MdDelete, MdPersonRemove, MdAdminPanelSettings, MdWarning } from "react-icons/md";
+import {
+  MdPeople,
+  MdDelete,
+  MdPersonRemove,
+  MdAdminPanelSettings,
+  MdWarning,
+} from "react-icons/md";
 import { FiUsers, FiAlertCircle } from "react-icons/fi";
 import api from "../utils/api";
 import { useAccount } from "../context/AccountContext.jsx";
 import toast from "react-hot-toast";
 
 export default function ManageAccount() {
-  const { currentAccount, currentAccountId, isOwner, loadAccounts } = useAccount();
+  const { currentAccount, currentAccountId, isOwner, loadAccounts } =
+    useAccount();
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -72,7 +79,10 @@ export default function ManageAccount() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Manage Account</h1>
             <p className="text-sm text-gray-600 mt-0.5">
-              {currentAccount?.name || (currentAccount?.type === "personal" ? "Personal Account" : "Shared Account")}
+              {currentAccount?.name ||
+                (currentAccount?.type === "personal"
+                  ? "Personal Account"
+                  : "Shared Account")}
             </p>
           </div>
         </div>
@@ -133,10 +143,18 @@ export default function ManageAccount() {
             <table className="w-full">
               <thead>
                 <tr className="text-left text-gray-600 bg-gray-50/50 border-b border-gray-100">
-                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">Member</th>
-                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">Role</th>
-                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-center">Actions</th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">
+                    Member
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">
+                    Role
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-center">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -150,11 +168,13 @@ export default function ManageAccount() {
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm shadow-sm ${
-                          m.role === "owner"
-                            ? "bg-gradient-to-br from-primary to-primary-light text-white"
-                            : "bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
-                        }`}>
+                        <div
+                          className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm shadow-sm ${
+                            m.role === "owner"
+                              ? "bg-gradient-to-br from-primary to-primary-light text-white"
+                              : "bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
+                          }`}
+                        >
                           {(m.fullName || m.email).charAt(0).toUpperCase()}
                         </div>
                         <span className="font-semibold text-gray-900">
@@ -162,7 +182,9 @@ export default function ManageAccount() {
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{m.email}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {m.email}
+                    </td>
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg ${
@@ -173,7 +195,11 @@ export default function ManageAccount() {
                       >
                         {m.role === "owner" ? (
                           <>
-                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <svg
+                              className="w-3 h-3"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
                               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                             </svg>
                             Owner
@@ -197,7 +223,9 @@ export default function ManageAccount() {
                             Remove
                           </button>
                         ) : (
-                          <span className="text-xs text-gray-400 font-medium">-</span>
+                          <span className="text-xs text-gray-400 font-medium">
+                            -
+                          </span>
                         )}
                       </div>
                     </td>
@@ -225,7 +253,11 @@ export default function ManageAccount() {
               Remove Member?
             </h2>
             <p className="text-gray-600 text-center mb-6">
-              Are you sure you want to remove <span className="font-semibold">{memberToRemove.fullName || memberToRemove.email}</span> from this account?
+              Are you sure you want to remove{" "}
+              <span className="font-semibold">
+                {memberToRemove.fullName || memberToRemove.email}
+              </span>{" "}
+              from this account?
             </p>
 
             <div className="space-y-3">

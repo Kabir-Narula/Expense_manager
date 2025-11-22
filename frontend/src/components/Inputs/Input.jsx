@@ -29,11 +29,12 @@ const Input = ({ label, value, onChange, placeholder, type, name, error }) => {
           className={`w-full px-4 py-3 rounded-xl border-2 bg-white 
             text-sm text-gray-900 placeholder-gray-400 
             focus:outline-none transition-all duration-200
-            ${error 
-              ? "border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/10" 
-              : isFocused 
-                ? "border-primary ring-4 ring-primary/10" 
-                : "border-gray-200 hover:border-gray-300"
+            ${
+              error
+                ? "border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+                : isFocused
+                  ? "border-primary ring-4 ring-primary/10"
+                  : "border-gray-200 hover:border-gray-300"
             }`}
           value={value}
           onChange={onChange}
