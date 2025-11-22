@@ -9,7 +9,7 @@ import EditSource from "../components/EditSource";
 import AddExpense from "../components/AddExpense";
 
 // Mock API calls
-vi.mock("../src/Utils/api", () => ({
+vi.mock("../utils/api", () => ({
   default: {
     post: vi.fn(),
     put: vi.fn(),
@@ -21,7 +21,7 @@ describe("Recurring Income/Expense Interface", () => {
   let mockApi;
 
   beforeAll(async () => {
-    const apiModule = await import("../src/Utils/api");
+    const apiModule = await import("../utils/api");
     mockApi = vi.mocked(apiModule).default;
   });
 

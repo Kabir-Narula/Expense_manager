@@ -8,17 +8,17 @@ import {
 import { Toaster } from "react-hot-toast";
 import "./App.css";
 
-import SideNavbar from "../components/SideNavbar";
-import Dashboard from "../pages/Dashboard";
-import Expenses from "../pages/Expenses";
-import Income from "../pages/Income";
-import Logout from "../pages/Logout";
-import Charts from "../pages/Charts";
-import Login from "../pages/Auth/Login";
-import Signup from "../pages/Auth/Signup";
-import EditProfile from "../pages/EditProfile";
-import ProtectedRoute from "../components/ProtectedRoutes";
-import ManageAccount from "../pages/ManageAccount";
+import SideNavbar from "./components/SideNavbar";
+import Dashboard from "./pages/Dashboard";
+import Expenses from "./pages/Expenses";
+import Income from "./pages/Income";
+import Logout from "./pages/Logout";
+import Charts from "./pages/Charts";
+import Login from "./pages/Auth/Login";
+import Signup from "./pages/Auth/Signup";
+import EditProfile from "./pages/EditProfile";
+import ProtectedRoute from "./components/ProtectedRoutes";
+import ManageAccount from "./pages/ManageAccount";
 
 const App = () => {
   const location = useLocation();
@@ -30,24 +30,43 @@ const App = () => {
       <Toaster
         position="top-right"
         toastOptions={{
-          duration: 3000,
+          duration: 3500,
           style: {
             background: "#fff",
-            color: "#363636",
-            padding: "16px",
-            borderRadius: "8px",
+            color: "#1f2937",
+            padding: "16px 20px",
+            borderRadius: "16px",
             boxShadow:
-              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+              "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+            border: "1px solid rgba(0, 0, 0, 0.05)",
+            fontSize: "14px",
+            fontWeight: "500",
           },
           success: {
+            style: {
+              background: "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)",
+              color: "#065f46",
+              border: "1px solid #6ee7b7",
+            },
             iconTheme: {
               primary: "#10b981",
               secondary: "#fff",
             },
           },
           error: {
+            style: {
+              background: "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
+              color: "#991b1b",
+              border: "1px solid #fca5a5",
+            },
             iconTheme: {
               primary: "#ef4444",
+              secondary: "#fff",
+            },
+          },
+          loading: {
+            iconTheme: {
+              primary: "#875cf5",
               secondary: "#fff",
             },
           },
