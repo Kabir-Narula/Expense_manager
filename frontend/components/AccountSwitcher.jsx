@@ -2,7 +2,13 @@ import { useEffect } from "react";
 import { useAccount } from "../src/context/AccountContext.jsx";
 
 export default function AccountSwitcher() {
-  const { allAccounts, currentAccountId, setCurrentAccountId, loading, loadAccounts } = useAccount();
+  const {
+    allAccounts,
+    currentAccountId,
+    setCurrentAccountId,
+    loading,
+    loadAccounts,
+  } = useAccount();
 
   useEffect(() => {
     if (!allAccounts?.length) loadAccounts();
@@ -22,8 +28,8 @@ export default function AccountSwitcher() {
       >
         {allAccounts.map((acc) => (
           <option key={acc._id} value={acc._id}>
-            {acc.name || (acc.type === 'personal' ? 'Personal' : 'Shared')}
-            {acc.type === 'shared' && acc.owner ? '' : ''}
+            {acc.name || (acc.type === "personal" ? "Personal" : "Shared")}
+            {acc.type === "shared" && acc.owner ? "" : ""}
           </option>
         ))}
       </select>
