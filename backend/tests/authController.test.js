@@ -1,4 +1,8 @@
-import { registerUser, loginUser, getUserInfo } from "../controllers/authController.js";
+import {
+  registerUser,
+  loginUser,
+  getUserInfo,
+} from "../controllers/authController.js";
 import User from "../models/User.js";
 //import jwt from "jsonwebtoken";
 import { expect, jest } from "@jest/globals";

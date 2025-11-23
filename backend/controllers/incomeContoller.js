@@ -4,21 +4,27 @@ export const addIncome = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const { icon, source, amount, date, tags, recurring, endDate, head} = req.body;
+    const { icon, source, amount, date, tags, recurring, endDate, head } =
+      req.body;
     if (!source || isNaN(amount) || !date) {
       return res.status(400).json({ message: "All fields are required." });
     }
-    if (amount <= 0 ) {
-      return res.status(400).json({ message: "Please provide value more than 0." });
+    if (amount <= 0) {
+      return res
+        .status(400)
+        .json({ message: "Please provide value more than 0." });
     }
-    const finalStartDate = new Date(date)
+    const finalStartDate = new Date(date);
 
     // Process tags: convert comma-separated string to array, trim whitespace
-    const tagsArray = tags 
-      ? tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
+    const tagsArray = tags
+      ? tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0)
       : [];
 
-    const finalEndDate = endDate? new Date(endDate) : ""
+    const finalEndDate = endDate ? new Date(endDate) : "";
     const newIncome = new Income({
       userId,
       icon,
@@ -32,7 +38,7 @@ export const addIncome = async (req, res) => {
       accountId: req.account?._id,
       createdBy: req.user._id,
     });
-    await newIncome.save()
+    await newIncome.save();
     res.status(200).json(newIncome);
   } catch (err) {
     res.status(500).json({ message: err });
@@ -67,7 +73,7 @@ export const getAllIncome = async (req, res) => {
     endDate = new Date();
     if (range) {
       switch (range) {
-        case "4w": 
+        case "4w":
           startDate.setDate(startDate.getDate() - 28);
           break;
         case "3m":
@@ -76,18 +82,23 @@ export const getAllIncome = async (req, res) => {
         case "6m":
           startDate.setMonth(startDate.getMonth() - 6);
           break;
-        case "12m": 
-          startDate.setFullYear(startDate.getFullYear() -1);
+        case "12m":
+          startDate.setFullYear(startDate.getFullYear() - 1);
           break;
-        default: 
-          return res.status(400).json({error: "Invalid range date"});
+        default:
+          return res.status(400).json({ error: "Invalid range date" });
       }
     }
     if (start && end) {
       startDate = new Date(start);
-      endDate = new Date(end)
+      endDate = new Date(end);
       if (endDate <= startDate) {
-        return res.status(400).json({message: "Incorrect date range. Make sure the start date is before the end date."})
+        return res
+          .status(400)
+          .json({
+            message:
+              "Incorrect date range. Make sure the start date is before the end date.",
+          });
       }
     }
     /*
@@ -95,72 +106,71 @@ export const getAllIncome = async (req, res) => {
       duplicates, only select documents that have a true "head" flag. Once it is duplicated
       with a new date, assign the current income.head = false and set the newIncome.head = true. 
     */
-    const recurringIncomes = await Income.find({recurring: {$in: ["monthly", "bi-weekly"]}, head: true});
-    for ( const income of recurringIncomes) {
-      
-      // get the date of when the most recent document was added. 
+    const recurringIncomes = await Income.find({
+      recurring: { $in: ["monthly", "bi-weekly"] },
+      head: true,
+    });
+    for (const income of recurringIncomes) {
+      // get the date of when the most recent document was added.
       const lastDate = new Date(income.date);
       let nextDate;
       if (income.recurring === "bi-weekly") {
         // if its bi-weekly, get the next bi-weekly date by using the last date.
-        nextDate = new Date(lastDate); 
-        
+        nextDate = new Date(lastDate);
+
         nextDate.setDate(lastDate.getDate() + 14);
-        
       } else if (income.recurring === "monthly") {
-      
         nextDate = new Date(lastDate);
         nextDate.setMonth(lastDate.getMonth() + 1);
       }
-      const todayISOStr = today.toISOString().slice(0,10);
-      var nextDateISOStr = nextDate.toISOString().slice(0,10);
-      const endDateISOStr = income.endDate ? income.endDate.toISOString().slice(0,10) : "";
-
-      // if the current date is ahead of the next bi-weekly/monthly date, then create it.
-      // the head property of the newIncome object will be true.
-      var prevDoc = income;
-      while (todayISOStr >= nextDateISOStr) {
-        // set previous document head to false. If we are in this loop,
-        // it means we are creating a new document and we need to change
-        // the head. 
-        prevDoc.head = false;
-        prevDoc.recurring = "once";
-        await prevDoc.save();
-        if (!endDateISOStr || nextDateISOStr <= endDateISOStr) {
-          const newIncome = new Income({
-            userId: income.userId,
-            icon: income.icon,
-            source: income.source,
-            amount: income.amount,
-            date: nextDate,
-            tags: income.tags,
-            recurring: income.recurring,
-            endDate: income.endDate,
-            head: true,
-            accountId: income.accountId,
-            createdBy: income.userId,
-          });
-          await newIncome.save();
-          if (income.recurring === "monthly") {
-            nextDate.setMonth(nextDate.getMonth() + 1);
-          } else {
-            nextDate.setDate(nextDate.getDate() + 14);
-          }
-
-          nextDateISOStr = nextDate.toISOString().slice(0,10);
-
-          // store a reference to the most recently created document
-          // for manipulation if another loop is needed.
-          prevDoc = newIncome;
-
-          await income.save();
+      const todayISOStr = today.toISOString().slice(0, 10);
+      var nextDateISOStr = nextDate.toISOString().slice(0, 10);
+      const endDateISOStr = income.endDate
+        ? income.endDate.toISOString().slice(0, 10)
+        : "";
+      const limitDate =
+        endDateISOStr && endDateISOStr <= todayISOStr
+          ? endDateISOStr
+          : todayISOStr;
+      var prevDoc;
+      while (nextDateISOStr <= limitDate) {
+        const newIncome = new Income({
+          userId: income.userId,
+          icon: income.icon,
+          source: income.source,
+          amount: income.amount,
+          date: nextDate,
+          tags: income.tags,
+          recurring: income.recurring,
+          endDate: income.endDate,
+          head: true,
+          accountId: income.accountId,
+          createdBy: income.userId,
+        });
+        await newIncome.save();
+        if (income.recurring === "monthly") {
+          nextDate.setMonth(nextDate.getMonth() + 1);
+        } else {
+          nextDate.setDate(nextDate.getDate() + 14);
         }
+
+        nextDateISOStr = nextDate.toISOString().slice(0, 10);
+
+        income.head = false;
+        income.recurring = "once";
+        await income.save();
+
+        // store a reference to the most recently created document
+        // for manipulation if another loop is needed.
+        prevDoc = newIncome;
       }
     }
     const incomes = await Income.find({
-      ...filter, 
-      date: {$gte: startDate, $lte: endDate},
-    }).sort({ date: -1 }).populate("createdBy", "fullName email");
+      ...filter,
+      date: { $gte: startDate, $lte: endDate },
+    })
+      .sort({ date: -1 })
+      .populate("createdBy", "fullName email");
     res.status(200).json(incomes);
   } catch (error) {
     res.status(500).json({ message: "Nothing to show!" });
@@ -173,14 +183,26 @@ export const deleteIncome = async (req, res) => {
     if (!doc) return res.status(404).json({ message: "Income not found" });
 
     // Check account ownership: record must belong to current account (or legacy personal)
-    const inAccount = req.account && doc.accountId && doc.accountId.toString() === req.account._id.toString();
-    const legacyPersonal = (!doc.accountId && req.account && req.account.type === "personal" && doc.userId.toString() === req.user._id.toString());
-    if (!inAccount && !legacyPersonal) return res.status(403).json({ message: "Forbidden" });
+    const inAccount =
+      req.account &&
+      doc.accountId &&
+      doc.accountId.toString() === req.account._id.toString();
+    const legacyPersonal =
+      !doc.accountId &&
+      req.account &&
+      req.account.type === "personal" &&
+      doc.userId.toString() === req.user._id.toString();
+    if (!inAccount && !legacyPersonal)
+      return res.status(403).json({ message: "Forbidden" });
 
     // Permission: owner can delete any; member can delete own only
-    const isOwner = req.account && req.account.owner.toString() === req.user._id.toString();
-    const isCreator = (doc.createdBy && doc.createdBy.toString() === req.user._id.toString()) || (legacyPersonal);
-    if (!isOwner && !isCreator) return res.status(403).json({ message: "Not allowed" });
+    const isOwner =
+      req.account && req.account.owner.toString() === req.user._id.toString();
+    const isCreator =
+      (doc.createdBy && doc.createdBy.toString() === req.user._id.toString()) ||
+      legacyPersonal;
+    if (!isOwner && !isCreator)
+      return res.status(403).json({ message: "Not allowed" });
 
     await doc.deleteOne();
     res.status(200).json({ message: "Income Deleted Successfully" });
@@ -192,35 +214,56 @@ export const deleteIncome = async (req, res) => {
 export const updateIncome = async (req, res) => {
   const userId = req.user.id;
   const incomeId = req.params.id;
-  
+
   try {
-    const { icon, source, amount, date, tags, recurring, endDate, head} = req.body;
-    const finalEndDate = endDate ? new Date(endDate) : ""
-    
+    const { icon, source, amount, date, tags, recurring, endDate, head } =
+      req.body;
+    const finalEndDate = endDate ? new Date(endDate) : "";
+
     if (!source || isNaN(amount) || !date) {
       return res.status(400).json({ message: "All fields are required." });
     }
 
-    if (amount <= 0 ) {
-      return res.status(400).json({ message: "Please provide value more than 0." });
+    if (amount <= 0) {
+      return res
+        .status(400)
+        .json({ message: "Please provide value more than 0." });
     }
 
     const existing = await Income.findById(incomeId);
     if (!existing) return res.status(404).json({ message: "Income not found" });
 
     // Check account membership and scope
-    const inAccount = req.account && existing.accountId && existing.accountId.toString() === req.account._id.toString();
-    const legacyPersonal = (!existing.accountId && req.account && req.account.type === "personal" && existing.userId.toString() === req.user._id.toString());
-    if (!inAccount && !legacyPersonal) return res.status(403).json({ message: "Forbidden" });
+    const inAccount =
+      req.account &&
+      existing.accountId &&
+      existing.accountId.toString() === req.account._id.toString();
+    const legacyPersonal =
+      !existing.accountId &&
+      req.account &&
+      req.account.type === "personal" &&
+      existing.userId.toString() === req.user._id.toString();
+    if (!inAccount && !legacyPersonal)
+      return res.status(403).json({ message: "Forbidden" });
 
     // Permission: owner can edit any; member can edit own
-    const isOwner = req.account && req.account.owner.toString() === req.user._id.toString();
-    const isCreator = (existing.createdBy && existing.createdBy.toString() === req.user._id.toString()) || legacyPersonal;
-    if (!isOwner && !isCreator) return res.status(403).json({ message: "Not allowed" });
+    const isOwner =
+      req.account && req.account.owner.toString() === req.user._id.toString();
+    const isCreator =
+      (existing.createdBy &&
+        existing.createdBy.toString() === req.user._id.toString()) ||
+      legacyPersonal;
+    if (!isOwner && !isCreator)
+      return res.status(403).json({ message: "Not allowed" });
 
     // Process tags: convert comma-separated string to array, trim whitespace
-    const tagsArray = tags 
-      ? (Array.isArray(tags) ? tags : tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0))
+    const tagsArray = tags
+      ? Array.isArray(tags)
+        ? tags
+        : tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter((tag) => tag.length > 0)
       : [];
 
     existing.icon = icon;
@@ -244,6 +287,8 @@ export const getUpcomingIncome = async (req, res) => {
     const accountId = req.account?._id;
     const { createdBy, tags, range } = req.query;
     const query = [];
+    let endDate;
+    const today = new Date();
     if (accountId) {
       query.push({ accountId });
     }
@@ -261,35 +306,83 @@ export const getUpcomingIncome = async (req, res) => {
       filter.tags = { $in: tagArray };
     }
 
+    endDate = new Date();
+    switch (range) {
+      case "4w":
+        endDate.setDate(endDate.getDate() + 28);
+        break;
+      case "3m":
+        endDate.setMonth(endDate.getMonth() + 3);
+        break;
+      case "6m":
+        endDate.setMonth(endDate.getMonth() + 6);
+        break;
+      case "12m":
+        endDate.setFullYear(endDate.getFullYear() + 1);
+        break;
+      default:
+        return res.status(400).json({ error: "Invalid range date" });
+    }
     const recurringIncomes = await Income.find({
       ...filter,
       recurring: { $in: ["monthly", "bi-weekly"] },
-      head: true 
+      head: true,
+      $or: [{ endDate: { $gte: today } }, { endDate: "" }],
     });
 
-    const futureIncomes = new Map();
+    /*
+      loop through the recurring incomes. Create new income objects for each one up until the
+      endDate (range) or until the income.endDate is reached
+    */
+    const upcomingIncomes = [];
     for (const income of recurringIncomes) {
-      if (!futureIncomes[`${income._id} - ${income.date.toISOString()}`]) {
-        futureIncomes.set(`${income._id} - ${income.date.toISOString()}`, []);
-     }
-     const lastDate = new Date(income.date);
+      const lastDate = new Date(income.date);
       let nextDate;
       if (income.recurring === "bi-weekly") {
-        nextDate = new Date(lastDate); 
+        nextDate = new Date(lastDate);
         nextDate.setDate(lastDate.getDate() + 14);
       } else if (income.recurring === "monthly") {
         nextDate = new Date(lastDate);
         nextDate.setMonth(lastDate.getMonth() + 1);
       }
-      const todayISOStr = new Date().toISOString().slice(0,10);
-      var nextDateISOStr = nextDate.toISOString().slice(0,10);
-      const endDateISOStr = income.endDate ? income.endDate.toISOString().slice(0,10) : "";
-      
-      if (todayISOStr < nextDateISOStr && (!endDateISOStr || nextDateISOStr <= endDateISOStr)) {
-        
+
+      var nextDateISOStr = nextDate.toISOString().slice(0, 10);
+      const endDateISOStr = income.endDate
+        ? income.endDate.toISOString().slice(0, 10)
+        : "";
+      const endRangeDateStr = endDate.toISOString().slice(0, 10);
+      const limitDate =
+        endDateISOStr && endDateISOStr <= endRangeDateStr
+          ? endDateISOStr
+          : endRangeDateStr;
+
+      while (nextDateISOStr <= limitDate) {
+        const newIncome = new Income({
+          userId: income.userId,
+          icon: income.icon,
+          source: income.source,
+          amount: income.amount,
+          date: new Date(nextDate),
+          tags: income.tags,
+          recurring: income.recurring,
+          endDate: income.endDate,
+          head: true,
+          accountId: income.accountId,
+          createdBy: income.userId,
+        });
+        upcomingIncomes.push(newIncome);
+
+        if (income.recurring === "monthly") {
+          nextDate.setMonth(nextDate.getMonth() + 1);
+        } else {
+          nextDate.setDate(nextDate.getDate() + 14);
+        }
+        nextDateISOStr = nextDate.toISOString().slice(0, 10);
       }
     }
+
+    res.status(200).json(upcomingIncomes);
   } catch (error) {
     res.status(500).json({ message: "Nothing to show!" });
   }
-}
+};

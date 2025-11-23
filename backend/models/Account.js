@@ -8,7 +8,7 @@ const AccountSchema = new mongoose.Schema(
     members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     deletedAt: { type: Date, default: null },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 AccountSchema.index({ owner: 1, type: 1 });

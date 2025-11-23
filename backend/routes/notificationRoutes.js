@@ -1,5 +1,10 @@
 import express from "express";
-import { createNotification, deleteNotification, handleNotification, markAsRead } from "../controllers/notificationContoller.js";
+import {
+  createNotification,
+  deleteNotification,
+  handleNotification,
+  markAsRead,
+} from "../controllers/notificationContoller.js";
 
 const router = express.Router();
 

@@ -14,12 +14,17 @@ export const updateName = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
       { fullName: String(fullName).trim() },
-      { new: true, runValidators: true, context: "query" }
+      { new: true, runValidators: true, context: "query" },
     ).select("-password");
 
-    return res.json({ message: "Name updated successfully", user: updatedUser });
+    return res.json({
+      message: "Name updated successfully",
+      user: updatedUser,
+    });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to update name", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Failed to update name", error: error.message });
   }
 };
 
@@ -27,7 +32,9 @@ export const updateName = async (req, res) => {
 export const updatePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   if (!currentPassword || !newPassword) {
-    return res.status(400).json({ message: "Current and new password are required" });
+    return res
+      .status(400)
+      .json({ message: "Current and new password are required" });
   }
 
   try {
@@ -35,14 +42,17 @@ export const updatePassword = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const isMatch = await user.comparePassword(currentPassword);
-    if (!isMatch) return res.status(400).json({ message: "Current password is incorrect" });
+    if (!isMatch)
+      return res.status(400).json({ message: "Current password is incorrect" });
 
     user.password = newPassword;
     await user.save();
 
     return res.json({ message: "Password updated successfully" });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to update password", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Failed to update password", error: error.message });
   }
 };
 
@@ -58,13 +68,19 @@ export const updateProfilePicture = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
       { profileImageURL: relativePath },
-      { new: true }
+      { new: true },
     ).select("-password");
 
-    return res.json({ message: "Profile picture updated successfully", user: updatedUser });
+    return res.json({
+      message: "Profile picture updated successfully",
+      user: updatedUser,
+    });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to update profile picture", error: error.message });
+    return res
+      .status(500)
+      .json({
+        message: "Failed to update profile picture",
+        error: error.message,
+      });
   }
 };
-
-
