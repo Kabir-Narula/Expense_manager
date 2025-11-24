@@ -15,6 +15,7 @@ import {
 import ExportButtons from "../components/ExportButtons.jsx";
 import ViewOptions from "../utils/ViewOptions.js";
 import Pagination from "../components/Pagination.jsx";
+import { TransactionOptions } from "../utils/ViewOptions.js";
 
 function Expenses() {
   const { year } = useParams();
@@ -43,6 +44,9 @@ function Expenses() {
   const viewOptions = ViewOptions({ setRange });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(15);
+  const [transactionOption, setTransactionOption] =
+    useState("All Transactions");
+  const transactionOptions = TransactionOptions({ setTransactionOption });
   // Export handlers
   const handleExportCSV = () => {
     if (!expenseUI || expenseUI.length === 0) {
@@ -112,10 +116,16 @@ function Expenses() {
   useEffect(() => {
     const fetchExpenseData = async () => {
       try {
-        let res = await api.get(`expense/get?range=${range}`);
+        let res;
+        if (transactionOption === "Upcoming Transactions") {
+          res = await api.get(`expense/upcomingExpenses?range=${range}`);
+        } else {
+          res = await api.get(`expense/get?range=${range}`);
+        }
         setNoDataMessage("");
         if (res.status === 200) {
           const expenseDocuments = res.data;
+          expenseDocuments.sort((a, b) => new Date(b.date) - new Date(a.date));
           // Extract all unique tags
           const tagsSet = new Set();
           expenseDocuments.forEach((item) => {
@@ -144,7 +154,15 @@ function Expenses() {
       }
     };
     fetchExpenseData();
-  }, [year, refreshKey, memberFilter, range, selectedTag, currentAccountId]);
+  }, [
+    year,
+    refreshKey,
+    memberFilter,
+    range,
+    selectedTag,
+    currentAccountId,
+    transactionOption,
+  ]);
 
   const paginatedExpense =
     expenseUI?.slice(
@@ -254,6 +272,17 @@ function Expenses() {
               >
                 Clear Filters
               </button>
+              <select
+                className="px-3 py-2 border-2 border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 hover:border-gray-300 transition-all cursor-pointer bg-white"
+                value={transactionOption}
+                onChange={(e) => setTransactionOption(e.target.value)}
+              >
+                {transactionOptions.map((item) => (
+                  <option key={item.label} value={item.label}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
 
               {/* Custom Search Toggle */}
               <button
@@ -405,7 +434,9 @@ function Expenses() {
           <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
             <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
               <span className="w-1 h-6 bg-gradient-to-b from-red-500 to-rose-600 rounded-full"></span>
-              Expense Transactions
+              {transactionOption === "All Transactions"
+                ? "All Transactions"
+                : "Upcoming Transactions"}
               {expenseUI && (
                 <span className="ml-2 px-3 py-1 bg-red-100 text-red-700 text-sm font-bold rounded-full">
                   {expenseUI.length}
@@ -501,33 +532,39 @@ function Expenses() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
-                          {(isOwner || item.createdBy?._id === user?._id) && (
-                            <>
-                              <button
-                                onClick={() => {
-                                  setOpen(true);
-                                  setType("editExpense");
-                                  setSelectedExpense(item);
-                                }}
-                                className="p-2 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
-                                title="Edit"
-                              >
-                                <MdModeEdit className="w-5 h-5" />
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setOpen(true);
-                                  setType("deleteExpense");
-                                  setSelectedExpense(item);
-                                }}
-                                className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-                                title="Delete"
-                              >
-                                <FaTrashAlt className="w-4 h-4" />
-                              </button>
-                            </>
-                          )}
+                          {(isOwner || item.createdBy?._id === user?._id) &&
+                            transactionOption === "All Transactions" && (
+                              <>
+                                <button
+                                  onClick={() => {
+                                    setOpen(true);
+                                    setType("editExpense");
+                                    setSelectedExpense(item);
+                                  }}
+                                  className="p-2 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+                                  title="Edit"
+                                >
+                                  <MdModeEdit className="w-5 h-5" />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setOpen(true);
+                                    setType("deleteExpense");
+                                    setSelectedExpense(item);
+                                  }}
+                                  className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                                  title="Delete"
+                                >
+                                  <FaTrashAlt className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
                         </div>
+                        {transactionOption === "Upcoming Transactions" && (
+                          <span className="text-sm text-gray-500 italic">
+                            Upcoming
+                          </span>
+                        )}
                       </td>
                     </motion.tr>
                   ))

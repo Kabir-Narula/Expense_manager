@@ -18,11 +18,17 @@ export const accountContext = async (req, res, next) => {
       }
       account = await Account.findOne({ _id: incomingId, deletedAt: null });
       if (!account) {
-        return res.status(404).json({ message: "Account not found or has been deleted" });
+        return res
+          .status(404)
+          .json({ message: "Account not found or has been deleted" });
       }
     } else {
       // Find or create personal account
-      account = await Account.findOne({ owner: req.user._id, type: "personal", deletedAt: null });
+      account = await Account.findOne({
+        owner: req.user._id,
+        type: "personal",
+        deletedAt: null,
+      });
       if (!account) {
         account = await Account.create({
           type: "personal",
@@ -53,7 +59,8 @@ export const accountContext = async (req, res, next) => {
 
     if (!isMember) {
       return res.status(403).json({
-        message: "You are not a member of this account. Please check your account access or accept any pending invitations."
+        message:
+          "You are not a member of this account. Please check your account access or accept any pending invitations.",
       });
     }
 
@@ -68,7 +75,9 @@ export const accountContext = async (req, res, next) => {
 export const ownerOnly = async (req, res, next) => {
   try {
     if (!req.account) {
-      return res.status(500).json({ message: "Account context missing. Please try again." });
+      return res
+        .status(500)
+        .json({ message: "Account context missing. Please try again." });
     }
 
     const uid = (req.user?._id || req.user?.id)?.toString();
@@ -76,7 +85,7 @@ export const ownerOnly = async (req, res, next) => {
 
     if (!isOwner) {
       return res.status(403).json({
-        message: "Only the account owner can perform this action"
+        message: "Only the account owner can perform this action",
       });
     }
 

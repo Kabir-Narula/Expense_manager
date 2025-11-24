@@ -17,6 +17,7 @@ import { exportIncomeToCSV, exportIncomeToPDF } from "../utils/exportUtils";
 import ExportButtons from "../components/ExportButtons";
 import ViewOptions from "../utils/ViewOptions.js";
 import Pagination from "../components/Pagination.jsx";
+import { TransactionOptions } from "../utils/ViewOptions.js";
 
 export default function Income() {
   const { year } = useParams();
@@ -45,6 +46,9 @@ export default function Income() {
   const [selectedTag, setSelectedTag] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
+  const [transactionOption, setTransactionOption] =
+    useState("All Transactions");
+  const transactionOptions = TransactionOptions({ setTransactionOption });
 
   // Export handlers
   const handleExportCSV = () => {
@@ -117,10 +121,16 @@ export default function Income() {
   useEffect(() => {
     const fetchIncomeData = async () => {
       try {
-        let res = await api.get(`income/get?range=${range}`);
+        let res;
+        if (transactionOption === "Upcoming Transactions") {
+          res = await api.get(`income/upcomingIncome?range=${range}`);
+        } else {
+          res = await api.get(`income/get?range=${range}`);
+        }
         setNoDataMessage("");
         if (res.status === 200) {
           const incomeDocuments = res.data;
+          incomeDocuments.sort((a, b) => new Date(b.date) - new Date(a.date));
           // Extract all unique tags
           const tagsSet = new Set();
           incomeDocuments.forEach((item) => {
@@ -149,7 +159,15 @@ export default function Income() {
       }
     };
     fetchIncomeData();
-  }, [year, refreshKey, memberFilter, range, selectedTag, currentAccountId]);
+  }, [
+    year,
+    refreshKey,
+    memberFilter,
+    range,
+    selectedTag,
+    currentAccountId,
+    transactionOption,
+  ]);
   const paginatedIncome =
     incomeUI?.slice(
       (currentPage - 1) * itemsPerPage,
@@ -258,43 +276,59 @@ export default function Income() {
                 Clear Filters
               </button>
 
-              {/* Custom Search Toggle */}
-              <button
-                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-50 rounded-lg transition-all"
-                onClick={() => setCustomSearch(!customSearch)}
+              <select
+                className="px-3 py-2 border-2 border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 hover:border-gray-300 transition-all cursor-pointer bg-white"
+                value={transactionOption}
+                onChange={(e) => setTransactionOption(e.target.value)}
               >
-                <MdCalendarToday className="w-4 h-4" />
-                Custom Date
-                {customSearch ? (
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                {transactionOptions.map((item) => (
+                  <option key={item.label} value={item.label}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+
+              {/* Custom Search Toggle */}
+              {transactionOption === "All Transactions" && (
+                <>
+                  <MdCalendarToday className="w-4 h-4" />
+                  <button
+                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-50 rounded-lg transition-all"
+                    onClick={() => setCustomSearch(!customSearch)}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 15l7-7 7 7"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                )}
-              </button>
+                    Custom Date
+                    {customSearch ? (
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 15l7-7 7 7"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Right Side: View Options & Export */}
@@ -408,7 +442,9 @@ export default function Income() {
           <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
             <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
               <span className="w-1 h-6 bg-gradient-to-b from-emerald-500 to-emerald-600 rounded-full"></span>
-              Income Transactions
+              {transactionOption === "All Transactions"
+                ? "All Income Transactions"
+                : "Upcoming Income Transactions"}
               {incomeUI && (
                 <span className="ml-2 px-3 py-1 bg-emerald-100 text-emerald-700 text-sm font-bold rounded-full">
                   {incomeUI.length}
@@ -504,33 +540,39 @@ export default function Income() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
-                          {(isOwner || item.createdBy?._id === user?._id) && (
-                            <>
-                              <button
-                                onClick={() => {
-                                  setOpen(true);
-                                  setType("editIncome");
-                                  setSelectedIncome(item);
-                                }}
-                                className="p-2 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors"
-                                title="Edit"
-                              >
-                                <MdModeEdit className="w-5 h-5" />
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setOpen(true);
-                                  setType("deleteIncome");
-                                  setSelectedIncome(item);
-                                }}
-                                className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-                                title="Delete"
-                              >
-                                <FaTrashAlt className="w-4 h-4" />
-                              </button>
-                            </>
-                          )}
+                          {(isOwner || item.createdBy?._id === user?._id) &&
+                            transactionOption === "All Transactions" && (
+                              <>
+                                <button
+                                  onClick={() => {
+                                    setOpen(true);
+                                    setType("editIncome");
+                                    setSelectedIncome(item);
+                                  }}
+                                  className="p-2 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors"
+                                  title="Edit"
+                                >
+                                  <MdModeEdit className="w-5 h-5" />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setOpen(true);
+                                    setType("deleteIncome");
+                                    setSelectedIncome(item);
+                                  }}
+                                  className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                                  title="Delete"
+                                >
+                                  <FaTrashAlt className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
                         </div>
+                        {transactionOption === "Upcoming Transactions" && (
+                          <span className="text-sm text-gray-500 italic">
+                            Upcoming
+                          </span>
+                        )}
                       </td>
                     </motion.tr>
                   ))
