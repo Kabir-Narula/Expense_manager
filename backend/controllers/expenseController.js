@@ -115,7 +115,7 @@ export const getAllExpense = async (req, res) => {
         nextDate.setMonth(lastDate.getMonth() + 1);
       }
       const todayISOStr = today.toISOString().slice(0, 10);
-      const nextDateISOStr = nextDate.toISOString().slice(0, 10);
+      var nextDateISOStr = nextDate.toISOString().slice(0, 10);
       const endDateISOStr = expense.endDate
         ? expense.endDate.toISOString().slice(0, 10)
         : "";
@@ -143,7 +143,7 @@ export const getAllExpense = async (req, res) => {
         if (prevDoc.recurring === "monthly") {
           nextDate.setMonth(nextDate.getMonth() + 1);
         } else {
-          expense.setDate(nextDate.getDate() + 14);
+          nextDate.setDate(nextDate.getDate() + 14);
         }
         nextDateISOStr = nextDate.toISOString().slice(0, 10);
         prevDoc.head = false;
@@ -158,6 +158,7 @@ export const getAllExpense = async (req, res) => {
     })
       .sort({ date: -1 })
       .populate("createdBy", "fullName email");
+
     res.status(200).json(expenses);
   } catch (error) {
     res.status(500).json({ message: "Nothing to show!" });
