@@ -130,6 +130,7 @@ export default function Income() {
         setNoDataMessage("");
         if (res.status === 200) {
           const incomeDocuments = res.data;
+          incomeDocuments.sort((a, b) => new Date(b.date) - new Date(a.date));
           // Extract all unique tags
           const tagsSet = new Set();
           incomeDocuments.forEach((item) => {

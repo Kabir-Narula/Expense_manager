@@ -125,6 +125,7 @@ function Expenses() {
         setNoDataMessage("");
         if (res.status === 200) {
           const expenseDocuments = res.data;
+          expenseDocuments.sort((a, b) => new Date(b.date) - new Date(a.date));
           // Extract all unique tags
           const tagsSet = new Set();
           expenseDocuments.forEach((item) => {
