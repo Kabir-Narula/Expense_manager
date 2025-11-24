@@ -100,6 +100,7 @@ export const getAllExpense = async (req, res) => {
     }
 
     const recurringExpenses = await Expense.find({
+      ...filter,
       recurring: { $in: ["monthly", "bi-weekly"] },
       head: true,
     });
