@@ -123,32 +123,32 @@ export const getAllExpense = async (req, res) => {
         endDateISOStr && endDateISOStr <= todayISOStr
           ? endDateISOStr
           : todayISOStr;
-      var prevDoc;
+      var prevDoc = expense;
       while (nextDateISOStr <= limitDate) {
         const newExpense = new Expense({
-          userId: expense.userId,
-          icon: expense.icon,
-          category: expense.category,
-          amount: expense.amount,
+          userId: prevDoc.userId,
+          icon: prevDoc.icon,
+          category: prevDoc.category,
+          amount: prevDoc.amount,
           date: nextDate,
-          tags: expense.tags,
-          recurring: expense.recurring,
-          endDate: expense.endDate,
+          tags: prevDoc.tags,
+          recurring: prevDoc.recurring,
+          endDate: prevDoc.endDate,
           head: true,
-          accountId: expense.accountId,
-          createdBy: expense.userId,
+          accountId: prevDoc.accountId,
+          createdBy: prevDoc.userId,
         });
 
         await newExpense.save();
-        if (expense.recurring === "monthly") {
+        if (prevDoc.recurring === "monthly") {
           nextDate.setMonth(nextDate.getMonth() + 1);
         } else {
           expense.setDate(nextDate.getDate() + 14);
         }
         nextDateISOStr = nextDate.toISOString().slice(0, 10);
-        expense.head = false;
-        expense.recurring = "once";
-        await expense.save();
+        prevDoc.head = false;
+        prevDoc.recurring = "once";
+        await prevDoc.save();
         prevDoc = newExpense;
       }
     }

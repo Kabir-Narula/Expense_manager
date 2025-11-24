@@ -132,23 +132,23 @@ export const getAllIncome = async (req, res) => {
         endDateISOStr && endDateISOStr <= todayISOStr
           ? endDateISOStr
           : todayISOStr;
-      var prevDoc;
+      var prevDoc = income;
       while (nextDateISOStr <= limitDate) {
         const newIncome = new Income({
-          userId: income.userId,
-          icon: income.icon,
-          source: income.source,
-          amount: income.amount,
+          userId: prevDoc.userId,
+          icon: prevDoc.icon,
+          source: prevDoc.source,
+          amount: prevDoc.amount,
           date: nextDate,
-          tags: income.tags,
-          recurring: income.recurring,
-          endDate: income.endDate,
+          tags: prevDoc.tags,
+          recurring: prevDoc.recurring,
+          endDate: prevDoc.endDate,
           head: true,
-          accountId: income.accountId,
-          createdBy: income.userId,
+          accountId: prevDoc.accountId,
+          createdBy: prevDoc.userId,
         });
         await newIncome.save();
-        if (income.recurring === "monthly") {
+        if (prevDoc.recurring === "monthly") {
           nextDate.setMonth(nextDate.getMonth() + 1);
         } else {
           nextDate.setDate(nextDate.getDate() + 14);
@@ -156,13 +156,14 @@ export const getAllIncome = async (req, res) => {
 
         nextDateISOStr = nextDate.toISOString().slice(0, 10);
 
-        income.head = false;
-        income.recurring = "once";
-        await income.save();
+        prevDoc.head = false;
+        prevDoc.recurring = "once";
+        await prevDoc.save();
 
         // store a reference to the most recently created document
         // for manipulation if another loop is needed.
         prevDoc = newIncome;
+        console.log("next date isoSTR: ", nextDateISOStr);
       }
     }
     const incomes = await Income.find({
