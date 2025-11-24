@@ -107,6 +107,7 @@ export const getAllIncome = async (req, res) => {
       with a new date, assign the current income.head = false and set the newIncome.head = true. 
     */
     const recurringIncomes = await Income.find({
+      ...filter,
       recurring: { $in: ["monthly", "bi-weekly"] },
       head: true,
     });
