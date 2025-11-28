@@ -46,6 +46,7 @@ export default function Income() {
     currentPage,
     setCurrentPage,
     totalPages,
+    location,
   } = useIncome();
   console.log("Transaction Option: " + JSON.stringify(transactionOption, null, 2));
   return (
@@ -55,6 +56,10 @@ export default function Income() {
         <PageHeader
           title="Income"
           subtitle="Track your earnings and revenue"
+          setOpen={setOpen}
+          setType={setType}
+          location={location.pathname}
+          text="Add Income"
         />
 
         {/* Compact Controls Bar */}
@@ -79,7 +84,7 @@ export default function Income() {
           setCustomEndDateUI={setCustomEndDateUI}
           handleRangeSubmit={handleRangeSubmit}
           noDataMessage={noDataMessage}
-          incomeUI={incomeUI}
+          documentUI={incomeUI}
           handleExportCSV={handleExportCSV}
           handleExportPDF={handleExportPDF}
           viewOptions={viewOptions}

@@ -21,6 +21,7 @@ import ProtectedRoute from "./components/ProtectedRoutes";
 import ManageAccount from "./pages/ManageAccount";
 import { AccountProvider } from "./context/AccountContext";
 import { IncomeProvider } from "./context/IncomeContext";
+import ExpenseProvider from "./context/ExpenseContext";
 
 const App = () => {
   const location = useLocation();
@@ -91,7 +92,11 @@ const App = () => {
               path="/expenses"
               element={
                 <ProtectedRoute>
-                  <Expenses />
+                  <AccountProvider>
+                    <ExpenseProvider>
+                      <Expenses />  
+                    </ExpenseProvider>
+                  </AccountProvider>
                 </ProtectedRoute>
               }
             />

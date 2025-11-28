@@ -1,24 +1,24 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAccount } from "../context/AccountContext.jsx";
 import { useParams, useLocation } from "react-router-dom";
-const IncomeContext = createContext(null);
+const ExpenseContext = createContext(null);
 import { parseDateToLocal } from "../utils/dateFormatter.js";
 import ViewOptions from "../utils/ViewOptions.js";
 import { TransactionOptions } from "../utils/ViewOptions.js";
-import { exportIncomeToCSV, exportIncomeToPDF } from "../utils/exportUtils.js";
+import { exportExpenseToCSV, exportExpenseToPDF } from "../utils/exportUtils.js";
 import api from "../utils/api";
-
-export const IncomeProvider = ({ children }) => {
-  const { year } = useParams();
+export default function ExpenseProvider({ children }) {const { year } = useParams();
   const location = useLocation();
-  const { income } = location.state || {};
+  const { expense } = location.state || {};
   const [open, setOpen] = useState(false);
   const [type, setType] = useState("");
-  const [incomeUI, setIncomeUI] = useState(null);
-  const [selectedIncome, setSelectedIncome] = useState({});
+  const [expenseUI, setExpenseUI] = useState(null);
+  const [selectedExpense, setSelectedExpense] = useState({});
   const { currentAccountId, user, isOwner } = useAccount();
   const [members, setMembers] = useState([]);
   const [memberFilter, setMemberFilter] = useState("all");
+  const [allTags, setAllTags] = useState([]);
+  const [selectedTag, setSelectedTag] = useState("");
   const [range, setRange] = useState("4w");
   const [customSearch, setCustomSearch] = useState(false);
   const today = new Date();
@@ -31,33 +31,18 @@ export const IncomeProvider = ({ children }) => {
   const [refreshKey, setRefreshKey] = useState(0); // trigger re-fetch
   const [noDataMessage, setNoDataMessage] = useState("");
   const viewOptions = ViewOptions({ setRange });
-  const [allTags, setAllTags] = useState([]);
-  const [selectedTag, setSelectedTag] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 15;
+  const [itemsPerPage] = useState(15);
   const [transactionOption, setTransactionOption] =
     useState("All Transactions");
   const transactionOptions = TransactionOptions({ setTransactionOption });
-
   // Export handlers
   const handleExportCSV = () => {
-    if (!incomeUI || incomeUI.length === 0) {
+    if (!expenseUI || expenseUI.length === 0) {
       return { success: false, message: "No data to export" };
     }
-    return exportIncomeToCSV(incomeUI, year, memberFilter);
+    return exportExpenseToCSV(expenseUI, year, memberFilter);
   };
-
-  useEffect(() => {
-    console.log("Transaction Option Income Context: " + JSON.stringify(transactionOption, null, 2));
-  }, [transactionOption])
-
-  const handleExportPDF = () => {
-    if (!incomeUI || incomeUI.length === 0) {
-      return { success: false, message: "No data to export" };
-    }
-    return exportIncomeToPDF(incomeUI, year, memberFilter);
-  };
-
   const handleClearFilters = () => {
     setMemberFilter("all");
     setSelectedTag("");
@@ -67,23 +52,30 @@ export const IncomeProvider = ({ children }) => {
     setCustomEndDateUI(todayStr);
     setCurrentPage(1);
   };
+
+  const handleExportPDF = () => {
+    if (!expenseUI || expenseUI.length === 0) {
+      return { success: false, message: "No data to export" };
+    }
+    return exportExpenseToPDF(expenseUI, year, memberFilter);
+  };
   const handleRangeSubmit = async (e) => {
     e.preventDefault();
     try {
       setNoDataMessage("");
       const res = await api.get(
-        `income/get?start=${customStartDateUI}&end=${customEndDateUI}`,
+        `expense/get?start=${customStartDateUI}&end=${customEndDateUI}`,
       );
       if (res.status === 200) {
-        const incomeDocuments = res.data;
-        if (incomeDocuments.length === 0) {
+        const expenseDocuments = res.data;
+        if (expenseDocuments.length === 0) {
           setNoDataMessage("Nothing to show!");
         }
         const withFilter =
           memberFilter === "all"
-            ? incomeDocuments
-            : incomeDocuments.filter((i) => i.createdBy?._id === memberFilter);
-        setIncomeUI(withFilter);
+            ? expenseDocuments
+            : expenseDocuments.filter((i) => i.createdBy?._id === memberFilter);
+        setExpenseUI(withFilter);
       }
     } catch (error) {
       setNoDataMessage(
@@ -91,13 +83,12 @@ export const IncomeProvider = ({ children }) => {
       );
     }
   };
-
   useEffect(() => {
-    if (income) {
-      setIncomeUI(income);
+    if (expense) {
+      setExpenseUI(expense);
     }
-  }, [income]);
-  // Fetch account members for filter
+  }, [expense]);
+
   useEffect(() => {
     const fetchMembers = async () => {
       try {
@@ -110,23 +101,23 @@ export const IncomeProvider = ({ children }) => {
     };
     fetchMembers();
   }, [currentAccountId]);
-  // Fetch year data on mount and when refreshKey or memberFilter changes
+
   useEffect(() => {
-    const fetchIncomeData = async () => {
+    const fetchExpenseData = async () => {
       try {
         let res;
         if (transactionOption === "Upcoming Transactions") {
-          res = await api.get(`income/upcomingIncome?range=${range}`);
+          res = await api.get(`expense/upcomingExpenses?range=${range}`);
         } else {
-          res = await api.get(`income/get?range=${range}`);
+          res = await api.get(`expense/get?range=${range}`);
         }
         setNoDataMessage("");
         if (res.status === 200) {
-          const incomeDocuments = res.data;
-          incomeDocuments.sort((a, b) => new Date(b.date) - new Date(a.date));
+          const expenseDocuments = res.data;
+          expenseDocuments.sort((a, b) => new Date(b.date) - new Date(a.date));
           // Extract all unique tags
           const tagsSet = new Set();
-          incomeDocuments.forEach((item) => {
+          expenseDocuments.forEach((item) => {
             if (item.tags && Array.isArray(item.tags)) {
               item.tags.forEach((tag) => tagsSet.add(tag));
             }
@@ -134,8 +125,8 @@ export const IncomeProvider = ({ children }) => {
           setAllTags(Array.from(tagsSet).sort());
           const withMemberFilter =
             memberFilter === "all"
-              ? incomeDocuments
-              : incomeDocuments.filter(
+              ? expenseDocuments
+              : expenseDocuments.filter(
                   (i) => i.createdBy?._id === memberFilter,
                 );
           // Apply tag filter
@@ -145,13 +136,13 @@ export const IncomeProvider = ({ children }) => {
               (item) => item.tags && item.tags.includes(selectedTag),
             );
           }
-          setIncomeUI(withTagAndMemberFilter);
+          setExpenseUI(withTagAndMemberFilter);
         }
       } catch (error) {
         console.error("Failed to fetch year data:", error);
       }
     };
-    fetchIncomeData();
+    fetchExpenseData();
   }, [
     year,
     refreshKey,
@@ -161,26 +152,29 @@ export const IncomeProvider = ({ children }) => {
     currentAccountId,
     transactionOption,
   ]);
-  const paginatedIncome =
-    incomeUI?.slice(
+
+  const paginatedExpense =
+    expenseUI?.slice(
       (currentPage - 1) * itemsPerPage,
       currentPage * itemsPerPage,
     ) || [];
 
-  const totalPages = Math.ceil((incomeUI?.length || 0) / itemsPerPage);
-
+  const totalPages = Math.ceil((expenseUI?.length || 0) / itemsPerPage);
   const value = {
     open,
     setOpen,
     type,
     setType,
-    incomeUI,
-    setIncomeUI,
-    selectedIncome,
-    setSelectedIncome,
+    expenseUI,
+    setExpenseUI,
+    selectedExpense,
+    setSelectedExpense,
     members,
     memberFilter,
     setMemberFilter,
+    allTags,
+    selectedTag,
+    setSelectedTag,
     range,
     setRange,
     customSearch,
@@ -192,36 +186,34 @@ export const IncomeProvider = ({ children }) => {
     refreshKey,
     setRefreshKey,
     noDataMessage,
-    setNoDataMessage,
     viewOptions,
-    allTags,
-    selectedTag,
-    setSelectedTag,
-    currentPage,
-    setCurrentPage,
-    itemsPerPage,
-    paginatedIncome,
-    totalPages,
     transactionOption,
     setTransactionOption,
     transactionOptions,
     handleExportCSV,
     handleExportPDF,
-    handleClearFilters,
     handleRangeSubmit,
+    handleClearFilters,
+    paginatedExpense,
+    currentPage,
+    setCurrentPage,
+    totalPages,
     user,
-    isOwner,
-    location,
-  };
-  return (
-    <IncomeContext.Provider value={value}>{children}</IncomeContext.Provider>
-  );
-};
+    isOwner
+  }
 
-export const useIncome = () => {
-  const context = useContext(IncomeContext);
+return (
+    <ExpenseContext.Provider value={value}>
+      {children}
+    </ExpenseContext.Provider>
+  );
+}
+export const useExpense = () => {
+  const context = useContext(ExpenseContext);
   if (!context) {
-    throw new Error("useIncome must be used within an IncomeProvider");
+    throw new Error("useExpense must be used within an ExpenseProvider");
   }
   return context;
 };
+
+

@@ -1,9 +1,14 @@
 import { motion } from "framer-motion";
 import { MdAttachMoney } from "react-icons/md";
 import AddSourceButton from "./AddSourceButton";
-import { useIncome } from "../context/IncomeContext";
-export default function PageHeader({ title, subtitle }) {
-    const { setOpen, setType } = useIncome();
+
+export default function PageHeader({ title, subtitle, setOpen, setType, location, text }) {
+    let type = "";
+    if (location === "/income") {
+        type = "addIncome";
+    } else {
+        type = "addExpense";
+    } 
     return (
     <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -24,9 +29,9 @@ export default function PageHeader({ title, subtitle }) {
           <AddSourceButton
             func={() => {
               setOpen(true);
-              setType("addIncome");
+              setType(type);
             }}
-            text="Add Income"
+            text={text}
           />
         </motion.div>
     )

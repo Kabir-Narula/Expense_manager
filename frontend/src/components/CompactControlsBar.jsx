@@ -23,7 +23,7 @@ export default function CompactControlsBar({
   setCustomEndDateUI,
   handleRangeSubmit,
   noDataMessage,
-  incomeUI,
+  documentUI,
   handleExportCSV,
   handleExportPDF,
   viewOptions,
@@ -179,7 +179,7 @@ export default function CompactControlsBar({
           <ExportButtons
             onExportCSV={handleExportCSV}
             onExportPDF={handleExportPDF}
-            disabled={!incomeUI || incomeUI.length === 0}
+            disabled={!documentUI || documentUI.length === 0}
           />
         </div>
       </div>
