@@ -171,7 +171,7 @@ function Expenses() {
     ) || [];
 
   const totalPages = Math.ceil((expenseUI?.length || 0) / itemsPerPage);
-
+  console.log("Transaction Option Expenses: " + JSON.stringify(transactionOption, null, 2));
   return (
     <>
       <div className="md:ml-72 md:pt-8 pt-20 p-8 min-h-screen bg-gray-50">

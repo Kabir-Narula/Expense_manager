@@ -19,6 +19,8 @@ import Signup from "./pages/Auth/Signup";
 import EditProfile from "./pages/EditProfile";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import ManageAccount from "./pages/ManageAccount";
+import { AccountProvider } from "./context/AccountContext";
+import { IncomeProvider } from "./context/IncomeContext";
 
 const App = () => {
   const location = useLocation();
@@ -97,7 +99,11 @@ const App = () => {
               path="/income"
               element={
                 <ProtectedRoute>
-                  <Income />
+                  <AccountProvider>
+                    <IncomeProvider>
+                      <Income />
+                    </IncomeProvider>
+                  </AccountProvider>
                 </ProtectedRoute>
               }
             />
