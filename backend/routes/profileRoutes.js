@@ -3,7 +3,11 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { protect } from "../middleware/authMiddleware.js";
-import { updateName, updatePassword, updateProfilePicture } from "../controllers/profileController.js";
+import {
+  updateName,
+  updatePassword,
+  updateProfilePicture,
+} from "../controllers/profileController.js";
 
 const router = express.Router();
 
@@ -21,7 +25,12 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     const ext = path.extname(file.originalname) || ".jpg";
-    cb(null, req.user?.id ? `${req.user.id}-${uniqueSuffix}${ext}` : `${uniqueSuffix}${ext}`);
+    cb(
+      null,
+      req.user?.id
+        ? `${req.user.id}-${uniqueSuffix}${ext}`
+        : `${uniqueSuffix}${ext}`,
+    );
   },
 });
 
@@ -31,7 +40,11 @@ const fileFilter = (req, file, cb) => {
   else cb(new Error("Only JPEG, PNG, or WEBP images are allowed"));
 };
 
-const upload = multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024 } });
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
 
 // Routes
 router.put("/name", protect, updateName);
@@ -39,5 +52,3 @@ router.put("/password", protect, updatePassword);
 router.put("/picture", protect, upload.single("picture"), updateProfilePicture);
 
 export default router;
-
-

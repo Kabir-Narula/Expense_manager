@@ -3,7 +3,12 @@ import { useState, useRef, useEffect } from "react";
 import api from "../utils/api";
 import { FiMenu, FiX, FiSettings } from "react-icons/fi";
 import { CgMenuGridO } from "react-icons/cg";
-import { MdAttachMoney, MdBarChart, MdPerson, MdAccountBalance } from "react-icons/md";
+import {
+  MdAttachMoney,
+  MdBarChart,
+  MdPerson,
+  MdAccountBalance,
+} from "react-icons/md";
 import { FaHandHoldingUsd } from "react-icons/fa";
 import { RiLogoutBoxLine, RiDashboardLine } from "react-icons/ri";
 import { HiSparkles } from "react-icons/hi";
@@ -121,11 +126,36 @@ const SideNavbar = () => {
           {/* Navigation Links */}
           <nav className="space-y-1.5 px-1">
             {[
-              { to: "/dashboard", icon: <CgMenuGridO />, text: "Dashboard", badge: null },
-              { to: "/income", icon: <MdAttachMoney />, text: "Income", badge: null },
-              { to: "/expenses", icon: <FaHandHoldingUsd />, text: "Expenses", badge: null },
-              { to: "/charts", icon: <MdBarChart />, text: "Analytics", badge: null },
-              { to: "/edit-profile", icon: <MdPerson />, text: "Profile", badge: null },
+              {
+                to: "/dashboard",
+                icon: <CgMenuGridO />,
+                text: "Dashboard",
+                badge: null,
+              },
+              {
+                to: "/income",
+                icon: <MdAttachMoney />,
+                text: "Income",
+                badge: null,
+              },
+              {
+                to: "/expenses",
+                icon: <FaHandHoldingUsd />,
+                text: "Expenses",
+                badge: null,
+              },
+              {
+                to: "/charts",
+                icon: <MdBarChart />,
+                text: "Analytics",
+                badge: null,
+              },
+              {
+                to: "/edit-profile",
+                icon: <MdPerson />,
+                text: "Profile",
+                badge: null,
+              },
               {
                 to: "/manage-account",
                 icon: <MdAccountBalance />,
@@ -147,7 +177,7 @@ const SideNavbar = () => {
                 {location.pathname === link.to && (
                   <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-primary to-primary-light rounded-r"></div>
                 )}
-                
+
                 <span
                   className={`text-xl mr-3.5 transition-all duration-200 ${
                     location.pathname === link.to
@@ -160,12 +190,12 @@ const SideNavbar = () => {
                 <span className="text-sm font-semibold tracking-wide flex-1">
                   {link.text}
                 </span>
-                
+
                 {/* Active pulse indicator */}
                 {location.pathname === link.to && (
                   <span className="w-2 h-2 bg-primary-light rounded-full animate-pulse shadow-lg shadow-primary-light/50" />
                 )}
-                
+
                 {/* Badge (if any) */}
                 {link.badge && (
                   <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
@@ -189,8 +219,10 @@ const SideNavbar = () => {
               <span className="text-xl mr-3.5 group-hover:text-red-400 text-indigo-400 transition-all duration-200 group-hover:scale-105">
                 <RiLogoutBoxLine />
               </span>
-              <span className="text-sm font-semibold tracking-wide">Log Out</span>
-              
+              <span className="text-sm font-semibold tracking-wide">
+                Log Out
+              </span>
+
               {/* Hover effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/10 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
@@ -206,14 +238,14 @@ const SideNavbar = () => {
             >
               {/* Animated background */}
               <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              
+
               {/* Profile Image */}
               <div className="relative flex-shrink-0">
                 <img
                   className="w-10 h-10 rounded-xl border-2 border-indigo-700/50 group-hover:border-primary/70 shadow-md group-hover:shadow-lg group-hover:shadow-primary/20 group-hover:scale-105 transition-all duration-300 relative z-10 object-cover"
                   src={
                     user.profileImageURL
-                      ? `${import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:8000'}${user.profileImageURL}`
+                      ? `${import.meta.env.VITE_API_URL?.replace("/api/v1", "") || "http://localhost:8000"}${user.profileImageURL}`
                       : defaultAvatar
                   }
                   alt="User profile"
@@ -248,4 +280,3 @@ const SideNavbar = () => {
 };
 
 export default SideNavbar;
-

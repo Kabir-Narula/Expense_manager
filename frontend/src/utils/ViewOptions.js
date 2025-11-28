@@ -10,3 +10,14 @@ export default function ViewOptions({ setRange }) {
     setter: () => setRange(c.value),
   }));
 }
+
+export function TransactionOptions({ setTransactionOption }) {
+  const config = [
+    { label: "All Transactions", value: false },
+    { label: "Upcoming Transactions", value: true },
+  ];
+  return config.map((c) => ({
+    label: c.label,
+    setter: () => setTransactionOption(c.value),
+  }));
+}

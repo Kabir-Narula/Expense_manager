@@ -21,11 +21,24 @@ export const createSharedAccount = async (req, res) => {
 export const getMyAccounts = async (req, res) => {
   try {
     // personal (create if not exists handled by accountContext on other routes; here we'll ensure as well)
-    let personal = await Account.findOne({ owner: req.user._id, type: "personal", deletedAt: null });
+    let personal = await Account.findOne({
+      owner: req.user._id,
+      type: "personal",
+      deletedAt: null,
+    });
     if (!personal) {
-      personal = await Account.create({ type: "personal", name: "Personal", owner: req.user._id, members: [req.user._id] });
+      personal = await Account.create({
+        type: "personal",
+        name: "Personal",
+        owner: req.user._id,
+        members: [req.user._id],
+      });
     }
-    const shared = await Account.find({ members: req.user._id, type: "shared", deletedAt: null });
+    const shared = await Account.find({
+      members: req.user._id,
+      type: "shared",
+      deletedAt: null,
+    });
     return res.json({ personal, shared });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -36,11 +49,17 @@ export const listMembers = async (req, res) => {
   try {
     const account = req.account; // provided by accountContext
     // Ensure owner is included in the list, even if members array is missing it
-    const uniqueIds = Array.from(new Set([
-      ...account.members.map((m) => m.toString()),
-      account.owner?.toString(),
-    ].filter(Boolean)));
-    const users = await User.find({ _id: { $in: uniqueIds } }).select("fullName email");
+    const uniqueIds = Array.from(
+      new Set(
+        [
+          ...account.members.map((m) => m.toString()),
+          account.owner?.toString(),
+        ].filter(Boolean),
+      ),
+    );
+    const users = await User.find({ _id: { $in: uniqueIds } }).select(
+      "fullName email",
+    );
     const result = users.map((u) => ({
       userId: u._id,
       fullName: u.fullName,
@@ -71,9 +90,14 @@ export const removeMember = async (req, res) => {
 export const deleteAccount = async (req, res) => {
   try {
     const account = req.account; // ownerOnly checked
-    if (account.type !== "shared") return res.status(400).json({ message: "Cannot delete personal account" });
+    if (account.type !== "shared")
+      return res
+        .status(400)
+        .json({ message: "Cannot delete personal account" });
     // Ensure consistency: owner must be part of members
-    if (!account.members.some((m) => m.toString() === account.owner.toString())) {
+    if (
+      !account.members.some((m) => m.toString() === account.owner.toString())
+    ) {
       account.members.push(account.owner);
     }
     account.deletedAt = new Date();

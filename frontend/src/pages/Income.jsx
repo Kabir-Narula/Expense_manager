@@ -2,8 +2,11 @@ import { useParams, useLocation } from "react-router-dom";
 import AddSourceButton from "../components/AddSourceButton";
 import { useState, useEffect } from "react";
 import EditSource from "../components/EditSource";
-import { FaTrashAlt } from "react-icons/fa";
-import { MdModeEdit, MdFilterList, MdAttachMoney, MdCalendarToday } from "react-icons/md";
+import {
+  MdFilterList,
+  MdAttachMoney,
+  MdCalendarToday,
+} from "react-icons/md";
 import { motion } from "framer-motion";
 import api from "../Utils/api";
 import { useAccount } from "../context/AccountContext.jsx";
@@ -12,6 +15,7 @@ import { exportIncomeToCSV, exportIncomeToPDF } from "../utils/exportUtils";
 import ExportButtons from "../components/ExportButtons";
 import ViewOptions from "../utils/ViewOptions.js";
 import TransactionsTable from "../layouts/Table.jsx";
+import { TransactionOptions } from "../utils/ViewOptions.js";
 
 export default function Income() {
   const { year } = useParams();
@@ -38,6 +42,11 @@ export default function Income() {
   const viewOptions = ViewOptions({ setRange });
   const [allTags, setAllTags] = useState([]);
   const [selectedTag, setSelectedTag] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
+  const [transactionOption, setTransactionOption] =
+    useState("All Transactions");
+  const transactionOptions = TransactionOptions({ setTransactionOption });
 
   // Export handlers
   const handleExportCSV = () => {
@@ -52,6 +61,16 @@ export default function Income() {
       return { success: false, message: "No data to export" };
     }
     return exportIncomeToPDF(incomeUI, year, memberFilter);
+  };
+
+  const handleClearFilters = () => {
+    setMemberFilter("all");
+    setSelectedTag("");
+    setRange("4w");
+    setCustomSearch(false);
+    setCustomStartDateUI(yesterdayStr);
+    setCustomEndDateUI(todayStr);
+    setCurrentPage(1);
   };
   const handleRangeSubmit = async (e) => {
     e.preventDefault();
@@ -100,10 +119,16 @@ export default function Income() {
   useEffect(() => {
     const fetchIncomeData = async () => {
       try {
-        let res = await api.get(`income/get?range=${range}`);
+        let res;
+        if (transactionOption === "Upcoming Transactions") {
+          res = await api.get(`income/upcomingIncome?range=${range}`);
+        } else {
+          res = await api.get(`income/get?range=${range}`);
+        }
         setNoDataMessage("");
         if (res.status === 200) {
           const incomeDocuments = res.data;
+          incomeDocuments.sort((a, b) => new Date(b.date) - new Date(a.date));
           // Extract all unique tags
           const tagsSet = new Set();
           incomeDocuments.forEach((item) => {
@@ -132,7 +157,16 @@ export default function Income() {
       }
     };
     fetchIncomeData();
-  }, [year, refreshKey, memberFilter, range, selectedTag, currentAccountId]);
+  }, [
+    year,
+    refreshKey,
+    memberFilter,
+    range,
+    selectedTag,
+    currentAccountId,
+    transactionOption,
+  ]);
+
   return (
     <>
       <div className="md:ml-72 md:pt-8 pt-20 p-8 min-h-screen bg-gray-50">
@@ -194,8 +228,18 @@ export default function Income() {
               {/* Tag Filter */}
               {allTags.length > 0 && (
                 <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  <svg
+                    className="w-5 h-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                    />
                   </svg>
                   <select
                     className="px-3 py-2 border-2 border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 hover:border-gray-300 transition-all cursor-pointer bg-white"
@@ -211,30 +255,80 @@ export default function Income() {
                   </select>
                 </div>
               )}
+              <button
+                onClick={handleClearFilters}
+                disabled={
+                  memberFilter === "all" &&
+                  !selectedTag &&
+                  range === "4w" &&
+                  !customSearch
+                }
+                className="px-3 py-2 border-2 border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 hover:border-gray-300 transition-all cursor-pointer bg-white"
+              >
+                Clear Filters
+              </button>
+
+              <select
+                className="px-3 py-2 border-2 border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 hover:border-gray-300 transition-all cursor-pointer bg-white"
+                value={transactionOption}
+                onChange={(e) => setTransactionOption(e.target.value)}
+              >
+                {transactionOptions.map((item) => (
+                  <option key={item.label} value={item.label}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
 
               {/* Custom Search Toggle */}
-              <button
-                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-50 rounded-lg transition-all"
-                onClick={() => setCustomSearch(!customSearch)}
-              >
-                <MdCalendarToday className="w-4 h-4" />
-                Custom Date
-                {customSearch ? (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                  </svg>
-                ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                )}
-              </button>
+              {transactionOption === "All Transactions" && (
+                <>
+                  <MdCalendarToday className="w-4 h-4" />
+                  <button
+                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-50 rounded-lg transition-all"
+                    onClick={() => setCustomSearch(!customSearch)}
+                  >
+                    Custom Date
+                    {customSearch ? (
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 15l7-7 7 7"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Right Side: View Options & Export */}
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700 hidden sm:inline">Period:</span>
+                <span className="text-sm font-medium text-gray-700 hidden sm:inline">
+                  Period:
+                </span>
                 <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
                   {viewOptions.map((item) => (
                     <button
@@ -263,7 +357,10 @@ export default function Income() {
               exit={{ height: 0, opacity: 0 }}
               className="mt-4 pt-4 border-t-2 border-gray-100"
             >
-              <form onSubmit={handleRangeSubmit} className="flex flex-col sm:flex-row items-end gap-3">
+              <form
+                onSubmit={handleRangeSubmit}
+                className="flex flex-col sm:flex-row items-end gap-3"
+              >
                 <div className="flex-1 w-full sm:w-auto">
                   <label className="block text-xs font-semibold text-gray-700 mb-1">
                     From Date
@@ -297,8 +394,16 @@ export default function Income() {
               </form>
               {noDataMessage && (
                 <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-sm">
-                  <svg className="w-4 h-4 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  <svg
+                    className="w-4 h-4 text-red-600 flex-shrink-0"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                   <p className="text-red-700 font-medium">{noDataMessage}</p>
                 </div>
@@ -339,4 +444,3 @@ export default function Income() {
     </>
   );
 }
-

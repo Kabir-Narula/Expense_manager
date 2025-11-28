@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MdClose, MdAttachMoney, MdCalendarToday, MdRepeat, MdLabel, MdDelete, MdEdit, MdAdd } from "react-icons/md";
+import {
+  MdClose,
+  MdAttachMoney,
+  MdCalendarToday,
+  MdRepeat,
+  MdLabel,
+  MdDelete,
+  MdEdit,
+  MdAdd,
+} from "react-icons/md";
 import { FiAlertCircle } from "react-icons/fi";
 import api from "../utils/api";
 import { formatDateToSend } from "../utils/dateFormatter";
@@ -26,18 +35,30 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
     formattedEndDate = formatDateToSend(incomeData.endDate);
   }
 
-  const [sourceUI, setSourceUI] = useState(type === "editIncome" ? incomeData.source : "");
-  const [amountUI, setAmountUI] = useState(type === "editIncome" ? (incomeData.amount / 100).toFixed(2) : "");
+  const [sourceUI, setSourceUI] = useState(
+    type === "editIncome" ? incomeData.source : "",
+  );
+  const [amountUI, setAmountUI] = useState(
+    type === "editIncome" ? (incomeData.amount / 100).toFixed(2) : "",
+  );
   const [startDateUI, setStartDateUI] = useState(formattedStartDate);
   const [endDateUI, setEndDateUI] = useState(formattedEndDate);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [recurringUI, setRecurringUI] = useState(type === "editIncome" ? incomeData.recurring : "once");
+  const [recurringUI, setRecurringUI] = useState(
+    type === "editIncome" ? incomeData.recurring : "once",
+  );
   const recurrenceOptions = ["once", "bi-weekly", "monthly"];
   const [endOption, setEndOption] = useState(
-    type === "editIncome" ? (incomeData.endDate ? "customEndDate" : "noEndDate") : "noEndDate"
+    type === "editIncome"
+      ? incomeData.endDate
+        ? "customEndDate"
+        : "noEndDate"
+      : "noEndDate",
   );
-  const [tagsUI, setTagsUI] = useState(type === "editIncome" ? incomeData.tags?.join(", ") || "" : "");
+  const [tagsUI, setTagsUI] = useState(
+    type === "editIncome" ? incomeData.tags?.join(", ") || "" : "",
+  );
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -112,7 +133,8 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
               Delete Income?
             </h2>
             <p className="text-gray-600 text-center mb-6">
-              This action cannot be undone. Are you sure you want to delete this income entry?
+              This action cannot be undone. Are you sure you want to delete this
+              income entry?
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-3">
@@ -251,7 +273,8 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
                 <MdLabel className="w-4 h-4 text-emerald-600" />
-                Tags <span className="text-gray-400 font-normal">(Optional)</span>
+                Tags{" "}
+                <span className="text-gray-400 font-normal">(Optional)</span>
               </label>
               <input
                 type="text"
@@ -346,7 +369,9 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
                       Recurring Entry
                     </p>
                     <p className="text-xs text-blue-800">
-                      This is part of a recurring income. To edit the recurring income, go to the most recent recurring entry and make changes there.
+                      This is part of a recurring income. To edit the recurring
+                      income, go to the most recent recurring entry and make
+                      changes there.
                     </p>
                   </div>
                 </div>
@@ -356,7 +381,9 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
             {showError && (
               <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3">
                 <FiAlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                <p className="text-sm text-red-700 font-medium">{errorMessage}</p>
+                <p className="text-sm text-red-700 font-medium">
+                  {errorMessage}
+                </p>
               </div>
             )}
 
@@ -378,8 +405,20 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
                     </svg>
                     Saving...
                   </span>

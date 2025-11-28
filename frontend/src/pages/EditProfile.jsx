@@ -3,7 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import api from "../utils/api";
 import Input from "../components/Inputs/Input";
-import { MdPerson, MdLock, MdPhotoCamera, MdCheckCircle, MdEmail, MdShield } from "react-icons/md";
+import {
+  MdPerson,
+  MdLock,
+  MdPhotoCamera,
+  MdCheckCircle,
+  MdEmail,
+  MdShield,
+} from "react-icons/md";
 import { FiUpload, FiUser } from "react-icons/fi";
 
 const EditProfile = () => {
@@ -32,7 +39,9 @@ const EditProfile = () => {
         setUser(data);
         setFullName(data.fullName || "");
         // Construct full URL for profile image
-        const baseURL = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:8000';
+        const baseURL =
+          import.meta.env.VITE_API_URL?.replace("/api/v1", "") ||
+          "http://localhost:8000";
         const fullImageUrl = data.profileImageURL
           ? `${baseURL}${data.profileImageURL}`
           : "";
@@ -138,7 +147,9 @@ const EditProfile = () => {
 
       setUser(data.user);
       // Construct full URL for profile image
-      const baseURL = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:8000';
+      const baseURL =
+        import.meta.env.VITE_API_URL?.replace("/api/v1", "") ||
+        "http://localhost:8000";
       const fullImageUrl = data.user.profileImageURL
         ? `${baseURL}${data.user.profileImageURL}`
         : "";
@@ -200,7 +211,9 @@ const EditProfile = () => {
             <FiUser className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Profile Settings</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Profile Settings
+            </h1>
             <p className="text-sm text-gray-600 mt-0.5">
               Manage your account information and preferences
             </p>
@@ -231,7 +244,9 @@ const EditProfile = () => {
             >
               <div className="flex items-center gap-2 mb-4">
                 <MdPhotoCamera className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-bold text-gray-900">Profile Photo</h2>
+                <h2 className="text-lg font-bold text-gray-900">
+                  Profile Photo
+                </h2>
               </div>
 
               <div className="flex flex-col items-center">
@@ -263,13 +278,15 @@ const EditProfile = () => {
                   <FiUpload className="w-4 h-4" />
                   Choose Photo
                 </label>
-                
+
                 <p className="text-xs text-gray-500 mt-2 text-center">
                   JPEG, PNG or WEBP • Max 5MB
                 </p>
 
                 {errors.picture && (
-                  <p className="text-red-600 text-sm mt-2 font-medium">{errors.picture}</p>
+                  <p className="text-red-600 text-sm mt-2 font-medium">
+                    {errors.picture}
+                  </p>
                 )}
 
                 {profilePicture && (
@@ -293,16 +310,24 @@ const EditProfile = () => {
             >
               <div className="flex items-center gap-2 mb-4">
                 <MdEmail className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-bold text-gray-900">Account Info</h2>
+                <h2 className="text-lg font-bold text-gray-900">
+                  Account Info
+                </h2>
               </div>
-              
+
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</label>
-                  <p className="text-sm font-medium text-gray-900 mt-1">{user?.email}</p>
+                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Email
+                  </label>
+                  <p className="text-sm font-medium text-gray-900 mt-1">
+                    {user?.email}
+                  </p>
                 </div>
                 <div className="pt-3 border-t border-gray-100">
-                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Account Status</label>
+                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Account Status
+                  </label>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold">
                       <MdCheckCircle className="w-3 h-3" />
@@ -339,10 +364,14 @@ const EditProfile = () => {
                   placeholder="Enter your full name"
                 />
                 {errors.fullName && (
-                  <p className="text-red-600 text-sm font-medium">{errors.fullName}</p>
+                  <p className="text-red-600 text-sm font-medium">
+                    {errors.fullName}
+                  </p>
                 )}
                 {errors.name && (
-                  <p className="text-red-600 text-sm font-medium">{errors.name}</p>
+                  <p className="text-red-600 text-sm font-medium">
+                    {errors.name}
+                  </p>
                 )}
 
                 <button
@@ -353,12 +382,26 @@ const EditProfile = () => {
                   {updating ? (
                     <span className="flex items-center justify-center gap-2">
                       <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
                       </svg>
                       Updating...
                     </span>
-                  ) : "Update Name"}
+                  ) : (
+                    "Update Name"
+                  )}
                 </button>
               </div>
             </motion.div>
@@ -387,7 +430,9 @@ const EditProfile = () => {
                   type="password"
                 />
                 {errors.currentPassword && (
-                  <p className="text-red-600 text-sm font-medium">{errors.currentPassword}</p>
+                  <p className="text-red-600 text-sm font-medium">
+                    {errors.currentPassword}
+                  </p>
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -401,10 +446,12 @@ const EditProfile = () => {
                       type="password"
                     />
                     {errors.newPassword && (
-                      <p className="text-red-600 text-sm font-medium mt-1">{errors.newPassword}</p>
+                      <p className="text-red-600 text-sm font-medium mt-1">
+                        {errors.newPassword}
+                      </p>
                     )}
                   </div>
-                  
+
                   <div>
                     <Input
                       name="confirmPassword"
@@ -415,29 +462,52 @@ const EditProfile = () => {
                       type="password"
                     />
                     {errors.confirmPassword && (
-                      <p className="text-red-600 text-sm font-medium mt-1">{errors.confirmPassword}</p>
+                      <p className="text-red-600 text-sm font-medium mt-1">
+                        {errors.confirmPassword}
+                      </p>
                     )}
                   </div>
                 </div>
 
                 {errors.password && (
-                  <p className="text-red-600 text-sm font-medium">{errors.password}</p>
+                  <p className="text-red-600 text-sm font-medium">
+                    {errors.password}
+                  </p>
                 )}
 
                 <button
                   onClick={handlePasswordUpdate}
-                  disabled={updating || !currentPassword || !newPassword || !confirmPassword}
+                  disabled={
+                    updating ||
+                    !currentPassword ||
+                    !newPassword ||
+                    !confirmPassword
+                  }
                   className="btn-primary"
                 >
                   {updating ? (
                     <span className="flex items-center justify-center gap-2">
                       <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
                       </svg>
                       Updating...
                     </span>
-                  ) : "Update Password"}
+                  ) : (
+                    "Update Password"
+                  )}
                 </button>
               </div>
             </motion.div>
@@ -449,4 +519,3 @@ const EditProfile = () => {
 };
 
 export default EditProfile;
-
