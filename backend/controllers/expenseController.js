@@ -313,10 +313,17 @@ export const getUpcomingExpenses = async (req, res) => {
         return res.status(400).json({ error: "Invalid range date" });
     }
     const recurringExpenses = await Expense.find({
-      ...filter,
-      recurring: { $in: ["monthly", "bi-weekly"] },
-      head: true,
-      $or: [{ endDate: { $gte: today } }, { endDate: "" }],
+      $and: [
+        filter,
+        {recurring: { $in: ["monthly", "bi-weekly"] }},
+        {head: true},
+        {
+          $or: [
+            { endDate: { $gte: today } }, 
+            { endDate: "" }
+          ]
+        },
+      ]
     });
 
     const upcomingExpenses = [];

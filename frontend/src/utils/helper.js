@@ -20,3 +20,26 @@ export const validatePassword = (password) => {
     return { isValid: false, message: "At least one special character" };
   return { isValid: true, message: "" };
 };
+
+export const applyFilter = (documents, setter, selectedTag, memberFilter) => {
+  // Extract all unique tags
+  const tagsSet = new Set();
+  documents.forEach((item) => {
+    if (item.tags && Array.isArray(item.tags)) {
+      item.tags.forEach((tag) => tagsSet.add(tag));
+    }
+  });
+  setter(Array.from(tagsSet).sort());
+  const withMemberFilter =
+    memberFilter === "all"
+      ? documents
+      : documents.filter((i) => i.createdBy?._id === memberFilter);
+  // Apply tag filter
+  let withTagAndMemberFilter = withMemberFilter;
+  if (selectedTag) {
+    withTagAndMemberFilter = withMemberFilter.filter(
+      (item) => item.tags && item.tags.includes(selectedTag),
+    );
+  }
+  return withTagAndMemberFilter;
+};

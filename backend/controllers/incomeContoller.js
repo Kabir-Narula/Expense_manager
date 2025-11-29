@@ -164,7 +164,6 @@ export const getAllIncome = async (req, res) => {
         // store a reference to the most recently created document
         // for manipulation if another loop is needed.
         prevDoc = newIncome;
-        console.log("next date isoSTR: ", nextDateISOStr);
       }
     }
     const incomes = await Income.find({
@@ -326,10 +325,17 @@ export const getUpcomingIncome = async (req, res) => {
         return res.status(400).json({ error: "Invalid range date" });
     }
     const recurringIncomes = await Income.find({
-      ...filter,
-      recurring: { $in: ["monthly", "bi-weekly"] },
-      head: true,
-      $or: [{ endDate: { $gte: today } }, { endDate: "" }],
+      $and: [
+        filter,
+        {recurring: { $in: ["monthly", "bi-weekly"] }},
+        {head: true},
+        {
+          $or: [
+            { endDate: { $gte: today } }, 
+            { endDate: "" }
+          ]
+        },
+      ]
     });
 
     /*

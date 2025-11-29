@@ -19,6 +19,9 @@ import Signup from "./pages/Auth/Signup";
 import EditProfile from "./pages/EditProfile";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import ManageAccount from "./pages/ManageAccount";
+import { AccountProvider } from "./context/AccountContext";
+import { IncomeProvider } from "./context/IncomeContext";
+import ExpenseProvider from "./context/ExpenseContext";
 
 const App = () => {
   const location = useLocation();
@@ -89,7 +92,11 @@ const App = () => {
               path="/expenses"
               element={
                 <ProtectedRoute>
-                  <Expenses />
+                  <AccountProvider>
+                    <ExpenseProvider>
+                      <Expenses />
+                    </ExpenseProvider>
+                  </AccountProvider>
                 </ProtectedRoute>
               }
             />
@@ -97,7 +104,11 @@ const App = () => {
               path="/income"
               element={
                 <ProtectedRoute>
-                  <Income />
+                  <AccountProvider>
+                    <IncomeProvider>
+                      <Income />
+                    </IncomeProvider>
+                  </AccountProvider>
                 </ProtectedRoute>
               }
             />
