@@ -37,14 +37,12 @@ export default function Income() {
     setRefreshKey,
     type,
     selectedIncome,
-    paginatedIncome,
     isOwner,
     user,
     setSelectedIncome,
-    currentPage,
-    setCurrentPage,
-    totalPages,
     location,
+    INCOME_KEY,
+    incomeCache,
   } = useIncome();
 
   return (
@@ -98,6 +96,8 @@ export default function Income() {
             }}
             type={type}
             incomeData={selectedIncome}
+            cacheKey={`${range}-${user._id}-${transactionOption}-${INCOME_KEY}`}
+            incomeCache={incomeCache.current}
           />
         )}
 
@@ -117,6 +117,7 @@ export default function Income() {
             setType("deleteIncome");
             setSelectedIncome(item);
           }}
+          transactionOption={transactionOption}
         />
       </div>
     </>

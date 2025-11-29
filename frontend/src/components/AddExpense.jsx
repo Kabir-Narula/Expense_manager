@@ -16,7 +16,14 @@ import api from "../utils/api";
 import { formatDateToSend } from "../utils/dateFormatter";
 import toast from "react-hot-toast";
 
-export default function EditExpense({ open, closeModal, type, expenseData }) {
+export default function EditExpense({
+  open,
+  closeModal,
+  type,
+  expenseData,
+  cacheKey,
+  expenseCache,
+}) {
   // Handle ESC key to close modal
   useEffect(() => {
     const handleEsc = (e) => {
@@ -97,6 +104,8 @@ export default function EditExpense({ open, closeModal, type, expenseData }) {
         closeModal();
         setShowError(false);
         setErrorMessage("");
+        expenseCache.clear();
+        console.log("Clearing expense since an update, add or delete occurred");
       }
     } catch (error) {
       setShowError(true);

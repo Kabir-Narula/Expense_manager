@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useRef, createContext, useContext, useEffect, useState } from "react";
 import { useAccount } from "../context/AccountContext.jsx";
 import { useParams, useLocation } from "react-router-dom";
 const ExpenseContext = createContext(null);
@@ -36,10 +36,11 @@ export default function ExpenseProvider({ children }) {
   const [refreshKey, setRefreshKey] = useState(0); // trigger re-fetch
   const [noDataMessage, setNoDataMessage] = useState("");
   const viewOptions = ViewOptions({ setRange });
-  const [itemsPerPage] = useState(15);
   const [transactionOption, setTransactionOption] =
     useState("All Transactions");
   const transactionOptions = TransactionOptions({ setTransactionOption });
+  const EXPENSE_KEY = "Expense";
+  const expenseCache = useRef(new Map());
   // Export handlers
   const handleExportCSV = () => {
     if (!expenseUI || expenseUI.length === 0) {
@@ -111,30 +112,42 @@ export default function ExpenseProvider({ children }) {
     const fetchExpenseData = async () => {
       try {
         let res;
-        if (transactionOption === "Upcoming Transactions") {
-          res = await api.get(`expense/upcomingExpenses?range=${range}`);
-        } else {
-          res = await api.get(`expense/get?range=${range}`);
-        }
-        setNoDataMessage("");
-        if (res.status === 200) {
-          const expenseDocuments = res.data;
-          if (transactionOption === "All Transactions") {
-            expenseDocuments.sort(
-              (a, b) => new Date(b.date) - new Date(a.date),
-            );
-          } else {
-            expenseDocuments.sort(
-              (a, b) => new Date(a.date) - new Date(b.date),
-            );
-          }
-          const withTagAndMemberFilter = applyFilter(
-            expenseDocuments,
-            setAllTags,
-            selectedTag,
-            memberFilter,
+        const cacheKey = `${range}-${user._id}-${transactionOption}-${EXPENSE_KEY}`;
+        const cachedData = expenseCache.current.get(cacheKey);
+        if (cachedData) {
+          console.log(
+            "EXPENSE cached data: " + JSON.stringify(cachedData, null, 2),
           );
-          setExpenseUI(withTagAndMemberFilter);
+          console.log("EXPENSE cache key: " + cacheKey);
+          setExpenseUI(cachedData);
+        } else {
+          if (transactionOption === "Upcoming Transactions") {
+            res = await api.get(`expense/upcomingExpenses?range=${range}`);
+          } else {
+            res = await api.get(`expense/get?range=${range}`);
+          }
+          setNoDataMessage("");
+          if (res.status === 200) {
+            const expenseDocuments = res.data;
+            if (transactionOption === "All Transactions") {
+              expenseDocuments.sort(
+                (a, b) => new Date(b.date) - new Date(a.date),
+              );
+            } else {
+              expenseDocuments.sort(
+                (a, b) => new Date(a.date) - new Date(b.date),
+              );
+            }
+            const withTagAndMemberFilter = applyFilter(
+              expenseDocuments,
+              setAllTags,
+              selectedTag,
+              memberFilter,
+            );
+            setExpenseUI(withTagAndMemberFilter);
+            console.log("no cache for expense. API call was made. ");
+            expenseCache.current.set(cacheKey, withTagAndMemberFilter);
+          }
         }
       } catch (error) {
         console.error("Failed to fetch year data:", error);
@@ -149,6 +162,7 @@ export default function ExpenseProvider({ children }) {
     selectedTag,
     currentAccountId,
     transactionOption,
+    user,
   ]);
 
   const value = {
@@ -187,6 +201,8 @@ export default function ExpenseProvider({ children }) {
     handleClearFilters,
     user,
     isOwner,
+    expenseCache,
+    EXPENSE_KEY,
   };
 
   return (

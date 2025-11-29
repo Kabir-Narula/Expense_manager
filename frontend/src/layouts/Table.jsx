@@ -12,6 +12,7 @@ export default function TransactionsTable({
   user,
   onEdit,
   onDelete,
+  transactionOption,
   itemsPerPage = 15,
 }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,7 +24,7 @@ export default function TransactionsTable({
     return source.slice(start, end);
   }, [data, currentPage, itemsPerPage]);
 
-  const totalPages = Math.ceil(((data?.length) || 0) / itemsPerPage) || 1;
+  const totalPages = Math.ceil((data?.length || 0) / itemsPerPage) || 1;
 
   const isIncome = type === "income";
 
@@ -145,7 +146,7 @@ export default function TransactionsTable({
                   <td className="px-6 py-4 text-sm text-gray-600">
                     {item.date
                       ? new Date(
-                          item.date.slice(0, 10) + "T00:00:00"
+                          item.date.slice(0, 10) + "T00:00:00",
                         ).toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "short",
@@ -165,9 +166,11 @@ export default function TransactionsTable({
                       <div
                         className={`w-9 h-9 rounded-xl bg-gradient-to-br ${headerGradient} flex items-center justify-center text-white font-bold text-sm shadow-sm`}
                       >
-                        {(item.createdBy?.fullName ||
+                        {(
+                          item.createdBy?.fullName ||
                           item.createdBy?.email ||
-                          "You")
+                          "You"
+                        )
                           .charAt(0)
                           .toUpperCase()}
                       </div>
@@ -179,30 +182,36 @@ export default function TransactionsTable({
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center justify-center gap-2">
-                      {(isOwner || item.createdBy?._id === user?._id) && (
-                        <>
-                          <button
-                            onClick={() => handleEdit(item)}
-                            className={`p-2 rounded-lg transition-colors ${
-                              isIncome
-                                ? "text-emerald-600 hover:bg-emerald-50"
-                                : "text-blue-600 hover:bg-blue-50"
-                            }`}
-                            title="Edit"
-                          >
-                            <MdModeEdit className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item)}
-                            className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-                            title="Delete"
-                          >
-                            <FaTrashAlt className="w-4 h-4" />
-                          </button>
-                        </>
-                      )}
-                    </div>
+                    {transactionOption === "All Transactions" ? (
+                      <div className="flex items-center justify-center gap-2">
+                        {(isOwner || item.createdBy?._id === user?._id) && (
+                          <>
+                            <button
+                              onClick={() => handleEdit(item)}
+                              className={`p-2 rounded-lg transition-colors ${
+                                isIncome
+                                  ? "text-emerald-600 hover:bg-emerald-50"
+                                  : "text-blue-600 hover:bg-blue-50"
+                              }`}
+                              title="Edit"
+                            >
+                              <MdModeEdit className="w-5 h-5" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(item)}
+                              className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                              title="Delete"
+                            >
+                              <FaTrashAlt className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-sm text-gray-500 italic">
+                        Upcoming
+                      </span>
+                    )}
                   </td>
                 </motion.tr>
               ))
@@ -213,7 +222,9 @@ export default function TransactionsTable({
                     <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                       {emptyIcon}
                     </div>
-                    <p className="text-gray-600 font-medium mb-1">{emptyTitle}</p>
+                    <p className="text-gray-600 font-medium mb-1">
+                      {emptyTitle}
+                    </p>
                     <p className="text-sm text-gray-400">{emptySubtitle}</p>
                   </div>
                 </td>

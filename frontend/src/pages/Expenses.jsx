@@ -1,5 +1,5 @@
 import AddExpense from "../components/AddExpense.jsx";
-import TransactionsTable from "../layouts/Table.jsx"
+import TransactionsTable from "../layouts/Table.jsx";
 import { useExpense } from "../context/ExpenseContext.jsx";
 import PageHeader from "../components/PageHeader.jsx";
 import CompactControlsBar from "../components/CompactControlsBar.jsx";
@@ -40,6 +40,8 @@ function Expenses() {
     isOwner,
     user,
     setSelectedExpense,
+    EXPENSE_KEY,
+    expenseCache,
   } = useExpense();
 
   return (
@@ -93,6 +95,8 @@ function Expenses() {
             }}
             type={type}
             expenseData={selectedExpense}
+            cacheKey={`${range}-${user._id}-${transactionOption}-${EXPENSE_KEY}`}
+            expenseCache={expenseCache.current}
           />
         )}
 
@@ -112,6 +116,7 @@ function Expenses() {
             setType("deleteExpense");
             setSelectedExpense(item);
           }}
+          transactionOption={transactionOption}
         />
       </div>
     </>

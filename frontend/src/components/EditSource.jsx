@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, cache } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MdClose,
@@ -15,7 +15,14 @@ import api from "../utils/api";
 import { formatDateToSend } from "../utils/dateFormatter";
 import toast from "react-hot-toast";
 
-export default function EditSource({ open, closeModal, type, incomeData }) {
+export default function EditSource({
+  open,
+  closeModal,
+  type,
+  incomeData,
+  cacheKey,
+  incomeCache,
+}) {
   // Handle ESC key to close modal
   useEffect(() => {
     const handleEsc = (e) => {
@@ -25,7 +32,7 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
       window.addEventListener("keydown", handleEsc);
     }
     return () => window.removeEventListener("keydown", handleEsc);
-  }, [open, closeModal]);
+  }, [open, closeModal, cacheKey]);
 
   // format the date:
   let formattedStartDate = "";
@@ -60,7 +67,10 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
     type === "editIncome" ? incomeData.tags?.join(", ") || "" : "",
   );
   const [loading, setLoading] = useState(false);
-
+  useEffect(() => {
+    console.log("Cache key: " + cacheKey);
+    console.log("income cache: " + JSON.stringify(incomeCache, null, 2));
+  }, [cacheKey]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -77,7 +87,7 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
         endDate: endDateUI,
         head: true,
       };
-
+      // whenever a request is made, be sure to update the cache.
       let res;
       if (type === "addIncome") {
         res = await api.post("/income/add", formData);
@@ -94,6 +104,8 @@ export default function EditSource({ open, closeModal, type, incomeData }) {
         closeModal();
         setShowError(false);
         setErrorMessage("");
+        incomeCache.clear();
+        console.log("clearing cache since an update, add or delete ocurred");
       }
     } catch (error) {
       setShowError(true);
