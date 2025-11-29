@@ -5,9 +5,14 @@ const ExpenseContext = createContext(null);
 import { parseDateToLocal } from "../utils/dateFormatter.js";
 import ViewOptions from "../utils/ViewOptions.js";
 import { TransactionOptions } from "../utils/ViewOptions.js";
-import { exportExpenseToCSV, exportExpenseToPDF } from "../utils/exportUtils.js";
+import {
+  exportExpenseToCSV,
+  exportExpenseToPDF,
+} from "../utils/exportUtils.js";
 import api from "../utils/api";
-export default function ExpenseProvider({ children }) {const { year } = useParams();
+import { applyFilter } from "../utils/helper.js";
+export default function ExpenseProvider({ children }) {
+  const { year } = useParams();
   const location = useLocation();
   const { expense } = location.state || {};
   const [open, setOpen] = useState(false);
@@ -71,11 +76,13 @@ export default function ExpenseProvider({ children }) {const { year } = useParam
         if (expenseDocuments.length === 0) {
           setNoDataMessage("Nothing to show!");
         }
-        const withFilter =
-          memberFilter === "all"
-            ? expenseDocuments
-            : expenseDocuments.filter((i) => i.createdBy?._id === memberFilter);
-        setExpenseUI(withFilter);
+        const withTagAndMemberFilter = applyFilter(
+          expenseDocuments,
+          setAllTags,
+          selectedTag,
+          memberFilter,
+        );
+        setExpenseUI(withTagAndMemberFilter);
       }
     } catch (error) {
       setNoDataMessage(
@@ -114,28 +121,21 @@ export default function ExpenseProvider({ children }) {const { year } = useParam
         setNoDataMessage("");
         if (res.status === 200) {
           const expenseDocuments = res.data;
-          expenseDocuments.sort((a, b) => new Date(b.date) - new Date(a.date));
-          // Extract all unique tags
-          const tagsSet = new Set();
-          expenseDocuments.forEach((item) => {
-            if (item.tags && Array.isArray(item.tags)) {
-              item.tags.forEach((tag) => tagsSet.add(tag));
-            }
-          });
-          setAllTags(Array.from(tagsSet).sort());
-          const withMemberFilter =
-            memberFilter === "all"
-              ? expenseDocuments
-              : expenseDocuments.filter(
-                  (i) => i.createdBy?._id === memberFilter,
-                );
-          // Apply tag filter
-          let withTagAndMemberFilter = withMemberFilter;
-          if (selectedTag) {
-            withTagAndMemberFilter = withMemberFilter.filter(
-              (item) => item.tags && item.tags.includes(selectedTag),
+          if (transactionOption === "All Transactions") {
+            expenseDocuments.sort(
+              (a, b) => new Date(b.date) - new Date(a.date),
+            );
+          } else {
+            expenseDocuments.sort(
+              (a, b) => new Date(a.date) - new Date(b.date),
             );
           }
+          const withTagAndMemberFilter = applyFilter(
+            expenseDocuments,
+            setAllTags,
+            selectedTag,
+            memberFilter,
+          );
           setExpenseUI(withTagAndMemberFilter);
         }
       } catch (error) {
@@ -199,13 +199,11 @@ export default function ExpenseProvider({ children }) {const { year } = useParam
     setCurrentPage,
     totalPages,
     user,
-    isOwner
-  }
+    isOwner,
+  };
 
-return (
-    <ExpenseContext.Provider value={value}>
-      {children}
-    </ExpenseContext.Provider>
+  return (
+    <ExpenseContext.Provider value={value}>{children}</ExpenseContext.Provider>
   );
 }
 export const useExpense = () => {
@@ -215,5 +213,3 @@ export const useExpense = () => {
   }
   return context;
 };
-
-

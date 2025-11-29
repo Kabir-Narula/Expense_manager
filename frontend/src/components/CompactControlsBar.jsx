@@ -29,8 +29,6 @@ export default function CompactControlsBar({
   viewOptions,
   range,
 }) {
-  console.log("CONTROL BAR TRANSACTION OPTION: " + JSON.stringify(transactionOption, null, 2));
-  console.log("TRANSACTION OPTIONS: " + JSON.stringify(transactionOptions, null, 2));
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

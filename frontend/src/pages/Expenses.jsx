@@ -8,7 +8,6 @@ import { useExpense } from "../context/ExpenseContext.jsx";
 import PageHeader from "../components/PageHeader.jsx";
 import CompactControlsBar from "../components/CompactControlsBar.jsx";
 
-
 function Expenses() {
   const {
     open,
@@ -39,12 +38,12 @@ function Expenses() {
     handleExportPDF,
     viewOptions,
     range,
-    setRefreshKey, 
-    type, 
+    setRefreshKey,
+    type,
     selectedExpense,
     paginatedExpense,
     isOwner,
-    user, 
+    user,
     setSelectedExpense,
     currentPage,
     setCurrentPage,
@@ -89,7 +88,8 @@ function Expenses() {
           handleExportCSV={handleExportCSV}
           handleExportPDF={handleExportPDF}
           viewOptions={viewOptions}
-          range={range}/>
+          range={range}
+        />
 
         {open && (
           <AddExpense

@@ -7,6 +7,7 @@ import ViewOptions from "../utils/ViewOptions.js";
 import { TransactionOptions } from "../utils/ViewOptions.js";
 import { exportIncomeToCSV, exportIncomeToPDF } from "../utils/exportUtils.js";
 import api from "../utils/api";
+import { applyFilter } from "../utils/helper.js";
 
 export const IncomeProvider = ({ children }) => {
   const { year } = useParams();
@@ -47,10 +48,6 @@ export const IncomeProvider = ({ children }) => {
     return exportIncomeToCSV(incomeUI, year, memberFilter);
   };
 
-  useEffect(() => {
-    console.log("Transaction Option Income Context: " + JSON.stringify(transactionOption, null, 2));
-  }, [transactionOption])
-
   const handleExportPDF = () => {
     if (!incomeUI || incomeUI.length === 0) {
       return { success: false, message: "No data to export" };
@@ -79,11 +76,13 @@ export const IncomeProvider = ({ children }) => {
         if (incomeDocuments.length === 0) {
           setNoDataMessage("Nothing to show!");
         }
-        const withFilter =
-          memberFilter === "all"
-            ? incomeDocuments
-            : incomeDocuments.filter((i) => i.createdBy?._id === memberFilter);
-        setIncomeUI(withFilter);
+        const withTagAndMemberFilter = applyFilter(
+          incomeDocuments,
+          setAllTags,
+          selectedTag,
+          memberFilter,
+        );
+        setIncomeUI(withTagAndMemberFilter);
       }
     } catch (error) {
       setNoDataMessage(
@@ -123,28 +122,17 @@ export const IncomeProvider = ({ children }) => {
         setNoDataMessage("");
         if (res.status === 200) {
           const incomeDocuments = res.data;
-          incomeDocuments.sort((a, b) => new Date(b.date) - new Date(a.date));
-          // Extract all unique tags
-          const tagsSet = new Set();
-          incomeDocuments.forEach((item) => {
-            if (item.tags && Array.isArray(item.tags)) {
-              item.tags.forEach((tag) => tagsSet.add(tag));
-            }
-          });
-          setAllTags(Array.from(tagsSet).sort());
-          const withMemberFilter =
-            memberFilter === "all"
-              ? incomeDocuments
-              : incomeDocuments.filter(
-                  (i) => i.createdBy?._id === memberFilter,
-                );
-          // Apply tag filter
-          let withTagAndMemberFilter = withMemberFilter;
-          if (selectedTag) {
-            withTagAndMemberFilter = withMemberFilter.filter(
-              (item) => item.tags && item.tags.includes(selectedTag),
-            );
+          if (transactionOption === "All Transactions") {
+            incomeDocuments.sort((a, b) => new Date(b.date) - new Date(a.date));
+          } else {
+            incomeDocuments.sort((a, b) => new Date(a.date) - new Date(b.date));
           }
+          const withTagAndMemberFilter = applyFilter(
+            incomeDocuments,
+            setAllTags,
+            selectedTag,
+            memberFilter,
+          );
           setIncomeUI(withTagAndMemberFilter);
         }
       } catch (error) {

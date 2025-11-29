@@ -94,7 +94,7 @@ const App = () => {
                 <ProtectedRoute>
                   <AccountProvider>
                     <ExpenseProvider>
-                      <Expenses />  
+                      <Expenses />
                     </ExpenseProvider>
                   </AccountProvider>
                 </ProtectedRoute>

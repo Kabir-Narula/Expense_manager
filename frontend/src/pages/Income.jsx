@@ -36,19 +36,19 @@ export default function Income() {
     handleExportPDF,
     viewOptions,
     range,
-    setRefreshKey, 
-    type, 
+    setRefreshKey,
+    type,
     selectedIncome,
     paginatedIncome,
     isOwner,
-    user, 
+    user,
     setSelectedIncome,
     currentPage,
     setCurrentPage,
     totalPages,
     location,
   } = useIncome();
-  console.log("Transaction Option: " + JSON.stringify(transactionOption, null, 2));
+
   return (
     <>
       <div className="md:ml-72 md:pt-8 pt-20 p-8 min-h-screen bg-gray-50">
