@@ -34,8 +34,6 @@ export const IncomeProvider = ({ children }) => {
   const viewOptions = ViewOptions({ setRange });
   const [allTags, setAllTags] = useState([]);
   const [selectedTag, setSelectedTag] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 15;
   const [transactionOption, setTransactionOption] =
     useState("All Transactions");
   const transactionOptions = TransactionOptions({ setTransactionOption });
@@ -62,7 +60,6 @@ export const IncomeProvider = ({ children }) => {
     setCustomSearch(false);
     setCustomStartDateUI(yesterdayStr);
     setCustomEndDateUI(todayStr);
-    setCurrentPage(1);
   };
   const handleRangeSubmit = async (e) => {
     e.preventDefault();
@@ -149,13 +146,6 @@ export const IncomeProvider = ({ children }) => {
     currentAccountId,
     transactionOption,
   ]);
-  const paginatedIncome =
-    incomeUI?.slice(
-      (currentPage - 1) * itemsPerPage,
-      currentPage * itemsPerPage,
-    ) || [];
-
-  const totalPages = Math.ceil((incomeUI?.length || 0) / itemsPerPage);
 
   const value = {
     open,
@@ -185,11 +175,6 @@ export const IncomeProvider = ({ children }) => {
     allTags,
     selectedTag,
     setSelectedTag,
-    currentPage,
-    setCurrentPage,
-    itemsPerPage,
-    paginatedIncome,
-    totalPages,
     transactionOption,
     setTransactionOption,
     transactionOptions,

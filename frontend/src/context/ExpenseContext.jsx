@@ -36,7 +36,6 @@ export default function ExpenseProvider({ children }) {
   const [refreshKey, setRefreshKey] = useState(0); // trigger re-fetch
   const [noDataMessage, setNoDataMessage] = useState("");
   const viewOptions = ViewOptions({ setRange });
-  const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(15);
   const [transactionOption, setTransactionOption] =
     useState("All Transactions");
@@ -55,7 +54,6 @@ export default function ExpenseProvider({ children }) {
     setCustomSearch(false);
     setCustomStartDateUI(yesterdayStr);
     setCustomEndDateUI(todayStr);
-    setCurrentPage(1);
   };
 
   const handleExportPDF = () => {
@@ -153,13 +151,6 @@ export default function ExpenseProvider({ children }) {
     transactionOption,
   ]);
 
-  const paginatedExpense =
-    expenseUI?.slice(
-      (currentPage - 1) * itemsPerPage,
-      currentPage * itemsPerPage,
-    ) || [];
-
-  const totalPages = Math.ceil((expenseUI?.length || 0) / itemsPerPage);
   const value = {
     open,
     setOpen,
@@ -194,10 +185,6 @@ export default function ExpenseProvider({ children }) {
     handleExportPDF,
     handleRangeSubmit,
     handleClearFilters,
-    paginatedExpense,
-    currentPage,
-    setCurrentPage,
-    totalPages,
     user,
     isOwner,
   };
