@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { useAccount } from "../context/AccountContext.jsx";
 import { useParams, useLocation } from "react-router-dom";
 const IncomeContext = createContext(null);
@@ -37,7 +37,8 @@ export const IncomeProvider = ({ children }) => {
   const [transactionOption, setTransactionOption] =
     useState("All Transactions");
   const transactionOptions = TransactionOptions({ setTransactionOption });
-
+  const INCOME_KEY = "Income";
+  const incomeCache = useRef(new Map());
   // Export handlers
   const handleExportCSV = () => {
     if (!incomeUI || incomeUI.length === 0) {
@@ -45,7 +46,6 @@ export const IncomeProvider = ({ children }) => {
     }
     return exportIncomeToCSV(incomeUI, year, memberFilter);
   };
-
   const handleExportPDF = () => {
     if (!incomeUI || incomeUI.length === 0) {
       return { success: false, message: "No data to export" };
@@ -111,26 +111,42 @@ export const IncomeProvider = ({ children }) => {
     const fetchIncomeData = async () => {
       try {
         let res;
-        if (transactionOption === "Upcoming Transactions") {
-          res = await api.get(`income/upcomingIncome?range=${range}`);
-        } else {
-          res = await api.get(`income/get?range=${range}`);
-        }
-        setNoDataMessage("");
-        if (res.status === 200) {
-          const incomeDocuments = res.data;
-          if (transactionOption === "All Transactions") {
-            incomeDocuments.sort((a, b) => new Date(b.date) - new Date(a.date));
-          } else {
-            incomeDocuments.sort((a, b) => new Date(a.date) - new Date(b.date));
-          }
-          const withTagAndMemberFilter = applyFilter(
-            incomeDocuments,
-            setAllTags,
-            selectedTag,
-            memberFilter,
+        const cacheKey = `${range}-${user._id}-${transactionOption}-${INCOME_KEY}`;
+        const cachedData = incomeCache.current.get(cacheKey);
+        if (cachedData) {
+          console.log(
+            "INCOME cached data: " + JSON.stringify(cachedData, null, 2),
           );
-          setIncomeUI(withTagAndMemberFilter);
+          console.log("INCOME Cache key: " + cacheKey);
+          setIncomeUI(cachedData);
+        } else {
+          if (transactionOption === "Upcoming Transactions") {
+            res = await api.get(`income/upcomingIncome?range=${range}`);
+          } else {
+            res = await api.get(`income/get?range=${range}`);
+          }
+          setNoDataMessage("");
+          if (res.status === 200) {
+            const incomeDocuments = res.data;
+            if (transactionOption === "All Transactions") {
+              incomeDocuments.sort(
+                (a, b) => new Date(b.date) - new Date(a.date),
+              );
+            } else {
+              incomeDocuments.sort(
+                (a, b) => new Date(a.date) - new Date(b.date),
+              );
+            }
+            const withTagAndMemberFilter = applyFilter(
+              incomeDocuments,
+              setAllTags,
+              selectedTag,
+              memberFilter,
+            );
+            setIncomeUI(withTagAndMemberFilter);
+            console.log("no cache for income. API call was made");
+            incomeCache.current.set(cacheKey, withTagAndMemberFilter);
+          }
         }
       } catch (error) {
         console.error("Failed to fetch year data:", error);
@@ -145,6 +161,7 @@ export const IncomeProvider = ({ children }) => {
     selectedTag,
     currentAccountId,
     transactionOption,
+    user,
   ]);
 
   const value = {
@@ -185,6 +202,8 @@ export const IncomeProvider = ({ children }) => {
     user,
     isOwner,
     location,
+    INCOME_KEY,
+    incomeCache,
   };
   return (
     <IncomeContext.Provider value={value}>{children}</IncomeContext.Provider>
