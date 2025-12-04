@@ -111,7 +111,10 @@ export const IncomeProvider = ({ children }) => {
     const fetchIncomeData = async () => {
       try {
         let res;
-        const cacheKey = `${range}-${user._id}-${transactionOption}-${INCOME_KEY}`;
+        let cacheKey = `${range}-${user._id}-${transactionOption}`;
+        selectedTag ? cacheKey += `-${selectedTag}` : ""
+        memberFilter ? cacheKey += `${memberFilter}` : ""
+        cacheKey += `${INCOME_KEY}`
         const cachedData = incomeCache.current.get(cacheKey);
         if (cachedData) {
           console.log(
