@@ -114,8 +114,8 @@ export default function ExpenseProvider({ children }) {
         let res;
         let cacheKey = `${range}-${user._id}-${transactionOption}`;
         selectedTag ? cacheKey += `-${selectedTag}` : ""
-        memberFilter ? cacheKey += `${memberFilter}` : ""
-        cacheKey += `${EXPENSE_KEY}`
+        memberFilter ? cacheKey += `-${memberFilter}` : ""
+        cacheKey += `-${EXPENSE_KEY}`
         const cachedData = expenseCache.current.get(cacheKey);
         if (cachedData) {
           console.log(

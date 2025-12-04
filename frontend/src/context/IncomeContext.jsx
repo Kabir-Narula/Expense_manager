@@ -113,8 +113,8 @@ export const IncomeProvider = ({ children }) => {
         let res;
         let cacheKey = `${range}-${user._id}-${transactionOption}`;
         selectedTag ? cacheKey += `-${selectedTag}` : ""
-        memberFilter ? cacheKey += `${memberFilter}` : ""
-        cacheKey += `${INCOME_KEY}`
+        memberFilter ? cacheKey += `-${memberFilter}` : ""
+        cacheKey += `-${INCOME_KEY}`
         const cachedData = incomeCache.current.get(cacheKey);
         if (cachedData) {
           console.log(
