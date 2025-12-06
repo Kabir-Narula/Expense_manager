@@ -117,10 +117,6 @@ export const IncomeProvider = ({ children }) => {
         cacheKey += `-${INCOME_KEY}`
         const cachedData = incomeCache.current.get(cacheKey);
         if (cachedData) {
-          console.log(
-            "INCOME cached data: " + JSON.stringify(cachedData, null, 2),
-          );
-          console.log("INCOME Cache key: " + cacheKey);
           setIncomeUI(cachedData);
         } else {
           if (transactionOption === "Upcoming Transactions") {
