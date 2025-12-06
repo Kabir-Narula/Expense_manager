@@ -143,7 +143,6 @@ export const IncomeProvider = ({ children }) => {
               memberFilter,
             );
             setIncomeUI(withTagAndMemberFilter);
-            console.log("no cache for income. API call was made");
             incomeCache.current.set(cacheKey, withTagAndMemberFilter);
           }
         }

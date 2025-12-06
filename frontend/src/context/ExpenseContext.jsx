@@ -144,7 +144,6 @@ export default function ExpenseProvider({ children }) {
               memberFilter,
             );
             setExpenseUI(withTagAndMemberFilter);
-            console.log("no cache for expense. API call was made. ");
             expenseCache.current.set(cacheKey, withTagAndMemberFilter);
           }
         }

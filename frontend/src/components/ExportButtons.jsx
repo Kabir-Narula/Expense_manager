@@ -57,18 +57,15 @@ const ExportButtons = ({
 
     setIsExportingPDF(true);
     const loadingToast = toast.loading("Generating PDF file...");
-    console.log("Starting PDF export...");
     try {
       const result = await onExportPDF();
 
       if (result.success) {
-        console.log("PDF export successful.");
         toast.success(result.message || "PDF exported successfully!", {
           id: loadingToast,
           duration: 3000,
         });
       } else {
-        console.log("PDF export failed.");
         toast.error(result.message || "Failed to export PDF", {
           id: loadingToast,
           duration: 4000,

@@ -26,12 +26,10 @@ const Notifications = () => {
   }, []);
 
   const fetchNotifications = async () => {
-    console.log(user);
     if (!user?._id) return;
 
     try {
       setIsLoading(true);
-      console.log(user._id);
       const response = await api.get(`/notifications/${user._id}`);
       setNotifications(response.data.data);
     } catch (err) {
@@ -51,7 +49,6 @@ const Notifications = () => {
   const markAsRead = async (notificationId, e) => {
     e?.stopPropagation?.();
     try {
-      console.log(notificationId);
       await api.put(`/notifications/${notificationId}`);
       setNotifications(
         notifications.map((notif) =>

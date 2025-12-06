@@ -61,7 +61,6 @@ const SideNavbar = () => {
   // Listen for profile updates from other components, and does real-time updates
   useEffect(() => {
     const handleProfileUpdate = (event) => {
-      console.log("SideNavbar received profile update:", event.detail);
       setUser(event.detail);
     };
 

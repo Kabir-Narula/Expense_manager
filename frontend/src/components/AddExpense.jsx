@@ -105,7 +105,6 @@ export default function EditExpense({
         setShowError(false);
         setErrorMessage("");
         expenseCache.clear();
-        console.log("Clearing expense since an update, add or delete occurred");
       }
     } catch (error) {
       setShowError(true);

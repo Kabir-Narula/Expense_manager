@@ -158,10 +158,6 @@ const EditProfile = () => {
       setSuccessMessage("Profile picture updated successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
 
-      // Debug: Log the profile image URL
-      console.log("Profile image URL:", data.user.profileImageURL);
-      console.log("Full image URL:", fullImageUrl);
-
       // Dispatch custom event to notify other components
       window.dispatchEvent(
         new CustomEvent("profileUpdated", { detail: data.user }),

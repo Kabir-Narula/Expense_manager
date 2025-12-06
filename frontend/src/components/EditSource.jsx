@@ -67,10 +67,7 @@ export default function EditSource({
     type === "editIncome" ? incomeData.tags?.join(", ") || "" : "",
   );
   const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    console.log("Cache key: " + cacheKey);
-    console.log("income cache: " + JSON.stringify(incomeCache, null, 2));
-  }, [cacheKey]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -105,7 +102,6 @@ export default function EditSource({
         setShowError(false);
         setErrorMessage("");
         incomeCache.clear();
-        console.log("clearing cache since an update, add or delete ocurred");
       }
     } catch (error) {
       setShowError(true);
