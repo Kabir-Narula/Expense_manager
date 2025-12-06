@@ -118,10 +118,6 @@ export default function ExpenseProvider({ children }) {
         cacheKey += `-${EXPENSE_KEY}`
         const cachedData = expenseCache.current.get(cacheKey);
         if (cachedData) {
-          console.log(
-            "EXPENSE cached data: " + JSON.stringify(cachedData, null, 2),
-          );
-          console.log("EXPENSE cache key: " + cacheKey);
           setExpenseUI(cachedData);
         } else {
           if (transactionOption === "Upcoming Transactions") {
