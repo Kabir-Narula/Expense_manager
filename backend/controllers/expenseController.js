@@ -161,7 +161,7 @@ export const getAllExpense = async (req, res) => {
       .populate("createdBy", "fullName email");
 
     res.status(200).json(expenses);
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: "Nothing to show!" });
   }
 };
@@ -199,7 +199,6 @@ export const deleteExpense = async (req, res) => {
 };
 
 export const updateExpense = async (req, res) => {
-  const userId = req.user.id;
   const expenseId = req.params.id;
 
   try {
@@ -374,7 +373,8 @@ export const getUpcomingExpenses = async (req, res) => {
     }
 
     res.status(200).json(upcomingExpenses);
-  } catch (error) {
+    res.status(200).json(upcomingExpenses);
+  } catch {
     res.status(500).json({ message: "Nothing to show!" });
   }
 };

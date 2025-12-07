@@ -173,7 +173,7 @@ export const getAllIncome = async (req, res) => {
       .sort({ date: -1 })
       .populate("createdBy", "fullName email");
     res.status(200).json(incomes);
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: "Nothing to show!" });
   }
 };
@@ -213,7 +213,6 @@ export const deleteIncome = async (req, res) => {
 };
 
 export const updateIncome = async (req, res) => {
-  const userId = req.user.id;
   const incomeId = req.params.id;
 
   try {
@@ -390,7 +389,8 @@ export const getUpcomingIncome = async (req, res) => {
     }
 
     res.status(200).json(upcomingIncomes);
-  } catch (error) {
+    res.status(200).json(upcomingIncomes);
+  } catch {
     res.status(500).json({ message: "Nothing to show!" });
   }
 };
