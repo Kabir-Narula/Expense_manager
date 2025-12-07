@@ -6,7 +6,12 @@ const NotificationSchema = new mongoose.Schema(
     type: {
       type: String,
       required: true,
-      enum: ["budget_alert", "income_alert"],
+      enum: [
+        "budget_alert",
+        "income_alert",
+        "invitation-accepted",
+        "invitation-declined",
+      ],
       index: true,
     },
     data: {

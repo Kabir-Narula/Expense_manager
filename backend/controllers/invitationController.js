@@ -115,6 +115,8 @@ export const acceptInvitation = async (req, res) => {
       user: account.owner,
       type: "invitation-accepted",
       data: {
+        title: "Invitation Accepted",
+        message: `${req.user.fullName} accepted your invitation to join ${account.name}`,
         accountId: account._id,
         accountName: account.name,
         inviteeId: req.user._id,
@@ -162,6 +164,8 @@ export const declineInvitation = async (req, res) => {
       user: inv.inviter,
       type: "invitation-declined",
       data: {
+        title: "Invitation Declined",
+        message: `${req.user.fullName} declined your invitation to join ${account?.name || "Shared Account"}`,
         accountId: inv.account,
         accountName: account?.name || "Shared Account",
         inviteeId: req.user._id,
