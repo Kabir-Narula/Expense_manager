@@ -54,8 +54,3 @@ The database will run using either MongoDB or SQL combined with Prisma or Drizzl
 
 ### Development Tools
 The website will be developed using Visual Studio Code with a number of npm installations. We will use Postman and Thunder Client to test HTTP requests.
- 
-
-
-
-
