@@ -8,7 +8,7 @@ import { useAccount } from "../context/AccountContext.jsx";
 import Notifications from "../components/Notification.jsx";
 import { parseDateToLocal } from "../utils/dateFormatter.js";
 import ViewOptions from "../utils/ViewOptions.js";
-import calculateFinancialData from "../utils/calculateFinancialData.js";
+import calculateFinancialData from "../utils/CalculateFinancialData.js";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
