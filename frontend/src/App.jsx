@@ -15,7 +15,7 @@ import Income from "./pages/Income";
 import Logout from "./pages/Logout";
 import Charts from "./pages/Charts";
 import Login from "./pages/Auth/Login";
-import Signup from "./pages/Auth/Signup";
+import Signup from "./pages/Auth/SignUp";
 import EditProfile from "./pages/EditProfile";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import ManageAccount from "./pages/ManageAccount";
