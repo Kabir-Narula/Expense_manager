@@ -1,4 +1,3 @@
-import { RxDividerVertical } from "react-icons/rx";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { MdCalendarMonth, MdExpandMore, MdExpandLess } from "react-icons/md";
 
@@ -41,7 +40,7 @@ export default function DateRangeSelector({
               View:
             </span>
             <div className="flex items-center gap-0 bg-gray-100 rounded-xl p-1">
-              {viewOptions.map((item, index) => (
+              {viewOptions.map((item) => (
                 <button
                   key={item.label}
                   onClick={item.setter}

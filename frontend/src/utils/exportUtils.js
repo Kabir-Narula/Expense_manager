@@ -31,7 +31,7 @@ const formatDate = (dateString) => {
  * @param {string} str - String to escape
  * @returns {string} Escaped string
  */
-const escapeCSV = (str) => {
+const _escapeCSV = (str) => {
   if (str === null || str === undefined) return "";
   const stringValue = String(str);
   // If contains comma, quote, or newline, wrap in quotes and escape quotes

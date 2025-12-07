@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
-  MdPeople,
   MdDelete,
   MdPersonRemove,
   MdAdminPanelSettings,
@@ -21,7 +20,7 @@ export default function ManageAccount() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState(null);
 
-  const loadMembers = async () => {
+  const loadMembers = useCallback(async () => {
     if (!currentAccountId) return;
     try {
       setLoading(true);
@@ -34,11 +33,11 @@ export default function ManageAccount() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentAccountId]);
 
   useEffect(() => {
     loadMembers();
-  }, [currentAccountId]);
+  }, [loadMembers]);
 
   const removeMember = async (userId) => {
     if (!isOwner) return;

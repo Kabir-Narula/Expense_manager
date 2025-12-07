@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { MdClose, MdPeople, MdAccountBalance } from "react-icons/md";
 
 const CreateSharedAccountModal = ({ isOpen, onClose, onSubmit, loading }) => {
@@ -93,7 +93,7 @@ const CreateSharedAccountModal = ({ isOpen, onClose, onSubmit, loading }) => {
                   About Shared Accounts
                 </p>
                 <p className="text-xs text-blue-800">
-                  You'll be the owner and can invite members to view and manage
+                  You&apos;ll be the owner and can invite members to view and manage
                   transactions together. Members can add expenses and income.
                 </p>
               </div>

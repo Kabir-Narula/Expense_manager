@@ -100,7 +100,7 @@ export const IncomeProvider = ({ children }) => {
         if (!currentAccountId) return;
         const res = await api.get(`/accounts/${currentAccountId}/members`);
         setMembers(res.data || []);
-      } catch (e) {
+      } catch (_e) {
         setMembers([]);
       }
     };

@@ -127,7 +127,7 @@ export default function InviteMemberModal({ open, onClose, onInvited }) {
                 />
               </div>
               <p className="text-xs text-gray-600 mt-2">
-                They'll receive an invitation via email
+                They&apos;ll receive an invitation via email
               </p>
             </div>
 

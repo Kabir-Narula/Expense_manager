@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../../layouts/AuthLayout";
 import Input from "../../components/Inputs/Input";
@@ -127,7 +127,7 @@ const Login = () => {
           </button>
 
           <p className="text-center text-sm text-gray-600 pt-2">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               to="/signup"
               className="text-primary font-semibold hover:text-primary-dark underline-offset-2 hover:underline transition-all"

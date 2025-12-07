@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Bell, X, Check, AlertCircle } from "lucide-react";
 import { MdNotifications, MdNotificationsActive } from "react-icons/md";
@@ -25,22 +25,22 @@ const Notifications = () => {
     fetchUser();
   }, []);
 
-  const fetchNotifications = async () => {
-    if (!user?._id) return;
-
-    try {
-      setIsLoading(true);
-      const response = await api.get(`/notifications/${user._id}`);
-      setNotifications(response.data.data);
-    } catch (err) {
-      setError("Failed to fetch notifications");
-      console.error("Error fetching notifications:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchNotifications = async () => {
+      if (!user?._id) return;
+
+      try {
+        setIsLoading(true);
+        const response = await api.get(`/notifications/${user._id}`);
+        setNotifications(response.data.data);
+      } catch (err) {
+        setError("Failed to fetch notifications");
+        console.error("Error fetching notifications:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     if (user?._id) {
       fetchNotifications();
     }
@@ -172,7 +172,7 @@ const Notifications = () => {
                   No notifications yet
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  We'll notify you when something arrives
+                  We&apos;ll notify you when something arrives
                 </p>
               </div>
             ) : (

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   MdBarChart,
@@ -24,7 +24,6 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import calculateFinancialData from "../utils/calculateFinancialData";
 import { useAccount } from "../context/AccountContext";
 import { parseDateToLocal } from "../utils/dateFormatter";
 import ViewOptions from "../utils/ViewOptions";
@@ -40,7 +39,6 @@ const COLORS = [
 ];
 
 function FinancialCharts() {
-  const [user, setUser] = useState(null);
   const [incomeData, setIncomeData] = useState([]);
   const [expenseData, setExpenseData] = useState([]);
   const [monthlyData, setMonthlyData] = useState([]);
@@ -57,18 +55,8 @@ function FinancialCharts() {
   const yesterdayStr = parseDateToLocal(yesterday);
   const [customStartDateUI, setCustomStartDateUI] = useState(yesterdayStr);
   const [customEndDateUI, setCustomEndDateUI] = useState(todayStr);
-  const [refreshKey, setRefreshKey] = useState(0); // trigger re-fetch
   const [noDataMessage, setNoDataMessage] = useState("");
-  const [financialData, setFinancialData] = useState({
-    totalIncome: 0,
-    totalExpenses: 0,
-    transactions: [],
-  });
   const {
-    isOwner,
-    currentAccount,
-    loadAccounts,
-    setCurrentAccountId,
     currentAccountId,
   } = useAccount();
   const viewOptions = ViewOptions({ setRange });
@@ -108,7 +96,7 @@ function FinancialCharts() {
         if (!currentAccountId) return;
         const res = await api.get(`/accounts/${currentAccountId}/members`);
         setMembers(res.data || []);
-      } catch (e) {
+      } catch (_e) {
         setMembers([]);
       }
     };
@@ -118,8 +106,8 @@ function FinancialCharts() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const userResponse = await api.get("/auth/getUser");
-        setUser(userResponse.data);
+        // const userResponse = await api.get("/auth/getUser");
+        // setUser(userResponse.data);
 
         const incomeResponse = await api.get(`/income/get?range=${range}`);
         const incomes = incomeResponse.data || [];
@@ -159,7 +147,7 @@ function FinancialCharts() {
     }
   }, [incomeData, expenseData, range]);
 
-  const generateMonthlyData = () => {
+  const generateMonthlyData = useCallback(() => {
     const monthlyMap = {};
 
     // Process income data
@@ -207,9 +195,9 @@ function FinancialCharts() {
     );
 
     setMonthlyData(sortedData);
-  };
+  }, [incomeData, expenseData]);
 
-  const generateExpenseCategories = () => {
+  const generateExpenseCategories = useCallback(() => {
     const categoryMap = {};
 
     expenseData.forEach((expense) => {
@@ -228,7 +216,7 @@ function FinancialCharts() {
       .sort((a, b) => b.value - a.value);
 
     setExpenseCategories(categories);
-  };
+  }, [expenseData]);
 
   if (loading) {
     return (

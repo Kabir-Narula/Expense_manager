@@ -55,7 +55,7 @@ export const AccountProvider = ({ children }) => {
     try {
       const { data } = await api.get("/auth/getUser");
       setUser(data);
-    } catch (e) {
+    } catch (_e) {
       setUser(null);
     }
   };

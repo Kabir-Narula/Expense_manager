@@ -21,7 +21,6 @@ export default function EditExpense({
   closeModal,
   type,
   expenseData,
-  cacheKey,
   expenseCache,
 }) {
   // Handle ESC key to close modal

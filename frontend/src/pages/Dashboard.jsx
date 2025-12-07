@@ -84,7 +84,7 @@ function Dashboard() {
         if (!currentAccountId) return;
         const res = await api.get(`/accounts/${currentAccountId}/members`);
         setMembers(res.data || []);
-      } catch (e) {
+      } catch (_e) {
         setMembers([]);
       }
     };
@@ -201,7 +201,7 @@ function Dashboard() {
             <h1 className="text-3xl font-bold text-gray-900">
               Welcome back, {user?.fullName?.split(" ")[0] || "User"}! 👋
             </h1>
-            <p className="text-gray-600 mt-1">Here's your financial overview</p>
+            <p className="text-gray-600 mt-1">Here&apos;s your financial overview</p>
           </div>
           <div className="flex items-center gap-3">
             <Notifications />
@@ -736,7 +736,7 @@ function Dashboard() {
                   </p>
                   {i.message && (
                     <p className="text-sm text-gray-600 mt-2 italic bg-gray-50 p-2 rounded-lg border-l-4 border-primary">
-                      "{i.message}"
+                      &quot;{i.message}&quot;
                     </p>
                   )}
                 </div>
