@@ -7,9 +7,14 @@ import { FaTrashAlt } from "react-icons/fa";
 import { MdModeEdit } from "react-icons/md";
 import api from "../src/Utils/api";
 import { useAccount } from "../src/context/AccountContext.jsx";
-import { RxDividerVertical } from "react-icons/rx";
-import { FaMagnifyingGlass } from "react-icons/fa6";
 import { parseDateToLocal } from "../src/Utils/dateFormatter.js";
+import {
+  exportExpenseToCSV,
+  exportExpenseToPDF,
+} from "../src/Utils/exportUtils.js";
+import ExportButtons from "../src/components/ExportButtons.jsx";
+import DateRangeSelector from "../components/DateRangeSelector.jsx";
+import ViewOptions from "../src/Utils/ViewOptions.js";
 
 function Expenses() {
   const { year } = useParams();
@@ -28,12 +33,27 @@ function Expenses() {
   const yesterday = new Date();
   yesterday.setDate(today.getDate() - 1);
   const todayStr = parseDateToLocal(today);
-  const yesterdayStr = parseDateToLocal(yesterday)
+  const yesterdayStr = parseDateToLocal(yesterday);
   const [customStartDateUI, setCustomStartDateUI] = useState(yesterdayStr);
   const [customEndDateUI, setCustomEndDateUI] = useState(todayStr);
   const [refreshKey, setRefreshKey] = useState(0); // trigger re-fetch
   const [noDataMessage, setNoDataMessage] = useState("");
-    const handleRangeSubmit = async (e) => {
+  const viewOptions = ViewOptions({ setRange });
+  // Export handlers
+  const handleExportCSV = () => {
+    if (!expenseUI || expenseUI.length === 0) {
+      return { success: false, message: "No data to export" };
+    }
+    return exportExpenseToCSV(expenseUI, year, memberFilter);
+  };
+
+  const handleExportPDF = () => {
+    if (!expenseUI || expenseUI.length === 0) {
+      return { success: false, message: "No data to export" };
+    }
+    return exportExpenseToPDF(expenseUI, year, memberFilter);
+  };
+  const handleRangeSubmit = async (e) => {
     e.preventDefault();
     try {
       setNoDataMessage("");
@@ -57,25 +77,6 @@ function Expenses() {
       );
     }
   };
-    const viewOptions = [
-    {
-      label: "4 Weeks",
-      setter: () => setRange("4w"),
-    },
-    {
-      label: " 3 Months",
-      setter: () => setRange("3m"),
-    },
-    {
-      label: "6 Months",
-      setter: () => setRange("6m"),
-    },
-    {
-      label: " 12 Months",
-      setter: () => setRange("12m"),
-    },
-  ];
-
   useEffect(() => {
     if (expense) {
       setExpenseUI(expense);
@@ -94,7 +95,7 @@ function Expenses() {
     };
     fetchMembers();
   }, [currentAccountId]);
-  
+
   useEffect(() => {
     const fetchExpenseData = async () => {
       try {
@@ -134,86 +135,47 @@ function Expenses() {
           />
         </div>
         {/* Member filter */}
-        {members.length > 0 && (
-          <div className="mb-4">
-            <label className="text-sm text-gray-600 mr-2">
-              Filter by member:
-            </label>
-            <select
-              className="border rounded-md px-2 py-1 text-sm"
-              value={memberFilter}
-              onChange={(e) => setMemberFilter(e.target.value)}
-            >
-              <option value="all">All</option>
-              {members.map((m) => (
-                <option key={m.userId} value={m.userId}>
-                  {m.fullName || m.email}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-        <div className="flex justify-between">
-          <button
-            className="flex items-center cursor-pointer underline"
-            onClick={() => setCustomSearch(!customSearch)}
-          >
-            <FaMagnifyingGlass />
-            <p className="cursor-pointer">Custom Search</p>
-          </button>
-          <div className="flex items-center">
-            <p>View:&nbsp; &nbsp;</p>
-            {viewOptions.map((item) => (
-              <>
-                <button key={item} onClick={item.setter}>
-                  <p className="cursor-pointer">{item.label}</p>
-                </button>
-                <RxDividerVertical />
-              </>
-            ))}
-          </div>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm">
+          {members.length > 0 && (
+            <div className="mb-4">
+              <label className="text-sm text-gray-600 mr-2">
+                Filter by member:
+              </label>
+              <select
+                className="border rounded-md px-2 py-1 text-sm"
+                value={memberFilter}
+                onChange={(e) => setMemberFilter(e.target.value)}
+              >
+                <option value="all">All</option>
+                {members.map((m) => (
+                  <option key={m.userId} value={m.userId}>
+                    {m.fullName || m.email}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          <ExportButtons
+            onExportCSV={handleExportCSV}
+            onExportPDF={handleExportPDF}
+            disabled={!expenseUI || expenseUI.length === 0}
+          />
         </div>
-        {customSearch && (
-          <>
-            <br />
-            <hr className="border-gray-400 border-1" />
-            <br />
-            <form
-              className="flex flex-col max-w-xs"
-              onSubmit={handleRangeSubmit}
-            >
-              <label>From</label>
-              <input
-                type="date"
-                className="border-1 h-10 rounded-lg p-2"
-                max={yesterdayStr}
-                onChange={(e) => setCustomStartDateUI(e.target.value)}
-                value={customStartDateUI}
-              />
-              <label>To</label>
-              <input
-                type="date"
-                className="border-1 h-10 rounded-lg p-2"
-                max={todayStr}
-                onChange={(e) => setCustomEndDateUI(e.target.value)}
-                value={customEndDateUI}
-              />
-              <br />
-              <div className="flex justify-center w-full">
-                <button
-                  type="submit"
-                  className="bg-indigo-600 text-white px-4 py-2 rounded-lg 
-                    hover:bg-indigo-700 transition-colors flex items-center 
-                    cursor-pointer justify-center max-w-xs w-full"
-                >
-                  Set Range
-                </button>
-              </div>
-            </form>
-            <br />
-          </>
-        )}
-        {noDataMessage && <p className="text-red-600">{noDataMessage}</p>}
+        {/* setting date ranges */}
+        <DateRangeSelector
+          customSearch={customSearch}
+          viewOptions={viewOptions}
+          handleRangeSubmit={handleRangeSubmit}
+          noDataMessage={noDataMessage}
+          yesterdayStr={yesterdayStr}
+          todayStr={todayStr}
+          customEndDateUI={customEndDateUI}
+          customStartDateUI={customStartDateUI}
+          setCustomStartDateUI={setCustomStartDateUI}
+          setCustomEndDateUI={setCustomEndDateUI}
+          setCustomSearch={setCustomSearch}
+        />
+        <br />
         {open && (
           <AddExpense
             open={open}
@@ -236,7 +198,7 @@ function Expenses() {
               </tr>
             </thead>
             <tbody>
-             {expenseUI &&
+              {expenseUI &&
                 expenseUI.length > 0 &&
                 expenseUI.map((item) => (
                   <tr
@@ -309,7 +271,6 @@ function Expenses() {
         </div>
       </div>
     </>
-
   );
 }
 

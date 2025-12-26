@@ -25,15 +25,17 @@ const Signup = () => {
     const newErrors = {};
 
     if (!formData.name.trim()) newErrors.name = "Full name is required";
-    
+
     const emailValidation = validateEmail(formData.email);
     if (!emailValidation.isValid) newErrors.email = emailValidation.message;
-    
+
     const passwordValidation = validatePassword(formData.password);
-    if (!passwordValidation.isValid) newErrors.password = passwordValidation.message;
-    
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords don't match";
-    
+    if (!passwordValidation.isValid)
+      newErrors.password = passwordValidation.message;
+
+    if (formData.password !== formData.confirmPassword)
+      newErrors.confirmPassword = "Passwords don't match";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -78,7 +80,11 @@ const Signup = () => {
             name="name"
             value={formData.name}
             onChange={handleInputChange}
-            label={<>Full Name <span className="text-red-500">*</span></>}
+            label={
+              <>
+                Full Name <span className="text-red-500">*</span>
+              </>
+            }
             placeholder="John Doe"
             error={errors.name}
             required
@@ -88,7 +94,11 @@ const Signup = () => {
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            label={<>Email Address <span className="text-red-500">*</span></>}
+            label={
+              <>
+                Email Address <span className="text-red-500">*</span>
+              </>
+            }
             placeholder="john@example.com"
             error={errors.email}
             required
@@ -98,7 +108,11 @@ const Signup = () => {
             name="password"
             value={formData.password}
             onChange={handleInputChange}
-            label={<>Password <span className="text-red-500">*</span></>}
+            label={
+              <>
+                Password <span className="text-red-500">*</span>
+              </>
+            }
             placeholder="••••••••"
             type="password"
             error={errors.password}
@@ -109,7 +123,11 @@ const Signup = () => {
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleInputChange}
-            label={<>Confirm Password <span className="text-red-500">*</span></>}
+            label={
+              <>
+                Confirm Password <span className="text-red-500">*</span>
+              </>
+            }
             placeholder="••••••••"
             type="password"
             error={errors.confirmPassword}

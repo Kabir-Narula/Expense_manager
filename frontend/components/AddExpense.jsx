@@ -1,19 +1,19 @@
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import api from "../src/Utils/api";
 import { formatDateToSend } from "../src/Utils/dateFormatter";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
-export default function EditExpense ({open, closeModal, type, expenseData }) {
-    // Handle ESC key to close modal
-    useEffect(() => {
-        const handleEsc = (e) => {
-            if (e.key === 'Escape') closeModal();
-        };
-        if (open) {
-            window.addEventListener('keydown', handleEsc);
-        }
-        return () => window.removeEventListener('keydown', handleEsc);
-    }, [open, closeModal]);
+export default function EditExpense({ open, closeModal, type, expenseData }) {
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") closeModal();
+    };
+    if (open) {
+      window.addEventListener("keydown", handleEsc);
+    }
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [open, closeModal]);
 
   // format the date:
   let formattedStartDate = "";
@@ -80,7 +80,7 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75 border-black">
       <div className="flex flex-col bg-white justify-center gap-5 p-5 rounded-xl shadow-xl w-full max-w-xl border-solid max-h-120 border-red-50">
-        {type === "deleteExpense" ? (    
+        {type === "deleteExpense" ? (
           <>
             <div>
               <h1 className="text-2xl font-semibold text-center">
@@ -122,7 +122,8 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
                 <>
                   <h1 className="text-2xl font-semibold">Edit Expense</h1>
                   <h2 className="text-sm text-gray-500">
-                    You may edit the expense source, amount, or date as you wish.
+                    You may edit the expense source, amount, or date as you
+                    wish.
                   </h2>
                 </>
               )}
@@ -166,7 +167,7 @@ export default function EditExpense ({open, closeModal, type, expenseData }) {
                     value={startDateUI}
                     onChange={(e) => setStartDateUI(e.target.value)}
                     disabled={
-                     type === "editExpense" &&
+                      type === "editExpense" &&
                       expenseData.head === true &&
                       expenseData.recurring !== "once"
                     }

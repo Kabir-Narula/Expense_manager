@@ -83,9 +83,14 @@ const SideNavbar = () => {
       >
         <div>
           <div className="flex items-center justify-between mb-12 ml-2">
-            <Link to="/dashboard" className="flex items-center hover:opacity-80 transition-opacity cursor-pointer">
+            <Link
+              to="/dashboard"
+              className="flex items-center hover:opacity-80 transition-opacity cursor-pointer"
+            >
               <RiDashboardLine className="w-8 h-8 text-indigo-400" />
-              <span className="ml-3 text-xl font-semibold text-white">FinDashboard</span>
+              <span className="ml-3 text-xl font-semibold text-white">
+                FinDashboard
+              </span>
             </Link>
             {/* Close button for mobile */}
             <button

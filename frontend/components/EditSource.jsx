@@ -3,19 +3,19 @@ import api from "../src/Utils/api";
 
 import { formatDateToSend } from "../src/Utils/dateFormatter";
 
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
-export default function EditSource ({open, closeModal, type, incomeData }) {
-    // Handle ESC key to close modal
-    useEffect(() => {
-        const handleEsc = (e) => {
-            if (e.key === 'Escape') closeModal();
-        };
-        if (open) {
-            window.addEventListener('keydown', handleEsc);
-        }
-        return () => window.removeEventListener('keydown', handleEsc);
-    }, [open, closeModal]);
+export default function EditSource({ open, closeModal, type, incomeData }) {
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") closeModal();
+    };
+    if (open) {
+      window.addEventListener("keydown", handleEsc);
+    }
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [open, closeModal]);
   // format the date:
   let formattedStartDate = "";
   let formattedEndDate = "";

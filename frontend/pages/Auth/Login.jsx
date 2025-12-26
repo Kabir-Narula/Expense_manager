@@ -45,7 +45,11 @@ const Login = () => {
             name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            label={<>Email Address <span className="text-red-500">*</span></>}
+            label={
+              <>
+                Email Address <span className="text-red-500">*</span>
+              </>
+            }
             placeholder="john@example.com"
             required
           />
@@ -54,7 +58,11 @@ const Login = () => {
             name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            label={<>Password <span className="text-red-500">*</span></>}
+            label={
+              <>
+                Password <span className="text-red-500">*</span>
+              </>
+            }
             placeholder="••••••••"
             type="password"
             required
